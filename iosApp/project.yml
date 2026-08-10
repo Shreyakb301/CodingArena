@@ -1,0 +1,89 @@
+# XcodeGen spec for the iOS host app.
+#
+# The Xcode project is generated rather than committed: a .pbxproj is a large
+# file of opaque UUIDs that cannot be reviewed and conflicts badly in git.
+#
+#   brew install xcodegen
+#   cd iosApp && xcodegen generate && open iosApp.xcodeproj
+#
+# The build phase below runs the Gradle framework task, so opening the project
+# and pressing Run is enough - there is no separate Gradle step to remember.
+
+name: iosApp
+options:
+  bundleIdPrefix: com.codingarena
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    # Xcode 15+ sandboxes build scripts, which stops Gradle writing its
+    # outputs. Without this the framework build phase fails with a permission
+    # error that does not mention sandboxing at all.
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+
+targets:
+  iosApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: iosApp
+        # Info.plist is referenced through INFOPLIST_FILE below; including it
+        # as a source would also copy it in as a stray resource.
+        excludes:
+          - Info.plist
+    settings:
+      base:
+        INFOPLIST_FILE: iosApp/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.codingarena.app
+        PRODUCT_NAME: CodingArena
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+
+        # Free Apple ID signing. Set your team in Xcode under
+        # Signing & Capabilities on first open - it is intentionally not
+        # hard-coded here, since it differs per developer.
+        CODE_SIGN_STYLE: Automatic
+
+        # Where the Gradle task writes ComposeApp.framework.
+        FRAMEWORK_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"
+        OTHER_LDFLAGS:
+          - "$(inherited)"
+          - "-framework"
+          - "ComposeApp"
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/Frameworks"
+
+    preBuildScripts:
+      - name: Build shared Compose framework
+        # The Kotlin sources Gradle reads are not declared as inputs, so let it
+        # run every build and decide for itself what is up to date.
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+
+          # Xcode build phases run with a minimal environment: no JAVA_HOME and
+          # a PATH that usually excludes Homebrew. Gradle fails with a bare
+          # "JAVA_HOME is not set" that gives no hint where to fix it, so
+          # resolve a JDK here instead.
+          if [ -z "$JAVA_HOME" ]; then
+            if /usr/libexec/java_home > /dev/null 2>&1; then
+              JAVA_HOME="$(/usr/libexec/java_home)"
+              export JAVA_HOME
+            elif [ -d "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home" ]; then
+              export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
+            elif [ -d "/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home" ]; then
+              export JAVA_HOME="/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
+            else
+              echo "error: No JDK found. Install one with 'brew install openjdk@21', or set JAVA_HOME." >&2
+              exit 1
+            fi
+          fi
+
+          cd "$SRCROOT/.."
+          ./gradlew :composeApp:embedAndSignAppleFrameworkForXcode

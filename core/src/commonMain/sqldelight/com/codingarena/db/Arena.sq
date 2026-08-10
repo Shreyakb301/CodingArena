@@ -1,0 +1,389 @@
+-- Offline-first local store (spec 7).
+--
+-- Everything the app needs for a full practice session lives here, so a user
+-- with no connection can still get a Daily Puzzle, answer it, see the review,
+-- and have their rating move. The `synced` flags are what the upload pass
+-- filters on once a backend exists.
+
+CREATE TABLE profile (
+    id                TEXT    NOT NULL PRIMARY KEY,
+    displayName       TEXT    NOT NULL,
+    email             TEXT,
+    isGuest           INTEGER NOT NULL DEFAULT 1,
+    onboardingJson    TEXT    NOT NULL,
+    startingRating    INTEGER NOT NULL,
+    createdAt         INTEGER NOT NULL
+);
+
+CREATE TABLE problem (
+    id                TEXT    NOT NULL PRIMARY KEY,
+    payloadJson       TEXT    NOT NULL,
+    difficultyRating  INTEGER NOT NULL,
+    primaryTopic      TEXT    NOT NULL,
+    challengeType     TEXT    NOT NULL,
+    isPublished       INTEGER NOT NULL DEFAULT 1,
+    updatedAt         INTEGER NOT NULL
+);
+
+CREATE INDEX problem_topic_idx ON problem(primaryTopic, difficultyRating);
+
+CREATE TABLE attempt (
+    id                TEXT    NOT NULL PRIMARY KEY,
+    userId            TEXT    NOT NULL,
+    problemId         TEXT    NOT NULL,
+    startedAt         INTEGER NOT NULL,
+    completedAt       INTEGER,
+    selectedAnswers   TEXT    NOT NULL DEFAULT '',
+    outcome           TEXT    NOT NULL,
+    attemptsCount     INTEGER NOT NULL DEFAULT 1,
+    hintsUsed         INTEGER NOT NULL DEFAULT 0,
+    ratingBefore      INTEGER NOT NULL DEFAULT 0,
+    ratingAfter       INTEGER NOT NULL DEFAULT 0,
+    source            TEXT    NOT NULL,
+    synced            INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX attempt_user_idx ON attempt(userId, startedAt);
+CREATE INDEX attempt_sync_idx ON attempt(synced);
+
+CREATE TABLE topicRating (
+    userId            TEXT    NOT NULL,
+    topic             TEXT    NOT NULL,
+    rating            INTEGER NOT NULL,
+    attempts          INTEGER NOT NULL DEFAULT 0,
+    correctAnswers    INTEGER NOT NULL DEFAULT 0,
+    lastPracticedAt   INTEGER,
+    PRIMARY KEY (userId, topic)
+);
+
+CREATE TABLE modeRating (
+    userId            TEXT    NOT NULL,
+    mode              TEXT    NOT NULL,
+    rating            INTEGER NOT NULL,
+    attempts          INTEGER NOT NULL DEFAULT 0,
+    correctAnswers    INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (userId, mode)
+);
+
+CREATE TABLE overallRating (
+    userId            TEXT    NOT NULL PRIMARY KEY,
+    rating            INTEGER NOT NULL,
+    updatedAt         INTEGER NOT NULL
+);
+
+CREATE TABLE ratingHistory (
+    id                TEXT    NOT NULL PRIMARY KEY,
+    userId            TEXT    NOT NULL,
+    topic             TEXT,
+    rating            INTEGER NOT NULL,
+    change            INTEGER NOT NULL,
+    recordedAt        INTEGER NOT NULL,
+    problemId         TEXT
+);
+
+CREATE INDEX ratingHistory_idx ON ratingHistory(userId, topic, recordedAt);
+
+CREATE TABLE dailyPuzzle (
+    epochDay          INTEGER NOT NULL PRIMARY KEY,
+    problemId         TEXT    NOT NULL,
+    downloadedAt      INTEGER NOT NULL
+);
+
+CREATE TABLE dailyPuzzleResult (
+    epochDay          INTEGER NOT NULL,
+    userId            TEXT    NOT NULL,
+    problemId         TEXT    NOT NULL,
+    attemptId         TEXT    NOT NULL,
+    outcome           TEXT    NOT NULL,
+    solveDurationMs   INTEGER NOT NULL,
+    hintsUsed         INTEGER NOT NULL,
+    attemptsCount     INTEGER NOT NULL,
+    ratingChange      INTEGER NOT NULL,
+    completedAt       INTEGER NOT NULL,
+    PRIMARY KEY (epochDay, userId)
+);
+
+CREATE TABLE reviewSchedule (
+    userId            TEXT    NOT NULL,
+    problemId         TEXT    NOT NULL,
+    stage             TEXT    NOT NULL,
+    dueAt             INTEGER NOT NULL,
+    lastReviewedAt    INTEGER NOT NULL,
+    repetitions       INTEGER NOT NULL DEFAULT 0,
+    lapses            INTEGER NOT NULL DEFAULT 0,
+    topic             TEXT    NOT NULL,
+    PRIMARY KEY (userId, problemId)
+);
+
+CREATE INDEX reviewSchedule_due_idx ON reviewSchedule(userId, dueAt);
+
+CREATE TABLE streak (
+    userId            TEXT    NOT NULL PRIMARY KEY,
+    currentStreak     INTEGER NOT NULL DEFAULT 0,
+    longestStreak     INTEGER NOT NULL DEFAULT 0,
+    lastActiveDay     INTEGER,
+    weeklyGoalDays    INTEGER NOT NULL DEFAULT 5,
+    activeDaysThisWeek TEXT   NOT NULL DEFAULT '',
+    totalActiveDays   INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE userAchievement (
+    userId            TEXT    NOT NULL,
+    achievementId     TEXT    NOT NULL,
+    unlockedAt        INTEGER NOT NULL,
+    synced            INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (userId, achievementId)
+);
+
+CREATE TABLE learningPath (
+    id                TEXT    NOT NULL PRIMARY KEY,
+    userId            TEXT    NOT NULL,
+    payloadJson       TEXT    NOT NULL,
+    targetTopic       TEXT    NOT NULL,
+    createdAt         INTEGER NOT NULL,
+    completedAt       INTEGER
+);
+
+CREATE TABLE codeRushSession (
+    id                TEXT    NOT NULL PRIMARY KEY,
+    userId            TEXT    NOT NULL,
+    payloadJson       TEXT    NOT NULL,
+    score             INTEGER NOT NULL,
+    startedAt         INTEGER NOT NULL,
+    endedAt           INTEGER,
+    synced            INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE appSetting (
+    key               TEXT    NOT NULL PRIMARY KEY,
+    value             TEXT    NOT NULL
+);
+
+-- ---------------------------------------------------------------- profile
+
+upsertProfile:
+INSERT OR REPLACE INTO profile(id, displayName, email, isGuest, onboardingJson, startingRating, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectProfile:
+SELECT * FROM profile WHERE id = ? LIMIT 1;
+
+selectAnyProfile:
+SELECT * FROM profile LIMIT 1;
+
+deleteProfile:
+DELETE FROM profile WHERE id = ?;
+
+-- ---------------------------------------------------------------- problems
+
+upsertProblem:
+INSERT OR REPLACE INTO problem(id, payloadJson, difficultyRating, primaryTopic, challengeType, isPublished, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectAllProblems:
+SELECT * FROM problem WHERE isPublished = 1;
+
+selectProblemById:
+SELECT * FROM problem WHERE id = ?;
+
+selectProblemsByTopic:
+SELECT * FROM problem WHERE isPublished = 1 AND primaryTopic = ? ORDER BY difficultyRating;
+
+countProblems:
+SELECT count(*) FROM problem;
+
+-- ---------------------------------------------------------------- attempts
+
+insertAttempt:
+INSERT OR REPLACE INTO attempt(
+    id, userId, problemId, startedAt, completedAt, selectedAnswers, outcome,
+    attemptsCount, hintsUsed, ratingBefore, ratingAfter, source, synced
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAttempts:
+SELECT * FROM attempt WHERE userId = ? ORDER BY startedAt DESC;
+
+selectRecentAttempts:
+SELECT * FROM attempt WHERE userId = ? ORDER BY startedAt DESC LIMIT ?;
+
+selectAttemptsForProblem:
+SELECT * FROM attempt WHERE userId = ? AND problemId = ? ORDER BY startedAt DESC;
+
+selectUnsyncedAttempts:
+SELECT * FROM attempt WHERE synced = 0 ORDER BY startedAt;
+
+markAttemptsSynced:
+UPDATE attempt SET synced = 1 WHERE id IN ?;
+
+-- ---------------------------------------------------------------- ratings
+
+upsertOverallRating:
+INSERT OR REPLACE INTO overallRating(userId, rating, updatedAt) VALUES (?, ?, ?);
+
+selectOverallRating:
+SELECT * FROM overallRating WHERE userId = ?;
+
+upsertTopicRating:
+INSERT OR REPLACE INTO topicRating(userId, topic, rating, attempts, correctAnswers, lastPracticedAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectTopicRatings:
+SELECT * FROM topicRating WHERE userId = ?;
+
+upsertModeRating:
+INSERT OR REPLACE INTO modeRating(userId, mode, rating, attempts, correctAnswers)
+VALUES (?, ?, ?, ?, ?);
+
+selectModeRatings:
+SELECT * FROM modeRating WHERE userId = ?;
+
+insertRatingHistory:
+INSERT OR REPLACE INTO ratingHistory(id, userId, topic, rating, change, recordedAt, problemId)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectOverallHistory:
+SELECT * FROM ratingHistory WHERE userId = ? AND topic IS NULL ORDER BY recordedAt;
+
+selectTopicHistory:
+SELECT * FROM ratingHistory WHERE userId = ? AND topic = ? ORDER BY recordedAt;
+
+-- ---------------------------------------------------------------- daily puzzle
+
+upsertDailyPuzzle:
+INSERT OR REPLACE INTO dailyPuzzle(epochDay, problemId, downloadedAt) VALUES (?, ?, ?);
+
+selectDailyPuzzle:
+SELECT * FROM dailyPuzzle WHERE epochDay = ?;
+
+upsertDailyPuzzleResult:
+INSERT OR REPLACE INTO dailyPuzzleResult(
+    epochDay, userId, problemId, attemptId, outcome, solveDurationMs,
+    hintsUsed, attemptsCount, ratingChange, completedAt
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectDailyPuzzleResult:
+SELECT * FROM dailyPuzzleResult WHERE epochDay = ? AND userId = ?;
+
+-- ---------------------------------------------------------------- reviews
+
+upsertReview:
+INSERT OR REPLACE INTO reviewSchedule(userId, problemId, stage, dueAt, lastReviewedAt, repetitions, lapses, topic)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+selectReviews:
+SELECT * FROM reviewSchedule WHERE userId = ?;
+
+selectDueReviews:
+SELECT * FROM reviewSchedule WHERE userId = ? AND dueAt <= ? ORDER BY lapses DESC, dueAt;
+
+selectReviewForProblem:
+SELECT * FROM reviewSchedule WHERE userId = ? AND problemId = ?;
+
+-- ---------------------------------------------------------------- streaks
+
+upsertStreak:
+INSERT OR REPLACE INTO streak(userId, currentStreak, longestStreak, lastActiveDay, weeklyGoalDays, activeDaysThisWeek, totalActiveDays)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectStreak:
+SELECT * FROM streak WHERE userId = ?;
+
+-- ---------------------------------------------------------------- achievements
+
+upsertUserAchievement:
+INSERT OR REPLACE INTO userAchievement(userId, achievementId, unlockedAt, synced) VALUES (?, ?, ?, ?);
+
+selectUserAchievements:
+SELECT * FROM userAchievement WHERE userId = ?;
+
+selectUnsyncedAchievements:
+SELECT * FROM userAchievement WHERE synced = 0;
+
+-- ---------------------------------------------------------------- learning path
+
+upsertLearningPath:
+INSERT OR REPLACE INTO learningPath(id, userId, payloadJson, targetTopic, createdAt, completedAt)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectActiveLearningPath:
+SELECT * FROM learningPath WHERE userId = ? AND completedAt IS NULL ORDER BY createdAt DESC LIMIT 1;
+
+selectLearningPaths:
+SELECT * FROM learningPath WHERE userId = ? ORDER BY createdAt DESC;
+
+-- ---------------------------------------------------------------- code rush
+
+upsertCodeRushSession:
+INSERT OR REPLACE INTO codeRushSession(id, userId, payloadJson, score, startedAt, endedAt, synced)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectCodeRushSessions:
+SELECT * FROM codeRushSession WHERE userId = ? ORDER BY startedAt DESC;
+
+selectBestCodeRushScore:
+SELECT max(score) FROM codeRushSession WHERE userId = ? AND endedAt IS NOT NULL;
+
+-- ---------------------------------------------------------------- settings
+
+upsertSetting:
+INSERT OR REPLACE INTO appSetting(key, value) VALUES (?, ?);
+
+selectSetting:
+SELECT value FROM appSetting WHERE key = ?;
+
+selectAllSettings:
+SELECT * FROM appSetting;
+
+-- ---------------------------------------------------------------- curriculum
+--
+-- Blitz recall is stored per curriculum problem slug rather than per local
+-- problem id: the roadmap references LeetCode problems that do not exist in
+-- the bundled content set, and progress on them must survive a content update.
+
+CREATE TABLE recallRecord (
+    userId            TEXT    NOT NULL,
+    slug              TEXT    NOT NULL,
+    correctStreak     INTEGER NOT NULL DEFAULT 0,
+    totalSeen         INTEGER NOT NULL DEFAULT 0,
+    totalCorrect      INTEGER NOT NULL DEFAULT 0,
+    lastSeenAt        INTEGER,
+    fastestMs         INTEGER,
+    dueAt             INTEGER,
+    solved            INTEGER NOT NULL DEFAULT 0,
+    solvedAt          INTEGER,
+    PRIMARY KEY (userId, slug)
+);
+
+CREATE TABLE blitzSession (
+    id                TEXT    NOT NULL PRIMARY KEY,
+    userId            TEXT    NOT NULL,
+    curriculumId      TEXT    NOT NULL,
+    payloadJson       TEXT    NOT NULL,
+    score             INTEGER NOT NULL,
+    answered          INTEGER NOT NULL,
+    startedAt         INTEGER NOT NULL,
+    endedAt           INTEGER,
+    synced            INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX blitzSession_user_idx ON blitzSession(userId, startedAt);
+
+upsertRecallRecord:
+INSERT OR REPLACE INTO recallRecord(userId, slug, correctStreak, totalSeen, totalCorrect, lastSeenAt, fastestMs, dueAt, solved, solvedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectRecallRecords:
+SELECT * FROM recallRecord WHERE userId = ?;
+
+selectRecallRecord:
+SELECT * FROM recallRecord WHERE userId = ? AND slug = ?;
+
+upsertBlitzSession:
+INSERT OR REPLACE INTO blitzSession(id, userId, curriculumId, payloadJson, score, answered, startedAt, endedAt, synced)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectBlitzSessions:
+SELECT * FROM blitzSession WHERE userId = ? ORDER BY startedAt DESC LIMIT ?;
+
+selectBestBlitzStreak:
+SELECT max(score) FROM blitzSession WHERE userId = ? AND endedAt IS NOT NULL;
