@@ -1,0 +1,35 @@
+databases:
+  - name: codingarena-db
+    plan: free
+    databaseName: codingarena
+    user: codingarena
+
+services:
+  - type: web
+    name: codingarena-api
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: ARENA_DATABASE_URL
+        fromDatabase:
+          name: codingarena-db
+          property: connectionString
+      - key: ARENA_DATABASE_USER
+        fromDatabase:
+          name: codingarena-db
+          property: user
+      - key: ARENA_DATABASE_PASSWORD
+        fromDatabase:
+          name: codingarena-db
+          property: password
+      - key: ARENA_JWT_SECRET
+        generateValue: true
+      - key: JUDGE0_URL
+        value: http://127.0.0.1:2358
+      - key: JUDGE0_TOKEN
+        sync: false
