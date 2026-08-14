@@ -1,47 +1,58 @@
 package com.codingarena.features.roadmap
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.codingarena.content.NeetCode150
+import com.codingarena.content.RoadmapLessons
 import com.codingarena.core.common.TimeProvider
 import com.codingarena.core.design.ArenaChip
 import com.codingarena.core.design.ProgressBar
-import com.codingarena.core.design.SectionHeader
-import com.codingarena.core.design.StatTile
 import com.codingarena.domain.engine.BlitzEngine
 import com.codingarena.domain.engine.BlitzMode
 import com.codingarena.domain.engine.Confusion
+import com.codingarena.domain.engine.StreakEngine
 import com.codingarena.domain.engine.storageKey
 import com.codingarena.domain.model.Curriculum
 import com.codingarena.domain.model.CurriculumProblem
 import com.codingarena.domain.model.CurriculumProgress
+import com.codingarena.domain.model.CurriculumSection
 import com.codingarena.domain.model.PatternGroup
 import com.codingarena.domain.model.RecallRecord
 import com.codingarena.domain.model.RecallStrength
 import com.codingarena.domain.repository.CurriculumRepository
+import com.codingarena.domain.repository.StreakRepository
 import com.codingarena.domain.usecase.CurrentUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -57,6 +68,7 @@ data class RoadmapUiState(
     val bestScore: Int = 0,
     val confusions: List<Confusion> = emptyList(),
     val expanded: PatternGroup? = null,
+    val currentStreak: Int = 0,
 ) {
     val curriculum: Curriculum
         get() = if (showBlind75) NeetCode150.blind75 else NeetCode150.curriculum
@@ -67,6 +79,7 @@ class RoadmapViewModel(
     private val engine: BlitzEngine,
     private val currentUser: CurrentUser,
     private val time: TimeProvider,
+    private val streaks: StreakRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RoadmapUiState())
@@ -76,11 +89,13 @@ class RoadmapViewModel(
         viewModelScope.launch {
             val userId = currentUser.ensureLoaded()?.id ?: return@launch
             val records = curriculumRepo.records(userId)
+            val streak = StreakEngine().refresh(streaks.load(userId), time.epochDay())
             _state.value = _state.value.copy(
                 loading = false,
                 records = records,
                 progress = engine.progress(_state.value.curriculum, records, time.nowMillis()),
                 bestScore = curriculumRepo.bestScore(userId),
+                currentStreak = streak.currentStreak,
             )
         }
     }
@@ -116,7 +131,7 @@ class RoadmapViewModel(
 }
 
 /**
- * The NeetCode 150 / Blind 75 roadmap.
+ * The CodingArena 150 / Essential Shortlist roadmap.
  *
  * Progress here is deliberately separate from your rating: rating measures
  * skill, this measures coverage of a specific list. Drilling a card you already
@@ -126,6 +141,7 @@ class RoadmapViewModel(
 fun RoadmapScreen(
     onStartBlitz: (String) -> Unit,
     onOpenProblem: (String) -> Unit,
+    onBrowsePatterns: () -> Unit,
     viewModel: RoadmapViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -133,145 +149,213 @@ fun RoadmapScreen(
 
     val progress = state.progress
     val curriculum = state.curriculum
+    val currentGroup = curriculum.sections.firstOrNull { section ->
+        (progress?.sectionProgress?.get(section.group)?.fraction ?: 0f) < 1f
+    }?.group
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item {
-            Column(Modifier.padding(top = 16.dp)) {
-                Text(curriculum.name, style = MaterialTheme.typography.headlineSmall)
-                Text(
-                    curriculum.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(
-                    selected = !state.showBlind75,
-                    onClick = { viewModel.toggleList(false) },
-                    label = { Text("NeetCode 150") },
-                )
-                FilterChip(
-                    selected = state.showBlind75,
-                    onClick = { viewModel.toggleList(true) },
-                    label = { Text("Blind 75") },
-                )
+    Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(top = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("Roadmap", style = MaterialTheme.typography.titleLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onBrowsePatterns) { Text("Browse Patterns") }
+                if (state.currentStreak > 0) ArenaChip("🔥 ${state.currentStreak}d")
             }
         }
 
         if (progress != null) {
-            item {
-                Card(
-                    Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    ),
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(
-                            "${progress.mastered} of ${progress.total} locked in",
-                            style = MaterialTheme.typography.headlineSmall,
-                        )
-                        ProgressBar(progress.fraction, Modifier.padding(vertical = 8.dp))
-                        Text(
-                            "${progress.seen} seen at least once. A card locks in after three " +
-                                "correct recalls in a row.",
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-            }
-
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    StatTile("Locked in", progress.mastered.toString(), Modifier.weight(1f))
-                    StatTile("Solved", progress.solved.toString(), Modifier.weight(1f))
-                    StatTile("Due", progress.due.toString(), Modifier.weight(1f))
-                    StatTile("Best run", state.bestScore.toString(), Modifier.weight(1f))
-                }
-            }
-
-            item {
-                if (progress.due > 0) {
-                    Button(
-                        onClick = { onStartBlitz(BlitzMode.DueToday.storageKey) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text("Review ${progress.due} due card(s)") }
-                } else {
-                    Button(
-                        onClick = { onStartBlitz(BlitzMode.WeakestFirst.storageKey) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text("Blitz my weak spots") }
-                }
-            }
-
-            if (progress.weakestSections(3).isNotEmpty()) {
-                item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        progress.weakestSections(3).forEach {
-                            ArenaChip("${it.group.displayName} ${it.mastered}/${it.total}")
-                        }
-                    }
-                }
+            if (progress.due > 0) {
+                Button(
+                    onClick = { onStartBlitz(BlitzMode.DueToday.storageKey) },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                ) { Text("Review ${progress.due} due card(s)") }
+            } else {
+                Button(
+                    onClick = { onStartBlitz(BlitzMode.WeakestFirst.storageKey) },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                ) { Text("Blitz my weak spots") }
             }
         }
 
-        item { SectionHeader("Pattern groups", trailing = "tap to expand") }
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            itemsIndexed(curriculum.sections) { index, section ->
+                val sectionProgress = progress?.sectionProgress?.get(section.group)
+                val isExpanded = state.expanded == section.group
 
-        items(curriculum.sections) { section ->
-            val sectionProgress = progress?.sectionProgress?.get(section.group)
-            val isExpanded = state.expanded == section.group
+                PathSectionNode(
+                    number = index + 1,
+                    section = section,
+                    mastered = sectionProgress?.mastered ?: 0,
+                    fraction = sectionProgress?.fraction ?: 0f,
+                    isCurrent = section.group == currentGroup,
+                    isExpanded = isExpanded,
+                    records = state.records,
+                    onToggle = { viewModel.toggleSection(section.group) },
+                    onOpenProblem = onOpenProblem,
+                    onToggleSolved = viewModel::toggleSolved,
+                    onStartBlitz = {
+                        onStartBlitz(BlitzMode.Section(section.group).storageKey)
+                    },
+                    showConnector = index < curriculum.sections.lastIndex,
+                )
+            }
+        }
+    }
+}
 
-            Card(
-                Modifier.fillMaxWidth().clickable { viewModel.toggleSection(section.group) },
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+@Composable
+private fun PathSectionNode(
+    number: Int,
+    section: CurriculumSection,
+    mastered: Int,
+    fraction: Float,
+    isCurrent: Boolean,
+    isExpanded: Boolean,
+    records: Map<String, RecallRecord>,
+    onToggle: () -> Unit,
+    onOpenProblem: (String) -> Unit,
+    onToggleSolved: (String) -> Unit,
+    onStartBlitz: () -> Unit,
+    showConnector: Boolean,
+) {
+    val complete = fraction >= 1f
+    val nodeColor = when {
+        isCurrent -> MaterialTheme.colorScheme.primary
+        complete -> MaterialTheme.colorScheme.primaryContainer
+        else -> MaterialTheme.colorScheme.surfaceVariant
+    }
+    val nodeContentColor = when {
+        isCurrent -> MaterialTheme.colorScheme.onPrimary
+        complete -> MaterialTheme.colorScheme.onPrimaryContainer
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val nodeSize = if (isCurrent) 76.dp else 64.dp
+    val placeLabelLeft = number % 2 == 0
+
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (placeLabelLeft) {
+                PathNodeLabel(
+                    section = section,
+                    mastered = mastered,
+                    fraction = fraction,
+                    isCurrent = isCurrent,
+                    isExpanded = isExpanded,
+                    alignEnd = true,
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
+                Spacer(Modifier.weight(1f))
+            }
+            Spacer(Modifier.width(12.dp))
+            Box(
+                modifier = Modifier.size(nodeSize)
+                    .clip(CircleShape)
+                    .background(nodeColor),
+                contentAlignment = Alignment.Center,
             ) {
-                Column(Modifier.padding(14.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            section.group.displayName,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Text(
-                            "${sectionProgress?.mastered ?: 0}/${section.problems.size}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                    ProgressBar(sectionProgress?.fraction ?: 0f, Modifier.padding(top = 8.dp))
+                Text(
+                    when {
+                        isCurrent -> "GO"
+                        complete -> "✓"
+                        else -> number.toString()
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = nodeContentColor,
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            if (!placeLabelLeft) {
+                PathNodeLabel(
+                    section = section,
+                    mastered = mastered,
+                    fraction = fraction,
+                    isCurrent = isCurrent,
+                    isExpanded = isExpanded,
+                    alignEnd = false,
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
+                Spacer(Modifier.weight(1f))
+            }
+        }
 
-                    if (isExpanded) {
-                        section.problems.forEach { problem ->
-                            ProblemRow(
-                                problem = problem,
-                                record = state.records[problem.slug],
-                                onClick = { onOpenProblem(problem.slug) },
-                                onToggleSolved = { viewModel.toggleSolved(problem.slug) },
-                            )
-                        }
-                        Button(
-                            onClick = {
-                                onStartBlitz(BlitzMode.Section(section.group).storageKey)
-                            },
-                            modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
-                        ) { Text("Blitz ${section.group.displayName}") }
-                    }
+        if (isExpanded) {
+            Column(
+                Modifier.fillMaxWidth().padding(start = 76.dp, bottom = 8.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        RoundedCornerShape(16.dp),
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+            ) {
+                section.problems.forEach { problem ->
+                    ProblemRow(
+                        problem = problem,
+                        record = records[problem.slug],
+                        onClick = { onOpenProblem(problem.slug) },
+                        onToggleSolved = { onToggleSolved(problem.slug) },
+                    )
+                }
+                Button(onClick = onStartBlitz, modifier = Modifier.fillMaxWidth()) {
+                    Text("Practice this pattern")
                 }
             }
         }
 
-        item { Column(Modifier.padding(bottom = 24.dp)) {} }
+        if (showConnector) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Box(
+                    Modifier.width(3.dp).height(20.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PathNodeLabel(
+    section: CurriculumSection,
+    mastered: Int,
+    fraction: Float,
+    isCurrent: Boolean,
+    isExpanded: Boolean,
+    alignEnd: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = if (alignEnd) Alignment.End else Alignment.Start,
+    ) {
+        if (isCurrent) {
+            Text(
+                "NEXT UP",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        Text(
+            section.group.displayName,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = if (alignEnd) TextAlign.End else TextAlign.Start,
+        )
+        Text(
+            "$mastered/${section.problems.size}  ${if (isExpanded) "−" else "+"}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        ProgressBar(fraction, Modifier.padding(top = 6.dp))
     }
 }
 
@@ -295,14 +379,15 @@ private fun ProblemRow(
         )
         Column(Modifier.weight(1f).clickable(onClick = onClick)) {
             Text(problem.title, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                problem.ask,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (RoadmapLessons.hasLesson(problem.slug)) {
+                Text(
+                    "Guided lesson",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            if (problem.inBlind75) ArenaChip("B75")
             ArenaChip(
                 (record?.strength ?: RecallStrength.UNSEEN).displayName,
                 filled = record?.isMastered == true,
