@@ -3,11 +3,16 @@ package com.codingarena.domain.repository
 import com.codingarena.data.repository.BlitzSessionSummary
 import com.codingarena.domain.engine.BlitzSession
 import com.codingarena.domain.model.Achievement
+import com.codingarena.domain.model.AdaptivePracticeState
 import com.codingarena.domain.model.CodeRushSession
+import com.codingarena.domain.model.ChapterProgress
+import com.codingarena.domain.model.CodeDraft
+import com.codingarena.domain.model.ProgrammingLanguage
 import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.CodingTopic
 import com.codingarena.domain.model.DailyPuzzle
 import com.codingarena.domain.model.DailyPuzzleResult
+import com.codingarena.domain.model.InterviewProgress
 import com.codingarena.domain.model.LearningPath
 import com.codingarena.domain.model.PlayerRatings
 import com.codingarena.domain.model.PracticeAttempt
@@ -103,6 +108,31 @@ interface CodeRushRepository {
 }
 
 /**
+ * One active adaptive Practice session (Recommended / Topic-Focused / Mixed)
+ * per user. Unlike [CodeRushRepository] and [CurriculumRepository]'s Blitz
+ * sessions (only saved at completion), [save] is called after every round
+ * transition so an unfinished round, or a results page awaiting "Continue
+ * Practicing", survives an app restart.
+ */
+interface PracticeStateRepository {
+    suspend fun load(userId: String): AdaptivePracticeState?
+    suspend fun save(state: AdaptivePracticeState, now: Long)
+    suspend fun clear(userId: String)
+}
+
+/**
+ * Cross-session Interview tab stats - one row per user, written after every
+ * finished exercise/workout/mock. No in-progress exercise state is stored
+ * here; a killed app just restarts whatever exercise was in flight, which is
+ * an acceptable scope cut for single-decision drills and short 5-step/5-decision
+ * runs (unlike Practice's many-round sessions, there's nothing costly to lose).
+ */
+interface InterviewProgressRepository {
+    suspend fun load(userId: String): InterviewProgress?
+    suspend fun save(progress: InterviewProgress, now: Long)
+}
+
+/**
  * Blitz recall state over a curated roadmap.
  *
  * Keyed by curriculum slug rather than local problem id - the roadmap points
@@ -123,4 +153,24 @@ interface SettingsRepository {
     fun observe(key: String): Flow<String?>
     suspend fun get(key: String): String?
     suspend fun put(key: String, value: String)
+}
+
+interface CourseProgressRepository {
+    fun observe(userId: String): Flow<Map<String, ChapterProgress>>
+    suspend fun all(userId: String): Map<String, ChapterProgress>
+    suspend fun chapter(userId: String, chapterId: String): ChapterProgress?
+    suspend fun save(progress: ChapterProgress, synced: Boolean = false)
+    suspend fun unsynced(): List<ChapterProgress>
+    suspend fun markSynced(userId: String, chapterId: String)
+}
+
+interface CodeDraftRepository {
+    suspend fun draft(
+        userId: String,
+        problemId: String,
+        language: ProgrammingLanguage,
+    ): CodeDraft?
+    suspend fun drafts(userId: String): List<CodeDraft>
+    suspend fun save(draft: CodeDraft)
+    suspend fun delete(userId: String, problemId: String, language: ProgrammingLanguage)
 }

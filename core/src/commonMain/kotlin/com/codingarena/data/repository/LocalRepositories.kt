@@ -11,11 +11,13 @@ import com.codingarena.data.local.toOutcome
 import com.codingarena.data.local.toTopicOrNull
 import com.codingarena.db.ArenaDatabase
 import com.codingarena.domain.model.Achievement
+import com.codingarena.domain.model.AdaptivePracticeState
 import com.codingarena.domain.model.CodeRushSession
 import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.CodingTopic
 import com.codingarena.domain.model.DailyPuzzle
 import com.codingarena.domain.model.DailyPuzzleResult
+import com.codingarena.domain.model.InterviewProgress
 import com.codingarena.domain.model.LearningPath
 import com.codingarena.domain.model.OnboardingAnswers
 import com.codingarena.domain.model.PlayerRatings
@@ -28,7 +30,9 @@ import com.codingarena.domain.repository.AchievementRepository
 import com.codingarena.domain.repository.AttemptRepository
 import com.codingarena.domain.repository.CodeRushRepository
 import com.codingarena.domain.repository.DailyPuzzleRepository
+import com.codingarena.domain.repository.InterviewProgressRepository
 import com.codingarena.domain.repository.LearningPathRepository
+import com.codingarena.domain.repository.PracticeStateRepository
 import com.codingarena.domain.repository.ProblemRepository
 import com.codingarena.domain.repository.ProfileRepository
 import com.codingarena.domain.repository.RatingRepository
@@ -469,6 +473,54 @@ class LocalCodeRushRepository(
 
     private fun String.decode(): CodeRushSession? =
         runCatching { arenaJson.decodeFromString<CodeRushSession>(this) }.getOrNull()
+}
+
+class LocalPracticeStateRepository(
+    private val db: ArenaDatabase,
+    private val io: CoroutineDispatcher,
+) : PracticeStateRepository {
+
+    override suspend fun load(userId: String): AdaptivePracticeState? = withContext(io) {
+        db.arenaQueries.selectPracticeAdaptiveState(userId).executeAsOneOrNull()?.payloadJson?.decode()
+    }
+
+    override suspend fun save(state: AdaptivePracticeState, now: Long) = withContext(io) {
+        db.arenaQueries.upsertPracticeAdaptiveState(
+            userId = state.userId,
+            payloadJson = arenaJson.encodeToString(state),
+            updatedAt = now,
+            synced = 0L,
+        )
+    }
+
+    override suspend fun clear(userId: String) = withContext(io) {
+        db.arenaQueries.clearPracticeAdaptiveState(userId)
+    }
+
+    private fun String.decode(): AdaptivePracticeState? =
+        runCatching { arenaJson.decodeFromString<AdaptivePracticeState>(this) }.getOrNull()
+}
+
+class LocalInterviewProgressRepository(
+    private val db: ArenaDatabase,
+    private val io: CoroutineDispatcher,
+) : InterviewProgressRepository {
+
+    override suspend fun load(userId: String): InterviewProgress? = withContext(io) {
+        db.arenaQueries.selectInterviewProgress(userId).executeAsOneOrNull()?.payloadJson?.decode()
+    }
+
+    override suspend fun save(progress: InterviewProgress, now: Long) = withContext(io) {
+        db.arenaQueries.upsertInterviewProgress(
+            userId = progress.userId,
+            payloadJson = arenaJson.encodeToString(progress),
+            updatedAt = now,
+            synced = 0L,
+        )
+    }
+
+    private fun String.decode(): InterviewProgress? =
+        runCatching { arenaJson.decodeFromString<InterviewProgress>(this) }.getOrNull()
 }
 
 class LocalSettingsRepository(

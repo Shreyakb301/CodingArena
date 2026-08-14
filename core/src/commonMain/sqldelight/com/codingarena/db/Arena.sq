@@ -368,6 +368,28 @@ CREATE TABLE blitzSession (
 
 CREATE INDEX blitzSession_user_idx ON blitzSession(userId, startedAt);
 
+-- One active adaptive Practice session (Recommended / Topic-Focused / Mixed)
+-- per user - starting a different mode or topic overwrites it. Unlike
+-- blitzSession/codeRushSession (only saved at completion), this is written
+-- after every round transition so an unfinished round or a results page
+-- awaiting "Continue Practicing" survives an app restart.
+CREATE TABLE practiceAdaptiveState (
+    userId      TEXT    NOT NULL PRIMARY KEY,
+    payloadJson TEXT    NOT NULL,
+    updatedAt   INTEGER NOT NULL,
+    synced      INTEGER NOT NULL DEFAULT 0
+);
+
+-- Cross-session Interview tab stats - one row per user, updated after every
+-- finished exercise/workout/mock. Nothing mid-exercise is persisted here;
+-- see InterviewProgress's doc comment for why that's an intentional scope cut.
+CREATE TABLE interviewProgress (
+    userId      TEXT    NOT NULL PRIMARY KEY,
+    payloadJson TEXT    NOT NULL,
+    updatedAt   INTEGER NOT NULL,
+    synced      INTEGER NOT NULL DEFAULT 0
+);
+
 upsertRecallRecord:
 INSERT OR REPLACE INTO recallRecord(userId, slug, correctStreak, totalSeen, totalCorrect, lastSeenAt, fastestMs, dueAt, solved, solvedAt)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -387,3 +409,77 @@ SELECT * FROM blitzSession WHERE userId = ? ORDER BY startedAt DESC LIMIT ?;
 
 selectBestBlitzStreak:
 SELECT max(score) FROM blitzSession WHERE userId = ? AND endedAt IS NOT NULL;
+
+-- ---------------------------------------------------------------- course progression and offline drafts
+
+CREATE TABLE chapterProgress (
+    userId            TEXT    NOT NULL,
+    chapterId         TEXT    NOT NULL,
+    payloadJson       TEXT    NOT NULL,
+    updatedAt         INTEGER NOT NULL,
+    synced            INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (userId, chapterId)
+);
+
+CREATE INDEX chapterProgress_sync_idx ON chapterProgress(synced, updatedAt);
+
+CREATE TABLE codeDraft (
+    userId            TEXT    NOT NULL,
+    problemId         TEXT    NOT NULL,
+    language          TEXT    NOT NULL,
+    sourceCode        TEXT    NOT NULL,
+    updatedAt         INTEGER NOT NULL,
+    synced            INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (userId, problemId, language)
+);
+
+CREATE INDEX codeDraft_sync_idx ON codeDraft(synced, updatedAt);
+
+upsertChapterProgress:
+INSERT OR REPLACE INTO chapterProgress(userId, chapterId, payloadJson, updatedAt, synced)
+VALUES (?, ?, ?, ?, ?);
+
+selectChapterProgress:
+SELECT * FROM chapterProgress WHERE userId = ? ORDER BY chapterId;
+
+selectChapterProgressById:
+SELECT * FROM chapterProgress WHERE userId = ? AND chapterId = ?;
+
+selectUnsyncedChapterProgress:
+SELECT * FROM chapterProgress WHERE synced = 0 ORDER BY updatedAt;
+
+markChapterProgressSynced:
+UPDATE chapterProgress SET synced = 1 WHERE userId = ? AND chapterId = ?;
+
+upsertCodeDraft:
+INSERT OR REPLACE INTO codeDraft(userId, problemId, language, sourceCode, updatedAt, synced)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectCodeDraft:
+SELECT * FROM codeDraft WHERE userId = ? AND problemId = ? AND language = ?;
+
+selectCodeDrafts:
+SELECT * FROM codeDraft WHERE userId = ? ORDER BY updatedAt DESC;
+
+selectUnsyncedCodeDrafts:
+SELECT * FROM codeDraft WHERE synced = 0 ORDER BY updatedAt;
+
+deleteCodeDraft:
+DELETE FROM codeDraft WHERE userId = ? AND problemId = ? AND language = ?;
+
+upsertPracticeAdaptiveState:
+INSERT OR REPLACE INTO practiceAdaptiveState(userId, payloadJson, updatedAt, synced)
+VALUES (?, ?, ?, ?);
+
+selectPracticeAdaptiveState:
+SELECT * FROM practiceAdaptiveState WHERE userId = ?;
+
+clearPracticeAdaptiveState:
+DELETE FROM practiceAdaptiveState WHERE userId = ?;
+
+upsertInterviewProgress:
+INSERT OR REPLACE INTO interviewProgress(userId, payloadJson, updatedAt, synced)
+VALUES (?, ?, ?, ?);
+
+selectInterviewProgress:
+SELECT * FROM interviewProgress WHERE userId = ?;
