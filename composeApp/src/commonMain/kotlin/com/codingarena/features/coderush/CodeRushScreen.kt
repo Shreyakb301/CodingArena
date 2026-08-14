@@ -10,10 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,15 +32,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.codingarena.core.common.IdGenerator
 import com.codingarena.core.common.TimeProvider
-import com.codingarena.core.design.ArenaChip
 import com.codingarena.core.design.CodeBlock
-import com.codingarena.core.design.StatTile
+import com.codingarena.core.design.ProgressBar
 import com.codingarena.domain.engine.CodeRushEngine
 import com.codingarena.domain.engine.StreakEngine
 import com.codingarena.domain.model.AttemptSource
 import com.codingarena.domain.model.CodeRushMode
 import com.codingarena.domain.model.CodeRushSession
-import com.codingarena.domain.model.CodeRushStats
 import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.RushEndReason
 import com.codingarena.domain.model.StreakActivity
@@ -59,101 +62,15 @@ object CodeRushModes {
     const val SURVIVAL = "survival"
 
     fun parse(key: String): CodeRushMode = when (key) {
-        FIVE -> CodeRushMode.FiveMinute
+        THREE -> CodeRushMode.ThreeMinute
         SURVIVAL -> CodeRushMode.Survival
-        else -> CodeRushMode.ThreeMinute
+        else -> CodeRushMode.FiveMinute
     }
 
     fun key(mode: CodeRushMode): String = when (mode) {
-        CodeRushMode.FiveMinute -> FIVE
+        CodeRushMode.ThreeMinute -> THREE
         CodeRushMode.Survival -> SURVIVAL
-        else -> THREE
-    }
-}
-
-class CodeRushMenuViewModel(
-    private val codeRush: CodeRushRepository,
-    private val engine: CodeRushEngine,
-    private val currentUser: CurrentUser,
-) : ViewModel() {
-
-    private val _stats = MutableStateFlow(CodeRushStats())
-    val stats: StateFlow<CodeRushStats> = _stats.asStateFlow()
-
-    fun refresh() {
-        viewModelScope.launch {
-            val userId = currentUser.ensureLoaded()?.id ?: return@launch
-            _stats.value = engine.summarise(codeRush.sessions(userId))
-        }
-    }
-}
-
-@Composable
-fun CodeRushScreen(
-    onStart: (String) -> Unit,
-    viewModel: CodeRushMenuViewModel = koinViewModel(),
-) {
-    val stats by viewModel.stats.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) { viewModel.refresh() }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        item {
-            Column {
-                Text("Code Rush", style = MaterialTheme.typography.headlineSmall)
-                Text(
-                    "As many short questions as you can. Three lives, rising difficulty.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatTile("Best", stats.bestScore.toString(), Modifier.weight(1f))
-                StatTile(
-                    "Average",
-                    ((stats.averageScore * 10).toInt() / 10.0).toString(),
-                    Modifier.weight(1f),
-                )
-                StatTile(
-                    "Accuracy",
-                    "${(stats.accuracy * 100).toInt()}%",
-                    Modifier.weight(1f),
-                )
-            }
-        }
-
-        if (stats.strongestCategory != null || stats.weakestCategory != null) {
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    stats.strongestCategory?.let {
-                        ArenaChip("Strongest: ${it.displayName}", filled = true)
-                    }
-                    stats.weakestCategory?.let { ArenaChip("Weakest: ${it.displayName}") }
-                }
-            }
-        }
-
-        items(CodeRushMode.standardModes) { mode ->
-            Card(
-                Modifier.fillMaxWidth().clickable { onStart(CodeRushModes.key(mode)) },
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(mode.displayName, style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        mode.durationSeconds?.let { "${it / 60} minutes, 3 lives" }
-                            ?: "No clock - survive as long as you can",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
+        else -> FIVE
     }
 }
 
@@ -318,10 +235,28 @@ private fun RushQuestion(
 ) {
     val problem = state.problem!!
     val session = state.session!!
+    val totalSeconds = session.mode.durationSeconds
+    val elapsedProgress = totalSeconds?.let { total ->
+        val remaining = state.secondsRemaining ?: total
+        ((total - remaining).toFloat() / total).coerceIn(0f, 1f)
+    }
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
+    Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 22.dp)) {
         Row(
             Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            IconButton(onClick = onAbandon) {
+                Icon(Icons.Filled.Close, contentDescription = "Give up")
+            }
+            if (elapsedProgress != null) {
+                ProgressBar(elapsedProgress, Modifier.weight(1f))
+            }
+        }
+
+        Row(
+            Modifier.fillMaxWidth().padding(top = 28.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -334,34 +269,39 @@ private fun RushQuestion(
         }
 
         LazyColumn(
-            modifier = Modifier.weight(1f).padding(top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.weight(1f).padding(top = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                Text(problem.description, style = MaterialTheme.typography.bodyLarge)
+                Text(problem.description, style = MaterialTheme.typography.titleMedium)
             }
-            problem.codeSnippet?.let { item { CodeBlock(it) } }
+            problem.codeSnippet?.let {
+                item { CodeBlock(it, Modifier.padding(vertical = 4.dp)) }
+            }
             item {
-                Text(problem.challengeType.prompt, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    problem.challengeType.prompt,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
             }
             items(problem.choices) { choice ->
                 Card(
                     Modifier.fillMaxWidth().clickable { onAnswer(choice.id) },
+                    shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface,
                     ),
                 ) {
-                    Text(choice.text, Modifier.padding(14.dp))
+                    Text(
+                        choice.text,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+                    )
                 }
             }
+            item { Box(Modifier.padding(bottom = 12.dp)) }
         }
-
-        Text(
-            "Give up",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.clickable(onClick = onAbandon).padding(8.dp),
-        )
     }
 }
 

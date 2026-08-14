@@ -118,7 +118,7 @@ sealed interface BlitzMode {
 
     /** Only the Blind 75 subset. */
     data object Blind75 : BlitzMode {
-        override val displayName get() = "Blind 75"
+        override val displayName get() = "Essential Shortlist"
     }
 
     /** Only cards whose spaced-repetition review has come round. */
@@ -272,7 +272,7 @@ class BlitzEngine(private val config: BlitzConfig = BlitzConfig()) {
      *
      * Kept separate from recall: knowing a problem is Sliding Window and having
      * written the solution are different achievements, and for someone working
-     * the NeetCode list the second is the one that counts.
+     * the CodingArena list the second is the one that counts.
      */
     fun markSolved(
         existing: RecallRecord?,

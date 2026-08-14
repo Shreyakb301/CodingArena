@@ -1,36 +1,35 @@
 package com.codingarena.features.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import com.codingarena.core.design.ArenaChip
-import com.codingarena.core.design.ArenaListItem
-import com.codingarena.core.design.ProgressBar
-import com.codingarena.core.design.RatingDelta
-import com.codingarena.core.design.SectionHeader
-import com.codingarena.core.design.StatTile
 import com.codingarena.domain.model.AttemptSource
 import com.codingarena.domain.usecase.CurrentUser
 import com.codingarena.domain.usecase.GetHomeSnapshotUseCase
@@ -51,7 +50,6 @@ class HomeViewModel(
     private val getSnapshot: GetHomeSnapshotUseCase,
     private val currentUser: CurrentUser,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
 
@@ -74,24 +72,18 @@ class HomeViewModel(
 @Composable
 fun HomeScreen(
     onOpenProblem: (String, AttemptSource) -> Unit,
-    onOpenCodeRush: () -> Unit,
+    onOpenPractice: () -> Unit,
     onOpenLearningPath: () -> Unit,
     onOpenRatings: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    // Re-read on every entry: ratings, streaks and review counts all move as a
-    // result of work done on other screens.
     LaunchedEffect(Unit) { viewModel.refresh() }
 
     when {
-        state.loading -> Column(
-            Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) { CircularProgressIndicator() }
-
+        state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
         state.error != null -> Column(
             Modifier.fillMaxSize().padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -102,9 +94,8 @@ fun HomeScreen(
                 Text("Try again")
             }
         }
-
-        else -> state.snapshot?.let { snapshot ->
-            HomeContent(snapshot, onOpenProblem, onOpenCodeRush, onOpenLearningPath, onOpenRatings)
+        else -> state.snapshot?.let {
+            HomeContent(it, onOpenPractice, onOpenLearningPath, onOpenRatings)
         }
     }
 }
@@ -112,192 +103,132 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     snapshot: HomeSnapshot,
-    onOpenProblem: (String, AttemptSource) -> Unit,
-    onOpenCodeRush: () -> Unit,
+    onOpenPractice: () -> Unit,
     onOpenLearningPath: () -> Unit,
     onOpenRatings: () -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
     ) {
         item {
             Row(
-                Modifier.fillMaxWidth().padding(top = 16.dp),
+                Modifier.fillMaxWidth().padding(top = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        snapshot.profile?.displayName?.takeIf { it.isNotBlank() }?.let { "Hi, $it" }
-                            ?: "Welcome back",
-                        style = MaterialTheme.typography.headlineSmall,
+                        "{}",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold,
                     )
-                    Text(
-                        if (snapshot.streakAtRisk) {
-                            "Your ${snapshot.streak.currentStreak}-day streak ends today"
-                        } else {
-                            "${snapshot.streak.currentStreak}-day streak"
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (snapshot.streakAtRisk) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                    )
+                    Text(" CodingArena", style = MaterialTheme.typography.titleMedium)
                 }
-                Column(horizontalAlignment = Alignment.End, modifier = Modifier.clickable(onClick = onOpenRatings)) {
-                    Text(
-                        snapshot.ratings.overall.toString(),
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    RatingDelta(snapshot.recentRatingChange)
-                }
-            }
-        }
-
-        item {
-            DailyPuzzleCard(snapshot) { id -> onOpenProblem(id, AttemptSource.DAILY_PUZZLE) }
-        }
-
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatTile(
-                    label = "Due reviews",
-                    value = snapshot.dueReviewCount.toString(),
-                    caption = "${snapshot.upcomingReviewCount} this week",
-                    modifier = Modifier.weight(1f),
-                )
-                StatTile(
-                    label = "Accuracy",
-                    value = "${(snapshot.stats.accuracy * 100).toInt()}%",
-                    caption = "${snapshot.stats.totalCompleted} solved",
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
-
-        snapshot.readiness?.let { readiness ->
-            item {
-                Card(
-                    Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    ),
+                Row(
+                    modifier = Modifier.clickable(onClick = onOpenRatings),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Interview readiness", style = MaterialTheme.typography.labelSmall)
-                        Text(
-                            "${readiness.score}/100 - ${readiness.band.displayName}",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        ProgressBar(
-                            readiness.score / 100f,
-                            Modifier.padding(vertical = 8.dp),
-                        )
-                        Text(readiness.rationale, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
-        }
-
-        snapshot.learningPath?.let { path ->
-            item {
-                SectionHeader("Your learning path", trailing = "See all")
-                Card(
-                    Modifier.fillMaxWidth().clickable(onClick = onOpenLearningPath),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(path.title, style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            path.rationale,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        ProgressBar(path.fraction, Modifier.padding(top = 10.dp))
-                        Text(
-                            "${path.completedStepCount} of ${path.steps.size} steps",
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(top = 6.dp),
-                        )
-                    }
+                    Text("🔥 ${snapshot.streak.currentStreak}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("◆ ${snapshot.ratings.overall}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
 
         item {
-            OutlinedButton(onClick = onOpenCodeRush, modifier = Modifier.fillMaxWidth()) {
-                Text("Start Code Rush")
-            }
-        }
-
-        if (snapshot.recommendations.isNotEmpty()) {
-            item { SectionHeader("Practise next") }
-            items(snapshot.recommendations) { recommendation ->
-                ArenaListItem(
-                    title = recommendation.title,
-                    subtitle = recommendation.reason,
-                    trailing = recommendation.difficultyRating.toString(),
-                    onClick = { onOpenProblem(recommendation.problemId, AttemptSource.PRACTICE) },
+            Column(Modifier.padding(top = 46.dp, bottom = 26.dp)) {
+                Text(
+                    "Ready for one round?",
+                    style = MaterialTheme.typography.headlineMedium,
                 )
             }
         }
 
-        item { Column(Modifier.padding(bottom = 24.dp)) {} }
+        item {
+            DailyPracticeCard(onOpenPractice)
+        }
+
+        item {
+            Column(Modifier.padding(top = 26.dp)) {
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                HomeActionRow(
+                    mark = "↗",
+                    title = "Continue roadmap",
+                    subtitle = snapshot.learningPath?.let { path ->
+                        "${path.title} · ${(path.fraction * 100).toInt()}%"
+                    } ?: "Choose your next pattern",
+                    onClick = onOpenLearningPath,
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                HomeActionRow(
+                    mark = "↻",
+                    title = "Review",
+                    subtitle = if (snapshot.dueReviewCount == 1) "1 question due" else "${snapshot.dueReviewCount} questions due",
+                    onClick = onOpenPractice,
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+            }
+        }
+
+        item { Box(Modifier.padding(bottom = 24.dp)) }
     }
 }
 
 @Composable
-private fun DailyPuzzleCard(snapshot: HomeSnapshot, onOpen: (String) -> Unit) {
-    val puzzle = snapshot.dailyPuzzle ?: return
-    val done = snapshot.dailyPuzzleResult != null
-
-    Card(
-        Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+private fun DailyPracticeCard(onOpen: () -> Unit) {
+    Box(
+        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary, RoundedCornerShape(22.dp)),
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Daily Puzzle", style = MaterialTheme.typography.labelSmall)
-                ArenaChip(puzzle.difficulty.displayName)
-            }
+        Column(Modifier.padding(horizontal = 22.dp, vertical = 24.dp)) {
             Text(
-                puzzle.title,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 6.dp),
+                "TODAY · 3 MIN",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.78f),
             )
             Text(
-                "${puzzle.primaryTopic.displayName} - ${puzzle.challengeType.displayName}",
+                "Daily practice",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(top = 10.dp),
+            )
+            Text(
+                "Three questions picked from what you need to remember.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
+                modifier = Modifier.padding(top = 4.dp),
             )
-
-            if (done) {
-                val result = snapshot.dailyPuzzleResult!!
-                Row(
-                    Modifier.fillMaxWidth().padding(top = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        "Scored ${result.score(puzzle.difficultyRating, puzzle.estimatedSeconds)}/100",
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    RatingDelta(result.ratingChange)
-                }
-            } else {
-                Button(
-                    onClick = { onOpen(puzzle.id) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-                ) { Text("Solve today's puzzle") }
+            Button(
+                onClick = onOpen,
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                ),
+                shape = RoundedCornerShape(14.dp),
+            ) {
+                Text("Start practice  →", fontWeight = FontWeight.Medium)
             }
         }
+    }
+}
+
+@Composable
+private fun HomeActionRow(mark: String, title: String, subtitle: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Box(
+            Modifier.background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(11.dp)).padding(10.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(mark, color = MaterialTheme.colorScheme.primary, fontFamily = FontFamily.Monospace)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Medium)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Text("›", color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

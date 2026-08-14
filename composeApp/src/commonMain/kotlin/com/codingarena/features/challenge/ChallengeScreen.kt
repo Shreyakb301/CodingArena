@@ -217,8 +217,8 @@ private fun ChallengeContent(
         }
 
         LazyColumn(
-            modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.weight(1f).padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -231,7 +231,7 @@ private fun ChallengeContent(
                 Text(
                     problem.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 10.dp),
                 )
             }
             problem.codeSnippet?.let { snippet ->
@@ -241,7 +241,7 @@ private fun ChallengeContent(
                 Text(
                     problem.challengeType.prompt,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 12.dp),
                 )
             }
 
@@ -276,7 +276,7 @@ private fun ChallengeContent(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                         ),
                     ) {
-                        Column(Modifier.padding(12.dp)) {
+                        Column(Modifier.padding(16.dp)) {
                             Text("Hint ${index + 1}", style = MaterialTheme.typography.labelSmall)
                             Text(hint, style = MaterialTheme.typography.bodyMedium)
                         }
@@ -287,7 +287,7 @@ private fun ChallengeContent(
             item { Column(Modifier.padding(bottom = 12.dp)) {} }
         }
 
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(horizontal = 24.dp, vertical = 20.dp)) {
             if (state.hintsRemaining > 0) {
                 OutlinedButton(
                     onClick = viewModel::revealHint,
@@ -299,7 +299,7 @@ private fun ChallengeContent(
             Button(
                 onClick = viewModel::submit,
                 enabled = state.canSubmit,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
             ) {
                 Text(if (state.submitting) "Checking..." else "Submit")
             }
@@ -319,6 +319,7 @@ private fun ChallengeContent(
 private fun ChoiceRow(choice: AnswerChoice, selected: Boolean, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {
                 MaterialTheme.colorScheme.primaryContainer
@@ -327,7 +328,10 @@ private fun ChoiceRow(choice: AnswerChoice, selected: Boolean, onClick: () -> Un
             },
         ),
     ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             choice.tag?.let {
                 Box(
                     Modifier
@@ -358,10 +362,11 @@ private fun OrderableRow(
 ) {
     Card(
         Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
-            Modifier.padding(10.dp).fillMaxWidth(),
+            Modifier.padding(horizontal = 16.dp, vertical = 14.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

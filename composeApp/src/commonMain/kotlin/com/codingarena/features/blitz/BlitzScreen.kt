@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,6 +42,10 @@ import com.codingarena.domain.engine.Confusion
 import com.codingarena.domain.model.CurriculumProblem
 import com.codingarena.domain.model.PatternGroup
 import com.codingarena.domain.repository.CurriculumRepository
+import com.codingarena.domain.repository.CourseProgressRepository
+import com.codingarena.domain.classroom.ClassroomGateway
+import com.codingarena.domain.model.ConfusionSummary
+import com.codingarena.domain.model.ProgressSyncPayload
 import com.codingarena.domain.usecase.CurrentUser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,6 +80,8 @@ class BlitzViewModel(
     private val currentUser: CurrentUser,
     private val time: TimeProvider,
     private val ids: IdGenerator,
+    private val courseProgress: CourseProgressRepository,
+    private val classroom: ClassroomGateway,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BlitzUiState())
@@ -162,7 +169,18 @@ class BlitzViewModel(
             confusions = engine.confusions(listOf(ended)),
         )
         viewModelScope.launch {
-            currentUser.userId?.let { curriculumRepo.saveSession(it, ids.newId(), ended) }
+            currentUser.userId?.let { userId ->
+                curriculumRepo.saveSession(userId, ids.newId(), ended)
+                val progress = courseProgress.all(userId).values.toList()
+                val confusions = engine.confusions(listOf(ended)).map {
+                    ConfusionSummary(it.actual.displayName, it.mistakenFor.displayName, it.count)
+                }
+                runCatching {
+                    classroom.pushProgress(
+                        ProgressSyncPayload(progress, confusions, time.nowMillis())
+                    )
+                }
+            }
         }
     }
 }
@@ -210,7 +228,7 @@ private fun BlitzQuestion(
     val session = state.session!!
     val colors = reviewColors()
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
+    Column(Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 22.dp)) {
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -224,28 +242,28 @@ private fun BlitzQuestion(
             )
             if (session.streak >= 3) ArenaChip("${session.streak} streak", filled = true)
         }
-        ProgressBar(state.progress, Modifier.padding(top = 8.dp))
+        ProgressBar(state.progress, Modifier.padding(top = 12.dp))
 
-        Column(Modifier.weight(1f).padding(top = 24.dp)) {
+        Column(Modifier.weight(1f).padding(top = 28.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 ArenaChip(card.problem.difficulty.displayName)
-                if (card.problem.inBlind75) ArenaChip("Blind 75")
+                if (card.problem.inBlind75) ArenaChip("Shortlist")
             }
             Text(
                 card.problem.title,
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(top = 10.dp),
+                modifier = Modifier.padding(top = 14.dp),
             )
             Text(
                 card.problem.ask,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 6.dp),
+                modifier = Modifier.padding(top = 8.dp),
             )
             Text(
                 "Which pattern?",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 20.dp, bottom = 8.dp),
+                modifier = Modifier.padding(top = 26.dp, bottom = 12.dp),
             )
 
             card.options.forEach { option ->
@@ -255,8 +273,9 @@ private fun BlitzQuestion(
 
                 Card(
                     Modifier.fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                        .padding(vertical = 6.dp)
                         .clickable(enabled = !answered) { onAnswer(option) },
+                    shape = RoundedCornerShape(18.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = when {
                             !answered -> MaterialTheme.colorScheme.surface
@@ -268,7 +287,7 @@ private fun BlitzQuestion(
                 ) {
                     Text(
                         option.displayName,
-                        Modifier.padding(16.dp),
+                        Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = if (answered && isCorrectOption) FontWeight.Bold else null,
                     )
@@ -278,12 +297,13 @@ private fun BlitzQuestion(
 
         if (state.lastWasCorrect == false && state.feedback != null) {
             Card(
-                Modifier.fillMaxWidth().padding(top = 12.dp),
+                Modifier.fillMaxWidth().padding(top = 18.dp),
+                shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
             ) {
-                Column(Modifier.padding(14.dp)) {
+                Column(Modifier.padding(18.dp)) {
                     Text(
                         "WHY",
                         style = MaterialTheme.typography.labelSmall,

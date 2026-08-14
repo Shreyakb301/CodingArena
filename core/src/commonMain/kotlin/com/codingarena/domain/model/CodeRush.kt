@@ -34,7 +34,8 @@ sealed interface CodeRushMode {
     }
 
     companion object {
-        val standardModes: List<CodeRushMode> = listOf(ThreeMinute, FiveMinute, Survival)
+        /** Only 5 Minute Rush is offered from the Code Rush menu today. */
+        val standardModes: List<CodeRushMode> = listOf(FiveMinute)
     }
 }
 
