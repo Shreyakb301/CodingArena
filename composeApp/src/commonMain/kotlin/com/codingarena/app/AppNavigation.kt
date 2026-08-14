@@ -1,6 +1,7 @@
 package com.codingarena.app
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -9,19 +10,41 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.savedstate.read
 import com.codingarena.domain.model.AttemptSource
+import com.codingarena.domain.model.BehavioralCategory
+import com.codingarena.domain.model.PatternGroup
+import com.codingarena.content.NeetCode150
+import com.codingarena.content.RoadmapLessons
 import com.codingarena.features.achievements.AchievementsScreen
 import com.codingarena.features.blitz.BlitzScreen
+import com.codingarena.features.blitz.BlitzHubScreen
+import com.codingarena.features.blitz.StrategyBlitzScreen
+import com.codingarena.features.course.ChapterScreen
+import com.codingarena.features.course.CourseRoadmapScreen
+import com.codingarena.features.editor.CodeEditorScreen
+import com.codingarena.features.classroom.ClassroomScreen
 import com.codingarena.features.challenge.ChallengeScreen
-import com.codingarena.features.coderush.CodeRushScreen
+import com.codingarena.features.coderush.CodeRushModes
 import com.codingarena.features.coderush.CodeRushSessionScreen
 import com.codingarena.features.home.HomeScreen
+import com.codingarena.features.interview.BehavioralRoundScreen
+import com.codingarena.features.interview.InterviewHomeScreen
+import com.codingarena.features.interview.MockInterviewScreen
+import com.codingarena.features.interview.TechCommProblemsScreen
+import com.codingarena.features.interview.TechCommRoundScreen
 import com.codingarena.features.learningpath.LearningPathScreen
 import com.codingarena.features.onboarding.OnboardingScreen
 import com.codingarena.features.patternlibrary.PatternDetailScreen
 import com.codingarena.features.patternlibrary.PatternLibraryScreen
 import com.codingarena.features.profile.ProfileScreen
+import com.codingarena.features.practice.PracticeScreen
+import com.codingarena.features.practice.TopicActivityScreen
+import com.codingarena.features.practice.TopicFocusScreen
+import com.codingarena.features.practice.WorkoutRunnerScreen
+import com.codingarena.features.practice.WorkoutSource
 import com.codingarena.features.ratings.RatingsScreen
 import com.codingarena.features.roadmap.RoadmapScreen
+import com.codingarena.features.roadmap.RoadmapLessonScreen
+import com.codingarena.features.roadmap.RoadmapExplanationScreen
 import com.codingarena.features.settings.SettingsScreen
 import com.codingarena.features.solutionreview.SolutionReviewScreen
 import com.codingarena.features.splash.SplashScreen
@@ -58,10 +81,133 @@ fun AppNavigation(navController: NavHostController) {
         composable(Routes.HOME) {
             HomeScreen(
                 onOpenProblem = { id, source -> navController.navigate(Routes.challenge(id, source)) },
-                onOpenCodeRush = { navController.navigate(Routes.CODE_RUSH) },
+                onOpenPractice = { navController.navigate(Routes.PRACTICE) },
                 onOpenLearningPath = { navController.navigate(Routes.LEARNING_PATH) },
                 onOpenRatings = { navController.navigate(Routes.RATINGS) },
             )
+        }
+
+        composable(Routes.PRACTICE) {
+            PracticeScreen(
+                onStartRecommended = { navController.navigate(Routes.WORKOUT_RECOMMENDED) },
+                onOpenTopicFocus = { navController.navigate(Routes.PRACTICE_TOPIC_FOCUS) },
+                onStartBlitz = { mode -> navController.navigate(Routes.blitz(mode)) },
+                onStartMixed = { navController.navigate(Routes.WORKOUT_MIXED) },
+                onOpenCodeRush = { navController.navigate(Routes.codeRushSession(CodeRushModes.FIVE)) },
+                onOpenQuickRecall = { navController.navigate(Routes.BLITZ_HOME) },
+            )
+        }
+
+        composable(Routes.PRACTICE_TOPIC_FOCUS) {
+            TopicFocusScreen(
+                onBack = { navController.popBackStack() },
+                onSelectTopic = { group -> navController.navigate(Routes.topicActivity(group.name)) },
+            )
+        }
+
+        composable(
+            route = Routes.PRACTICE_TOPIC_ACTIVITY_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_GROUP) { type = NavType.StringType }),
+        ) { entry ->
+            val group = entry.stringArg(Routes.ARG_GROUP)?.let { name ->
+                PatternGroup.entries.firstOrNull { it.name == name }
+            }
+            if (group == null) {
+                navController.popBackStack()
+            } else {
+                TopicActivityScreen(
+                    group = group,
+                    onBack = { navController.popBackStack() },
+                    onCompleteWorkout = { navController.navigate(Routes.workoutTopic(it.name)) },
+                    onLearnTheConcept = { slug, patternId ->
+                        when {
+                            slug != null -> navController.navigate(Routes.roadmapLesson(slug))
+                            patternId != null -> navController.navigate(Routes.patternDetail(patternId))
+                            else -> navController.navigate(Routes.PATTERNS)
+                        }
+                    },
+                    onTimedPractice = { navController.navigate(Routes.codeRushSession(CodeRushModes.FIVE)) },
+                )
+            }
+        }
+
+        composable(Routes.WORKOUT_RECOMMENDED) {
+            WorkoutRunnerScreen(
+                source = WorkoutSource.Recommended,
+                onExit = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.WORKOUT_MIXED) {
+            WorkoutRunnerScreen(
+                source = WorkoutSource.Mixed,
+                onExit = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = Routes.WORKOUT_TOPIC_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_GROUP) { type = NavType.StringType }),
+        ) { entry ->
+            val group = entry.stringArg(Routes.ARG_GROUP)?.let { name ->
+                PatternGroup.entries.firstOrNull { it.name == name }
+            }
+            if (group == null) {
+                navController.popBackStack()
+            } else {
+                WorkoutRunnerScreen(
+                    source = WorkoutSource.TopicFocused(group),
+                    onExit = { navController.popBackStack() },
+                )
+            }
+        }
+
+        composable(Routes.INTERVIEW_HOME) {
+            InterviewHomeScreen(
+                onStartCategoryWorkout = { category -> navController.navigate(Routes.interviewCategoryWorkout(category.name)) },
+                onOpenBehavioralWorkouts = { navController.navigate(Routes.INTERVIEW_ALL_WORKOUT) },
+                onOpenTechComm = { navController.navigate(Routes.INTERVIEW_TECH_COMM) },
+                onOpenMockInterview = { navController.navigate(Routes.INTERVIEW_MOCK) },
+            )
+        }
+
+        composable(Routes.INTERVIEW_ALL_WORKOUT) {
+            BehavioralRoundScreen(category = null, onExit = { navController.popBackStack() })
+        }
+
+        composable(
+            route = Routes.INTERVIEW_CATEGORY_WORKOUT_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_CATEGORY) { type = NavType.StringType }),
+        ) { entry ->
+            val category = entry.stringArg(Routes.ARG_CATEGORY)?.let { name ->
+                BehavioralCategory.entries.firstOrNull { it.name == name }
+            }
+            if (category == null) {
+                navController.popBackStack()
+            } else {
+                BehavioralRoundScreen(category = category, onExit = { navController.popBackStack() })
+            }
+        }
+
+        composable(Routes.INTERVIEW_TECH_COMM) {
+            TechCommProblemsScreen(
+                onBack = { navController.popBackStack() },
+                onSelectProblem = { slug -> navController.navigate(Routes.interviewTechCommProblem(slug)) },
+            )
+        }
+
+        composable(
+            route = Routes.INTERVIEW_TECH_COMM_PROBLEM_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_PROBLEM_SLUG) { type = NavType.StringType }),
+        ) { entry ->
+            TechCommRoundScreen(
+                problemSlug = entry.stringArg(Routes.ARG_PROBLEM_SLUG).orEmpty(),
+                onDone = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.INTERVIEW_MOCK) {
+            MockInterviewScreen(onExit = { navController.popBackStack() })
         }
 
         composable(
@@ -139,30 +285,102 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
 
-        composable(Routes.CODE_RUSH) {
-            CodeRushScreen(
-                onStart = { mode -> navController.navigate(Routes.codeRushSession(mode)) },
-            )
-        }
-
         composable(
             route = Routes.CODE_RUSH_SESSION_ROUTE,
             arguments = listOf(navArgument(Routes.ARG_MODE) { type = NavType.StringType }),
         ) { entry ->
             CodeRushSessionScreen(
                 modeKey = entry.stringArg(Routes.ARG_MODE).orEmpty(),
-                onFinished = { navController.popBackStack(Routes.CODE_RUSH, inclusive = false) },
+                onFinished = { navController.popBackStack() },
             )
         }
 
         composable(Routes.ROADMAP) {
+            val uriHandler = LocalUriHandler.current
             RoadmapScreen(
                 onStartBlitz = { mode -> navController.navigate(Routes.blitz(mode)) },
-                // Roadmap entries are LeetCode problems, not bundled ones, so
-                // tapping through opens the pattern lesson rather than a local
-                // challenge that does not exist.
-                onOpenProblem = { navController.navigate(Routes.PATTERNS) },
+                onOpenProblem = { slug ->
+                    if (RoadmapLessons.hasLesson(slug)) {
+                        navController.navigate(Routes.roadmapLesson(slug))
+                    } else {
+                        NeetCode150.curriculum.bySlug(slug)?.url?.let(uriHandler::openUri)
+                    }
+                },
+                onBrowsePatterns = { navController.navigate(Routes.PATTERNS) },
             )
+        }
+
+        composable(
+            route = Routes.ROADMAP_LESSON_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_SLUG) { type = NavType.StringType }),
+        ) { entry ->
+            RoadmapLessonScreen(
+                slug = entry.stringArg(Routes.ARG_SLUG).orEmpty(),
+                onBack = { navController.popBackStack() },
+                onReadExplanation = { slug ->
+                    navController.navigate(Routes.roadmapExplanation(slug))
+                },
+                onNextProblem = { nextSlug ->
+                    if (nextSlug != null) {
+                        navController.navigate(Routes.roadmapLesson(nextSlug)) {
+                            popUpTo(Routes.ROADMAP_LESSON_ROUTE) { inclusive = true }
+                        }
+                    } else {
+                        navController.popBackStack(Routes.ROADMAP, inclusive = false)
+                    }
+                },
+            )
+        }
+
+        composable(
+            route = Routes.ROADMAP_EXPLANATION_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_SLUG) { type = NavType.StringType }),
+        ) { entry ->
+            RoadmapExplanationScreen(
+                slug = entry.stringArg(Routes.ARG_SLUG).orEmpty(),
+                onBack = { navController.popBackStack() },
+                onNextProblem = { nextSlug ->
+                    if (nextSlug != null) {
+                        navController.navigate(Routes.roadmapLesson(nextSlug)) {
+                            popUpTo(Routes.ROADMAP_EXPLANATION_ROUTE) { inclusive = true }
+                        }
+                    } else {
+                        navController.popBackStack(Routes.ROADMAP, inclusive = false)
+                    }
+                },
+            )
+        }
+
+        composable(
+            route = Routes.CHAPTER_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_CHAPTER_ID) { type = NavType.StringType }),
+        ) { entry ->
+            ChapterScreen(
+                chapterId = entry.stringArg(Routes.ARG_CHAPTER_ID).orEmpty(),
+                onOpenEditor = { navController.navigate(Routes.editor(it)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = Routes.EDITOR_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_EXERCISE_ID) { type = NavType.StringType }),
+        ) { entry ->
+            CodeEditorScreen(
+                exerciseId = entry.stringArg(Routes.ARG_EXERCISE_ID).orEmpty(),
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.BLITZ_HOME) {
+            BlitzHubScreen(
+                onStart = { navController.navigate(Routes.blitz(it)) },
+                onStartStrategy = { navController.navigate(Routes.STRATEGY_BLITZ) },
+            )
+        }
+
+        composable(Routes.STRATEGY_BLITZ) {
+            StrategyBlitzScreen(onDone = { navController.popBackStack() })
         }
 
         composable(
@@ -182,7 +400,13 @@ fun AppNavigation(navController: NavHostController) {
                 onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenRatings = { navController.navigate(Routes.RATINGS) },
+                onOpenPatterns = { navController.navigate(Routes.PATTERNS) },
+                onOpenClassroom = { navController.navigate(Routes.TEACHER) },
             )
+        }
+
+        composable(Routes.TEACHER) {
+            ClassroomScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.SETTINGS) {

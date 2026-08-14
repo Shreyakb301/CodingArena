@@ -10,11 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -126,24 +127,19 @@ fun StatTile(
     modifier: Modifier = Modifier,
     caption: String? = null,
 ) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(Modifier.padding(14.dp)) {
+    Column(modifier.padding(vertical = 8.dp)) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(value, style = MaterialTheme.typography.headlineSmall)
+        caption?.let {
             Text(
-                label.uppercase(),
+                it,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Text(value, style = MaterialTheme.typography.headlineSmall)
-            caption?.let {
-                Text(
-                    it,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
     }
 }
@@ -192,21 +188,39 @@ fun ArenaListItem(
     title: String,
     subtitle: String?,
     modifier: Modifier = Modifier,
+    leading: String? = null,
     trailing: String? = null,
     onClick: (() -> Unit)? = null,
 ) {
-    Card(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
-            Modifier.padding(14.dp).fillMaxWidth(),
+            Modifier.fillMaxWidth().heightIn(min = 58.dp).padding(vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(Modifier.weight(1f)) {
+            leading?.let {
+                Box(
+                    modifier = Modifier.size(38.dp).background(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        RoundedCornerShape(12.dp),
+                    ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+            Column(
+                Modifier.weight(1f).padding(start = if (leading != null) 12.dp else 0.dp),
+            ) {
                 Text(title, style = MaterialTheme.typography.titleMedium)
                 subtitle?.let {
                     Text(
@@ -224,6 +238,7 @@ fun ArenaListItem(
                 )
             }
         }
+        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
     }
 }
 

@@ -42,6 +42,11 @@ import com.codingarena.domain.model.TargetJobLevel
 import com.codingarena.domain.repository.ProblemRepository
 import com.codingarena.domain.usecase.CompleteOnboardingUseCase
 import com.codingarena.domain.usecase.CurrentUser
+import com.codingarena.content.ArenaCourse
+import com.codingarena.core.common.TimeProvider
+import com.codingarena.domain.engine.CourseProgressEngine
+import com.codingarena.domain.model.ChapterProgress
+import com.codingarena.domain.repository.CourseProgressRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -92,6 +97,9 @@ class OnboardingViewModel(
     private val currentUser: CurrentUser,
     private val problems: ProblemRepository,
     private val placementEngine: PlacementTestEngine,
+    private val courseProgress: CourseProgressRepository,
+    private val courseEngine: CourseProgressEngine,
+    private val time: TimeProvider,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OnboardingUiState())
@@ -172,6 +180,21 @@ class OnboardingViewModel(
                 placement = _state.value.placementResult,
             )
             currentUser.set(profile)
+            val estimate = _state.value.placementResult?.estimatedRating
+                ?: _state.value.answers.experienceLevel.startingRating
+            val target = courseEngine.placementChapter(ArenaCourse.course, estimate)
+            ArenaCourse.availableChapters.filter { it.rank < target.rank }.forEach { chapter ->
+                courseProgress.save(
+                    ChapterProgress(
+                        userId = profile.id,
+                        chapterId = chapter.id,
+                        completedBlockIds = chapter.lessonBlockIds,
+                        checkpointScore = 1.0,
+                        passedIndependentExerciseIds = chapter.independentExercises.map { it.id }.toSet(),
+                        lastPractisedAt = time.nowMillis(),
+                    )
+                )
+            }
             _state.value = _state.value.copy(saving = false, finished = true)
         }
     }

@@ -2,15 +2,18 @@ package com.codingarena.core.design
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import com.codingarena.domain.model.ReviewLabel
 
 /**
@@ -20,8 +23,8 @@ import com.codingarena.domain.model.ReviewLabel
  */
 private val ArenaGreen = Color(0xFF5B8C3E)
 private val ArenaGreenDark = Color(0xFF3E6329)
-private val ArenaCream = Color(0xFFF4F1EA)
-private val ArenaCharcoal = Color(0xFF1F1D1A)
+private val ArenaCream = Color(0xFFF7F7F2)
+private val ArenaCharcoal = Color(0xFF20231F)
 
 private val LightColors = lightColorScheme(
     primary = ArenaGreen,
@@ -31,25 +34,25 @@ private val LightColors = lightColorScheme(
     secondary = Color(0xFF6C7A5B),
     background = ArenaCream,
     onBackground = ArenaCharcoal,
-    surface = Color.White,
+    surface = Color(0xFFF0F1EB),
     onSurface = ArenaCharcoal,
-    surfaceVariant = Color(0xFFE7E3DA),
-    onSurfaceVariant = Color(0xFF4A473F),
+    surfaceVariant = Color(0xFFE4E8DF),
+    onSurfaceVariant = Color(0xFF5F665B),
     error = Color(0xFFB3261E),
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFF9BC77A),
+    primary = Color(0xFF9BCB70),
     onPrimary = Color(0xFF1B2913),
-    primaryContainer = ArenaGreenDark,
-    onPrimaryContainer = Color(0xFFDCE9CF),
+    primaryContainer = Color(0xFF303D2D),
+    onPrimaryContainer = Color(0xFFA8D77D),
     secondary = Color(0xFFA8B598),
-    background = Color(0xFF16150F),
-    onBackground = Color(0xFFE9E5DB),
-    surface = Color(0xFF23211B),
-    onSurface = Color(0xFFE9E5DB),
-    surfaceVariant = Color(0xFF33302A),
-    onSurfaceVariant = Color(0xFFC9C4B8),
+    background = Color(0xFF191C18),
+    onBackground = Color(0xFFF0F1EA),
+    surface = Color(0xFF222720),
+    onSurface = Color(0xFFF0F1EA),
+    surfaceVariant = Color(0xFF343A32),
+    onSurfaceVariant = Color(0xFFAAB0A6),
     error = Color(0xFFF2B8B5),
 )
 
@@ -91,14 +94,22 @@ val DarkReviewColors = ReviewColors(
 )
 
 private val ArenaTypography = Typography(
-    displaySmall = TextStyle(fontSize = 34.sp, fontWeight = FontWeight.Bold),
-    headlineMedium = TextStyle(fontSize = 26.sp, fontWeight = FontWeight.Bold),
+    displaySmall = TextStyle(fontSize = 34.sp, fontWeight = FontWeight.SemiBold),
+    headlineMedium = TextStyle(fontSize = 26.sp, fontWeight = FontWeight.SemiBold),
     headlineSmall = TextStyle(fontSize = 21.sp, fontWeight = FontWeight.SemiBold),
-    titleMedium = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.SemiBold),
+    titleMedium = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Medium),
     bodyLarge = TextStyle(fontSize = 16.sp, lineHeight = 24.sp),
     bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 21.sp),
     labelLarge = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
     labelSmall = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Medium),
+)
+
+private val ArenaShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(22.dp),
+    extraLarge = RoundedCornerShape(28.dp),
 )
 
 /** Monospace style for every code snippet the app renders. */
@@ -116,6 +127,7 @@ fun ArenaTheme(
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
         typography = ArenaTypography,
+        shapes = ArenaShapes,
         content = content,
     )
 }
