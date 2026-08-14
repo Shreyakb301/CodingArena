@@ -398,7 +398,7 @@ object NeetCode150 {
 
     val curriculum: Curriculum = Curriculum(
         id = "neetcode-150",
-        name = "NeetCode 150",
+        name = "CodingArena 150",
         description = "150 problems grouped by the pattern each one wants. Work the groups, " +
             "not the list - the goal is recognising the shape before you write anything.",
         problems = problems,
@@ -412,9 +412,9 @@ object NeetCode150 {
      */
     val blind75: Curriculum = Curriculum(
         id = "blind-75",
-        name = "Blind 75",
-        description = "The classic shortlist. Every problem here is also in the NeetCode 150, " +
-            "so drilling one advances both.",
+        name = "Essential Shortlist",
+        description = "A compact interview-prep shortlist. Every problem here is also in the " +
+            "CodingArena 150, so drilling one advances both.",
         problems = problems.filter { it.inBlind75 },
     )
 }
