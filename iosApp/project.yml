@@ -72,15 +72,23 @@ targets:
           # "JAVA_HOME is not set" that gives no hint where to fix it, so
           # resolve a JDK here instead.
           if [ -z "$JAVA_HOME" ]; then
-            if /usr/libexec/java_home > /dev/null 2>&1; then
-              JAVA_HOME="$(/usr/libexec/java_home)"
+            if [ -d "/Library/Java/JavaVirtualMachines/jdk-19.jdk/Contents/Home" ]; then
+              export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-19.jdk/Contents/Home"
+            elif /usr/libexec/java_home -v 17 > /dev/null 2>&1; then
+              JAVA_HOME="$(/usr/libexec/java_home -v 17)"
               export JAVA_HOME
-            elif [ -d "/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home" ]; then
-              export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
-            elif [ -d "/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home" ]; then
-              export JAVA_HOME="/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
+            elif /usr/libexec/java_home -v 21 > /dev/null 2>&1; then
+              JAVA_HOME="$(/usr/libexec/java_home -v 21)"
+              export JAVA_HOME
+            elif /usr/libexec/java_home -v 19 > /dev/null 2>&1; then
+              JAVA_HOME="$(/usr/libexec/java_home -v 19)"
+              export JAVA_HOME
+            elif [ -d "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home" ]; then
+              export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+            elif [ -d "/usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home" ]; then
+              export JAVA_HOME="/usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
             else
-              echo "error: No JDK found. Install one with 'brew install openjdk@21', or set JAVA_HOME." >&2
+              echo "error: No supported JDK found. Install one with 'brew install openjdk@17', or set JAVA_HOME." >&2
               exit 1
             fi
           fi

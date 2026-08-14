@@ -12,7 +12,7 @@ path without one.
 xcode-select --install
 
 # A JDK for Gradle, and XcodeGen for the project file
-brew install openjdk@21 xcodegen
+brew install openjdk@17 xcodegen
 ```
 
 ## Look at it on the Mac first
@@ -70,7 +70,7 @@ gets old quickly - that is the real reason to pay, not any feature difference.
 
 **`JAVA_HOME is not set`** — Xcode build phases run without your shell
 environment. The build script tries `/usr/libexec/java_home` and the usual
-Homebrew locations; if none exist, install a JDK with `brew install openjdk@21`.
+Homebrew locations; if none exist, install a JDK with `brew install openjdk@17`.
 
 **A permission or sandbox error in the framework build phase** — Xcode 15+
 sandboxes build scripts. `ENABLE_USER_SCRIPT_SANDBOXING: NO` in `project.yml`
@@ -96,12 +96,13 @@ not live. Re-run `xcodegen generate`.
 
 ---
 
-## What has not been verified
+## Verification status
 
-None of this has run. It was written on Linux, where Compose Multiplatform
-cannot be compiled at all and Kotlin/Native cannot target Apple. The
-configuration follows the standard Compose Multiplatform layout and the known
-sharp edges are handled above, but expect to fix something on the first build.
+The JVM core suite, Ktor server suite, and desktop Compose target compile and
+pass on macOS. The Xcode 26.6 toolchain is detected. The first Kotlin/Native
+simulator framework build can take several minutes; run this direct gate before
+generating or opening the host project:
 
-The shared logic in `:core` is a different story - that is tested, and
-`./gradlew checkCore` will prove it on your machine in about a minute.
+```bash
+./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
+```

@@ -14,15 +14,14 @@ The product rule, taken from the brief:
 
 | Part | Status |
 |---|---|
-| `:core` — domain, engines, content, curriculum, persistence, sync | **Compiles and passes 304 tests** on the JVM target |
-| `:composeApp` — Compose UI, Android + iOS targets | **Written but never compiled** |
-| `iosApp` — Xcode host | Generated from `project.yml`, never opened |
+| `:core` — domain, course/mastery engines, content, persistence, sync | **Compiles and passes the JVM suite** |
+| `:composeApp` — Compose UI, Android + iOS targets | **Desktop compilation verified** |
+| `:server` — Ktor, PostgreSQL, JWT, classrooms, Judge0 gateway | **Compiles and passes API/security tests** |
+| `iosApp` — Xcode host | Generated from `project.yml`; simulator framework verification requires Xcode |
 
-The environment this was built in cannot compile Compose Multiplatform at all.
-Compose transitively requires `androidx.annotation` and `androidx.lifecycle`,
-which are published **only** to Google's Maven repository (`dl.google.com`),
-and that host is blocked by the sandbox network policy. There is also no
-Android SDK, and Kotlin/Native cannot cross-compile Apple targets from Linux.
+The project is pinned to JDK 17 through `.java-version` and CI. JDK 25 currently
+fails before Gradle can evaluate the Kotlin build scripts; use JDK 17 (JDK 19
+also works locally) until the Kotlin/Gradle toolchain supports that version.
 
 So the split above is not a design preference — it is the line between what
 could be verified and what could not. Everything below that line is
@@ -36,11 +35,11 @@ pushed down into it for exactly this reason — the challenge screen's rules, fo
 instance, live in `ChallengeSession` in `:core` and are unit tested, leaving the
 Compose `ChallengeViewModel` as a thin wrapper.
 
-### Verify the part that works
+### Verify the project
 
 ```bash
 cd CodingArena
-./gradlew checkCore          # == :core:jvmTest, 304 tests, needs only a JDK
+./gradlew :core:jvmTest :server:test :composeApp:compileKotlinDesktop
 ```
 
 ### See the UI, fastest route
@@ -89,6 +88,28 @@ JDK-only machine configure the build at all.
 ---
 
 ## What is implemented
+
+### Chess-style learning course
+
+The primary loop is now **Roadmap -> independent Practice -> Blitz review**.
+The first eight ranks cover variables through Arrays & Hashing; later ranks are
+visible but deliberately marked coming soon. Lessons include recognition cues
+and guided trace/rearrange/debug/fill exercises. A 70% checkpoint unlocks an
+independent solve, and three successful reviews on separate days award mastery.
+Mastered material can become review-due but is never relocked.
+
+Practice includes offline drafts and starter programs for Python, Java,
+JavaScript, Kotlin, C++, Go, and Swift. Run uses public examples; Submit adds
+server-held hidden tests. The Roadmap Blitz uses only unlocked strategies and
+prioritizes due reviews.
+
+### Classrooms and execution server
+
+Students and teachers can register, join or create classes, receive assignments,
+and sync mastery/confusion data. The teacher dashboard never exposes student
+source code. The Ktor server uses signed sessions, PostgreSQL, rate limiting,
+owner-scoped submission access, and a private Judge0 gateway. See
+`server/README.md` for local deployment.
 
 ### The learning loop
 
@@ -145,7 +166,7 @@ as already-known, and the topic the first learning path targets.
 
 ### Roadmap and Blitz
 
-The **NeetCode 150** (with the **Blind 75** flagged as a subset) is modelled as
+The **CodingArena 150** (with an **Essential Shortlist** flagged as a subset) is modelled as
 a curriculum: 150 entries across 18 pattern groups. **Blitz** drills it as
 flashcards — *"Longest Substring Without Repeating Characters — which pattern?"*
 — with four options, a 450ms flash on a right answer and 1.4s on a wrong one so
@@ -193,7 +214,7 @@ factual metadata about a published list. The original problem *statements* are
 copyrighted and are **not** reproduced — each entry carries a one-line
 paraphrase written for this app, plus a link out to solve the real thing.
 
-**Needs a spot-check:** the Blind 75 flags are a hand transcription and
+**Needs a spot-check:** the shortlist flags are a hand transcription and
 currently mark 76 problems, one more than the canonical list. `NeetCode150Test`
 pins the count so it cannot drift further, but one flag is likely wrong and
 should be checked against the source.
@@ -215,7 +236,7 @@ should be checked against the source.
 
 46 curated problems covering all 20 categories from the brief and every one of
 the 11 challenge types; a 20-entry pattern library; 14 achievements; and the
-150-entry NeetCode roadmap.
+150-entry CodingArena roadmap.
 
 Content integrity is enforced by tests, not by review. `StarterContentTest`
 checks cross-references, per-type coverage, and that every distractor carries a
@@ -277,17 +298,14 @@ Compose, an Android SDK, or a Mac. Package names still follow the brief.
 
 ---
 
-## Not built
+## Still to integrate
 
-Everything the brief excludes from the MVP, plus these Phase 2 items:
-
-- **A real backend.** `ArenaRemoteDataSource` defines the contract and
-  `SyncUseCase` implements the pass — upload-first ordering, per-step failure
-  isolation, and timestamp-based rating conflict resolution, all tested against
-  a fake. What is missing is the Supabase client behind it; today the binding is
-  `OfflineOnlyRemoteDataSource`, which honestly reports "no connection" rather
-  than pretending to succeed. Swapping one Koin binding turns sync on.
-- **Sign in with Apple / auth.** Profiles are local and guest-only.
+- **Legacy attempt/rating cloud sync.** Course progress, accounts, classes,
+  assignments, and execution use the Ktor server. The older
+  `ArenaRemoteDataSource` attempt/rating pass remains offline-only until its DTOs
+  are moved to the same API.
+- **Sign in with Apple.** Email/password account sessions are implemented; the
+  Apple identity-provider flow is not.
 - **Push notifications.** The settings toggle persists but nothing schedules.
 
 ---
@@ -303,8 +321,9 @@ core/src/jvmTest/      repositories, use cases, sync and a full end-to-end
                        journey, against in-memory SQLite
 ```
 
-304 tests, all passing. `LearningLoopJourneyTest` walks the whole flagship loop
+The complete suite is passing. `LearningLoopJourneyTest` walks the flagship loop
 — install, onboard, solve, review, streak, rating movement — so it fails loudest
 if the pieces stop fitting together.
 
-There are **no UI tests** — see the build-status note.
+There are no automated Compose UI tests yet; desktop compilation and the domain
+journey tests are the current UI-facing gates.

@@ -61,6 +61,7 @@ dependencyResolutionManagement {
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(":core")
+include(":server")
 if (uiEnabled) include(":composeApp")
 
 gradle.projectsLoaded {

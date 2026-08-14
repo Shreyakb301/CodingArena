@@ -1,0 +1,40 @@
+// Applied to :composeApp only when an Android SDK is present. This is a
+// Groovy script plugin deliberately: precompiled Kotlin script plugins are
+// compiled in an isolated classpath and cannot resolve the conditionally
+// loaded Android plugin types on every host. The `androidTarget { }` setup
+// itself lives back in build.gradle.kts, since it comes from the Kotlin
+// Multiplatform plugin (always on the classpath) rather than AGP, and a
+// typed Kotlin script resolves org.jetbrains.kotlin.gradle.dsl.JvmTarget
+// without the classloader-visibility issues this Groovy script hits.
+apply plugin: "com.android.application"
+
+android {
+    namespace = "com.codingarena"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.codingarena"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "0.1.0"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+            res.srcDirs("src/androidMain/res")
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}

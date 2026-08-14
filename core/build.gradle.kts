@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
@@ -9,10 +11,20 @@ val appleEnabled = System.getProperty("codingarena.apple").toBoolean()
 
 // Adds the Android target. Must run before the `kotlin { }` block below so the
 // android source sets exist by the time dependencies are wired up.
-if (androidEnabled) apply(from = rootProject.file("gradle/android-core.gradle.kts"))
+if (androidEnabled) apply(from = rootProject.file("gradle/android-core.gradle"))
 
 kotlin {
     jvm()
+
+    if (androidEnabled) {
+        androidTarget {
+            compilations.all {
+                compileTaskProvider.configure {
+                    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+                }
+            }
+        }
+    }
 
     if (appleEnabled) {
         iosX64()
@@ -49,9 +61,13 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
         }
 
-        findByName("iosMain")?.dependencies {
-            implementation(libs.sqldelight.driver.native)
-            implementation(libs.ktor.client.darwin)
+        if (appleEnabled) {
+            matching { it.name == "iosMain" }.configureEach {
+                dependencies {
+                    implementation(libs.sqldelight.driver.native)
+                    implementation(libs.ktor.client.darwin)
+                }
+            }
         }
     }
 }
