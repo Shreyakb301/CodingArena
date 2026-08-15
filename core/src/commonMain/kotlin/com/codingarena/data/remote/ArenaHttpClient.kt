@@ -5,7 +5,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-data class ArenaServerConfig(val baseUrl: String = "http://127.0.0.1:8080")
+data class ArenaServerConfig(val baseUrl: String = "https://codingarena-api.onrender.com")
 
 fun createArenaHttpClient(): HttpClient = HttpClient {
     install(ContentNegotiation) {

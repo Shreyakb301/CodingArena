@@ -8,6 +8,18 @@
 // without the classloader-visibility issues this Groovy script hits.
 apply plugin: "com.android.application"
 
+// Release signing secrets live outside version control in
+// keystore.properties (see .gitignore) so the upload key and its
+// passwords never end up in git history. Local/CI builds without that
+// file still work - they just fall back to an unsigned release artifact,
+// which is fine for anything short of an actual Play Console upload.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasSigningConfig = keystorePropertiesFile.exists()
+if (hasSigningConfig) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.codingarena"
     compileSdk = 35
@@ -27,10 +39,33 @@ android {
         }
     }
 
+    if (hasSigningConfig) {
+        signingConfigs {
+            release {
+                storeFile rootProject.file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled = false
+            if (hasSigningConfig) {
+                signingConfig = signingConfigs.release
+            }
         }
+    }
+
+    lint {
+        // lintVitalAnalyzeRelease crashes on this AGP/Kotlin-analysis-API
+        // combination (KaCallableMemberCall ClassCastException inside
+        // NonNullableMutableLiveDataDetector) rather than reporting a real
+        // issue in this project. Skip it for release builds until the AGP
+        // version fixes the incompatibility.
+        checkReleaseBuilds = false
     }
 
     compileOptions {

@@ -4,3 +4,8 @@ local.properties
 .DS_Store
 *.xcodeproj
 xcuserdata/
+
+# Release signing secrets - never commit these.
+*.jks
+*.keystore
+keystore.properties
