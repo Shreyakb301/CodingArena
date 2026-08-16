@@ -576,6 +576,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "left++\nwhile (left < right && nums[left] == nums[left - 1]) left++",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "# after recording a match at nums[i], nums[left], nums[right]\n# ???",
+                choices = listOf(
+                    choice("left += 1; right -= 1\nwhile left < right and nums[left] == nums[left - 1]:\n    left += 1\nwhile left < right and nums[right] == nums[right + 1]:\n    right -= 1", true, "Advancing past every run of equal values on both sides after a match, not just moving one step, ensures the exact same triplet's values are never rediscovered from an adjacent duplicate.", code = "left += 1; right -= 1\nwhile left < right and nums[left] == nums[left - 1]:\n    left += 1\nwhile left < right and nums[right] == nums[right + 1]:\n    right -= 1"),
+                    choice("left += 1; right -= 1", false, "Moving just one step past the match leaves duplicate values right next to the new positions, so the identical triplet can be found again from those adjacent equal values.", code = "left += 1; right -= 1"),
+                    choice("left += 1\nwhile left < right and nums[left] == nums[left - 1]:\n    left += 1", false, "Only skipping duplicates on the left side leaves the right pointer free to rediscover the same triplet from an adjacent equal value on its own side.", code = "left += 1\nwhile left < right and nums[left] == nums[left - 1]:\n    left += 1"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "// after recording a match at nums[i], nums[left], nums[right]\n// ???",
+                choices = listOf(
+                    choice("left++; right--;\nwhile (left < right && nums[left] == nums[left - 1]) left++;\nwhile (left < right && nums[right] == nums[right + 1]) right--;", true, "Advancing past every run of equal values on both sides after a match, not just moving one step, ensures the exact same triplet's values are never rediscovered from an adjacent duplicate.", code = "left++; right--;\nwhile (left < right && nums[left] == nums[left - 1]) left++;\nwhile (left < right && nums[right] == nums[right + 1]) right--;"),
+                    choice("left++; right--;", false, "Moving just one step past the match leaves duplicate values right next to the new positions, so the identical triplet can be found again from those adjacent equal values.", code = "left++; right--;"),
+                    choice("left++;\nwhile (left < right && nums[left] == nums[left - 1]) left++;", false, "Only skipping duplicates on the left side leaves the right pointer free to rediscover the same triplet from an adjacent equal value on its own side.", code = "left++;\nwhile (left < right && nums[left] == nums[left - 1]) left++;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "// after recording a match at nums[i], nums[left], nums[right]\n// ???",
+                choices = listOf(
+                    choice("left++; right--;\nwhile (left < right && nums[left] === nums[left - 1]) left++;\nwhile (left < right && nums[right] === nums[right + 1]) right--;", true, "Advancing past every run of equal values on both sides after a match, not just moving one step, ensures the exact same triplet's values are never rediscovered from an adjacent duplicate.", code = "left++; right--;\nwhile (left < right && nums[left] === nums[left - 1]) left++;\nwhile (left < right && nums[right] === nums[right + 1]) right--;"),
+                    choice("left++; right--;", false, "Moving just one step past the match leaves duplicate values right next to the new positions, so the identical triplet can be found again from those adjacent equal values.", code = "left++; right--;"),
+                    choice("left++;\nwhile (left < right && nums[left] === nums[left - 1]) left++;", false, "Only skipping duplicates on the left side leaves the right pointer free to rediscover the same triplet from an adjacent equal value on its own side.", code = "left++;\nwhile (left < right && nums[left] === nums[left - 1]) left++;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "// after recording a match at nums[i], nums[left], nums[right]\n// ???",
+                choices = listOf(
+                    choice("left++; right--;\nwhile (left < right && nums[left] == nums[left - 1]) left++;\nwhile (left < right && nums[right] == nums[right + 1]) right--;", true, "Advancing past every run of equal values on both sides after a match, not just moving one step, ensures the exact same triplet's values are never rediscovered from an adjacent duplicate.", code = "left++; right--;\nwhile (left < right && nums[left] == nums[left - 1]) left++;\nwhile (left < right && nums[right] == nums[right + 1]) right--;"),
+                    choice("left++; right--;", false, "Moving just one step past the match leaves duplicate values right next to the new positions, so the identical triplet can be found again from those adjacent equal values.", code = "left++; right--;"),
+                    choice("left++;\nwhile (left < right && nums[left] == nums[left - 1]) left++;", false, "Only skipping duplicates on the left side leaves the right pointer free to rediscover the same triplet from an adjacent equal value on its own side.", code = "left++;\nwhile (left < right && nums[left] == nums[left - 1]) left++;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "// after recording a match at nums[i], nums[left], nums[right]\n// ???",
+                choices = listOf(
+                    choice("left++\nright--\nfor left < right && nums[left] == nums[left-1] {\n    left++\n}\nfor left < right && nums[right] == nums[right+1] {\n    right--\n}", true, "Advancing past every run of equal values on both sides after a match, not just moving one step, ensures the exact same triplet's values are never rediscovered from an adjacent duplicate.", code = "left++\nright--\nfor left < right && nums[left] == nums[left-1] {\n    left++\n}\nfor left < right && nums[right] == nums[right+1] {\n    right--\n}"),
+                    choice("left++\nright--", false, "Moving just one step past the match leaves duplicate values right next to the new positions, so the identical triplet can be found again from those adjacent equal values.", code = "left++\nright--"),
+                    choice("left++\nfor left < right && nums[left] == nums[left-1] {\n    left++\n}", false, "Only skipping duplicates on the left side leaves the right pointer free to rediscover the same triplet from an adjacent equal value on its own side.", code = "left++\nfor left < right && nums[left] == nums[left-1] {\n    left++\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "// after recording a match at nums[i], nums[left], nums[right]\n// ???",
+                choices = listOf(
+                    choice("left += 1; right -= 1\nwhile left < right && nums[left] == nums[left - 1] { left += 1 }\nwhile left < right && nums[right] == nums[right + 1] { right -= 1 }", true, "Advancing past every run of equal values on both sides after a match, not just moving one step, ensures the exact same triplet's values are never rediscovered from an adjacent duplicate.", code = "left += 1; right -= 1\nwhile left < right && nums[left] == nums[left - 1] { left += 1 }\nwhile left < right && nums[right] == nums[right + 1] { right -= 1 }"),
+                    choice("left += 1; right -= 1", false, "Moving just one step past the match leaves duplicate values right next to the new positions, so the identical triplet can be found again from those adjacent equal values.", code = "left += 1; right -= 1"),
+                    choice("left += 1\nwhile left < right && nums[left] == nums[left - 1] { left += 1 }", false, "Only skipping duplicates on the left side leaves the right pointer free to rediscover the same triplet from an adjacent equal value on its own side.", code = "left += 1\nwhile left < right && nums[left] == nums[left - 1] { left += 1 }"),
+                ),
+            ),
+        ),
     ),
     step(
         "container-with-most-water", TWO_POINTERS, TIME_COMPLEXITY,
