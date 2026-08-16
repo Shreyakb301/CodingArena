@@ -46,6 +46,6 @@ class StartAppUseCase(
         const val KEY_CONTENT_VERSION = "content_version"
 
         /** Bump when the bundled problem set changes. */
-        const val CONTENT_VERSION = 1
+        const val CONTENT_VERSION = 2
     }
 }

@@ -2,8 +2,15 @@ package com.codingarena.content
 
 import com.codingarena.domain.model.AnswerChoice
 import com.codingarena.domain.model.ChallengeType
+import com.codingarena.domain.model.CodeVariant
 import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.CodingTopic
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.KOTLIN
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
 
 /**
  * Starter content, part four: the patterns that had lessons but no practice.
@@ -13,6 +20,85 @@ import com.codingarena.domain.model.CodingTopic
  * meant the recommender could never target them and a user weak in any of them
  * was invisible to the learning path engine.
  */
+/**
+ * Brace-language line numbers for `backtracking-02`, shared across all six
+ * variants: using an explicit brace on every if/for (rather than Python's
+ * bare-colon blocks) consistently pushes the "undo" bug from line 11 to
+ * line 13 and the skip-check from line 6 to line 7.
+ */
+private val backtrackingBraceChoices = listOf(
+    AnswerChoice(
+        "a", "Line 13", tag = "13",
+        rationale = "Correct: the used flag is reset but the element is never popped off " +
+            "path, so path keeps growing and later branches carry stale elements.",
+    ),
+    AnswerChoice(
+        "b", "Line 3", tag = "3",
+        rationale = "Copying the path before appending is exactly right - appending the live " +
+            "path itself would be the other classic bug here.",
+        insight = "This is the line that is usually wrong in this shape of code, so " +
+            "checking it first is good instinct.",
+    ),
+    AnswerChoice("c", "Line 7", tag = "7", rationale = "Skipping already-used elements is correct for permutations."),
+    AnswerChoice(
+        "d", "Line 11", tag = "11",
+        rationale = "Appending on the way down is correct; the fault is that nothing " +
+            "removes it on the way back up.",
+        insight = "You are looking at the right pair of operations - the missing half is " +
+            "the undo, not the do.",
+    ),
+)
+
+/**
+ * Brace-language line numbers for `unionfind-02`. Java/JavaScript/C++/Go can
+ * reassign their `x` parameter directly, matching Python's line count exactly
+ * except for the closing braces that push `union`'s body and `connected`'s
+ * return down by two lines. Kotlin/Swift parameters are immutable, so those
+ * need one extra local-variable line, shifting everything by one more.
+ */
+private val unionFindBraceChoicesGroupA = listOf(
+    AnswerChoice(
+        "a", "Line 9", tag = "9",
+        rationale = "Correct: it links the elements directly instead of their roots, so " +
+            "an earlier merge involving a is silently discarded.",
+    ),
+    AnswerChoice(
+        "b", "Line 13", tag = "13",
+        rationale = "Comparing roots is exactly right - that is what find is for.",
+        insight = "This is the classic Union Find mistake, so suspecting it is sound. " +
+            "Here it is the one line that is correct.",
+    ),
+    AnswerChoice("c", "Line 2", tag = "2", rationale = "Walking up until a node is its own parent is the correct root test."),
+    AnswerChoice(
+        "d", "Line 3", tag = "3",
+        rationale = "Ascending one level at a time is correct; it is merely slow without " +
+            "path compression, which is not what breaks correctness here.",
+        insight = "You are right that this line is suboptimal - it costs speed, not " +
+            "correctness.",
+    ),
+)
+private val unionFindBraceChoicesGroupB = listOf(
+    AnswerChoice(
+        "a", "Line 10", tag = "10",
+        rationale = "Correct: it links the elements directly instead of their roots, so " +
+            "an earlier merge involving a is silently discarded.",
+    ),
+    AnswerChoice(
+        "b", "Line 14", tag = "14",
+        rationale = "Comparing roots is exactly right - that is what find is for.",
+        insight = "This is the classic Union Find mistake, so suspecting it is sound. " +
+            "Here it is the one line that is correct.",
+    ),
+    AnswerChoice("c", "Line 3", tag = "3", rationale = "Walking up until a node is its own parent is the correct root test."),
+    AnswerChoice(
+        "d", "Line 4", tag = "4",
+        rationale = "Ascending one level at a time is correct; it is merely slow without " +
+            "path compression, which is not what breaks correctness here.",
+        insight = "You are right that this line is suboptimal - it costs speed, not " +
+            "correctness.",
+    ),
+)
+
 internal val advancedPatternProblems: List<CodingProblem> = listOf(
 
     // ------------------------------------------------------------ backtracking
@@ -134,6 +220,134 @@ internal val advancedPatternProblems: List<CodingProblem> = listOf(
         ),
         patternId = "backtracking",
         estimatedSeconds = 60,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                1  void permute(int[] nums, List<Integer> path, boolean[] used, List<List<Integer>> out) {
+                2      if (path.size() == nums.length) {
+                3          out.add(new ArrayList<>(path));
+                4          return;
+                5      }
+                6      for (int i = 0; i < nums.length; i++) {
+                7          if (used[i]) {
+                8              continue;
+                9          }
+                10         used[i] = true;
+                11         path.add(nums[i]);
+                12         permute(nums, path, used, out);
+                13         used[i] = false;
+                14     }
+                """.trimIndent(),
+                choices = backtrackingBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                1  function permute(nums, path, used, out) {
+                2      if (path.length === nums.length) {
+                3          out.push([...path]);
+                4          return;
+                5      }
+                6      for (let i = 0; i < nums.length; i++) {
+                7          if (used[i]) {
+                8              continue;
+                9          }
+                10         used[i] = true;
+                11         path.push(nums[i]);
+                12         permute(nums, path, used, out);
+                13         used[i] = false;
+                14     }
+                """.trimIndent(),
+                choices = backtrackingBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                1  fun permute(nums: IntArray, path: MutableList<Int>, used: BooleanArray, out: MutableList<List<Int>>) {
+                2      if (path.size == nums.size) {
+                3          out.add(path.toList())
+                4          return
+                5      }
+                6      for (i in nums.indices) {
+                7          if (used[i]) {
+                8              continue
+                9          }
+                10         used[i] = true
+                11         path.add(nums[i])
+                12         permute(nums, path, used, out)
+                13         used[i] = false
+                14     }
+                """.trimIndent(),
+                choices = backtrackingBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                1  void permute(vector<int>& nums, vector<int>& path, vector<bool>& used, vector<vector<int>>& out) {
+                2      if (path.size() == nums.size()) {
+                3          out.push_back(path);
+                4          return;
+                5      }
+                6      for (int i = 0; i < (int)nums.size(); i++) {
+                7          if (used[i]) {
+                8              continue;
+                9          }
+                10         used[i] = true;
+                11         path.push_back(nums[i]);
+                12         permute(nums, path, used, out);
+                13         used[i] = false;
+                14     }
+                """.trimIndent(),
+                choices = backtrackingBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                GO,
+                """
+                1  func permute(nums []int, path []int, used []bool, out *[][]int) {
+                2      if len(path) == len(nums) {
+                3          *out = append(*out, append([]int{}, path...))
+                4          return
+                5      }
+                6      for i := 0; i < len(nums); i++ {
+                7          if used[i] {
+                8              continue
+                9          }
+                10         used[i] = true
+                11         path = append(path, nums[i])
+                12         permute(nums, path, used, out)
+                13         used[i] = false
+                14     }
+                """.trimIndent(),
+                choices = backtrackingBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                1  func permute(_ nums: [Int], _ path: inout [Int], _ used: inout [Bool], _ out: inout [[Int]]) {
+                2      if path.count == nums.count {
+                3          out.append(path)
+                4          return
+                5      }
+                6      for i in 0..<nums.count {
+                7          if used[i] {
+                8              continue
+                9          }
+                10         used[i] = true
+                11         path.append(nums[i])
+                12         permute(nums, &path, &used, &out)
+                13         used[i] = false
+                14     }
+                """.trimIndent(),
+                choices = backtrackingBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -459,6 +673,122 @@ internal val advancedPatternProblems: List<CodingProblem> = listOf(
         ),
         patternId = "trie",
         estimatedSeconds = 55,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                void insert(TrieNode root, String word) {
+                    TrieNode node = root;
+                    for (char ch : word.toCharArray()) {
+                        // ___ blank ___
+                    }
+                    node.isWord = true;
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "node = node.children.computeIfAbsent(ch, c -> new TrieNode());", rationale = "Correct: creates the child if missing, then descends into it either way."),
+                    AnswerChoice("b", "node = node.children.get(ch);", rationale = "Descends correctly but returns null the first time a character has not been seen before - it never creates anything.", insight = "The descent is exactly right; what is missing is creating the node when it does not exist yet."),
+                    AnswerChoice("c", "node.children.put(ch, new TrieNode());", rationale = "Creates a child but never descends, so every character overwrites the same level and the word is flattened.", insight = "You have the creation half; the cursor also has to move down."),
+                    AnswerChoice("d", "root = root.children.computeIfAbsent(ch, c -> new TrieNode());", rationale = "Moves the root pointer instead of the cursor, corrupting the trie for every later insert."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function insert(root, word) {
+                    let node = root;
+                    for (const ch of word) {
+                        // ___ blank ___
+                    }
+                    node["*"] = true;
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "node = node[ch] ??= {};", rationale = "Correct: creates the child if missing, then descends into it either way."),
+                    AnswerChoice("b", "node = node[ch];", rationale = "Descends correctly but node becomes undefined the first time a character has not been seen before - it never creates anything.", insight = "The descent is exactly right; what is missing is creating the node when it does not exist yet."),
+                    AnswerChoice("c", "node[ch] = {};", rationale = "Creates a child but never descends, so every character overwrites the same level and the word is flattened.", insight = "You have the creation half; the cursor also has to move down."),
+                    AnswerChoice("d", "root = root[ch] ??= {};", rationale = "Moves the root pointer instead of the cursor, corrupting the trie for every later insert."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun insert(root: TrieNode, word: String) {
+                    var node = root
+                    for (ch in word) {
+                        // ___ blank ___
+                    }
+                    node.isWord = true
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "node = node.children.getOrPut(ch) { TrieNode() }", rationale = "Correct: creates the child if missing, then descends into it either way."),
+                    AnswerChoice("b", "node = node.children[ch]!!", rationale = "Descends correctly but throws the first time a character has not been seen before - it never creates anything.", insight = "The descent is exactly right; what is missing is creating the node when it does not exist yet."),
+                    AnswerChoice("c", "node.children[ch] = TrieNode()", rationale = "Creates a child but never descends, so every character overwrites the same level and the word is flattened.", insight = "You have the creation half; the cursor also has to move down."),
+                    AnswerChoice("d", "root.children[ch] = root.children.getOrPut(ch) { TrieNode() }", rationale = "Rewrites the root's own entry instead of moving the cursor down, corrupting the trie for every later insert."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                void insert(TrieNode* root, string word) {
+                    TrieNode* node = root;
+                    for (char ch : word) {
+                        // ___ blank ___
+                    }
+                    node->isWord = true;
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "node = node->children.emplace(ch, new TrieNode()).first->second;", rationale = "Correct: creates the child if missing, then descends into it either way."),
+                    AnswerChoice("b", "node = node->children[ch];", rationale = "Silently yields a null child the first time a character has not been seen before - it never creates a real node.", insight = "The descent is exactly right; what is missing is creating the node when it does not exist yet."),
+                    AnswerChoice("c", "node->children[ch] = new TrieNode();", rationale = "Creates a child but never descends, so every character overwrites the same level and the word is flattened.", insight = "You have the creation half; the cursor also has to move down."),
+                    AnswerChoice("d", "root = root->children.emplace(ch, new TrieNode()).first->second;", rationale = "Moves the root pointer instead of the cursor, corrupting the trie for every later insert."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func insert(root *TrieNode, word string) {
+                    node := root
+                    for _, ch := range word {
+                        // ___ blank ___
+                    }
+                    node.IsWord = true
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "node = getOrCreate(node.Children, ch)", rationale = "Correct: creates the child if missing, then descends into it either way."),
+                    AnswerChoice("b", "node = node.Children[ch]", rationale = "Descends correctly but node becomes nil the first time a character has not been seen before - it never creates anything.", insight = "The descent is exactly right; what is missing is creating the node when it does not exist yet."),
+                    AnswerChoice("c", "node.Children[ch] = &TrieNode{}", rationale = "Creates a child but never descends, so every character overwrites the same level and the word is flattened.", insight = "You have the creation half; the cursor also has to move down."),
+                    AnswerChoice("d", "root = getOrCreate(root.Children, ch)", rationale = "Moves the root pointer instead of the cursor, corrupting the trie for every later insert."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func insert(_ root: TrieNode, _ word: String) {
+                    var node = root
+                    for ch in word {
+                        // ___ blank ___
+                    }
+                    node.isWord = true
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "if node.children[ch] == nil { node.children[ch] = TrieNode() }\nnode = node.children[ch]!", rationale = "Correct: creates the child if missing, then descends into it either way."),
+                    AnswerChoice("b", "node = node.children[ch]!", rationale = "Descends correctly but crashes the first time a character has not been seen before - it never creates anything.", insight = "The descent is exactly right; what is missing is creating the node when it does not exist yet."),
+                    AnswerChoice("c", "node.children[ch] = TrieNode()", rationale = "Creates a child but never descends, so every character overwrites the same level and the word is flattened.", insight = "You have the creation half; the cursor also has to move down."),
+                    AnswerChoice("d", "if root.children[ch] == nil { root.children[ch] = TrieNode() }\nroot = root.children[ch]!", rationale = "Moves the root pointer instead of the cursor, corrupting the trie for every later insert."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+        ),
     ),
 
     // -------------------------------------------------------- bit manipulation
@@ -518,6 +848,80 @@ internal val advancedPatternProblems: List<CodingProblem> = listOf(
         ),
         patternId = "bit-manipulation",
         estimatedSeconds = 45,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                int x = 12;
+                int count = 0;
+                while (x != 0) {
+                    x = x & (x - 1);
+                    count++;
+                }
+                System.out.println(count);
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                let x = 12;
+                let count = 0;
+                while (x) {
+                    x = x & (x - 1);
+                    count++;
+                }
+                console.log(count);
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                var x = 12
+                var count = 0
+                while (x != 0) {
+                    x = x and (x - 1)
+                    count++
+                }
+                println(count)
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int x = 12;
+                int count = 0;
+                while (x) {
+                    x = x & (x - 1);
+                    count++;
+                }
+                cout << count;
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                x := 12
+                count := 0
+                for x != 0 {
+                    x = x & (x - 1)
+                    count++
+                }
+                fmt.Println(count)
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                var x = 12
+                var count = 0
+                while x != 0 {
+                    x = x & (x - 1)
+                    count += 1
+                }
+                print(count)
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -628,6 +1032,88 @@ internal val advancedPatternProblems: List<CodingProblem> = listOf(
         ),
         patternId = "bit-manipulation",
         estimatedSeconds = 60,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                int f(int n) {
+                    int result = 0;
+                    while (n > 0) {
+                        result = (result << 1) | (n & 1);
+                        n = n >> 1;
+                    }
+                    return result;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function f(n) {
+                    let result = 0;
+                    while (n > 0) {
+                        result = (result << 1) | (n & 1);
+                        n = n >> 1;
+                    }
+                    return result;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun f(start: Int): Int {
+                    var result = 0
+                    var n = start
+                    while (n > 0) {
+                        result = (result shl 1) or (n and 1)
+                        n = n shr 1
+                    }
+                    return result
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int f(int n) {
+                    int result = 0;
+                    while (n > 0) {
+                        result = (result << 1) | (n & 1);
+                        n = n >> 1;
+                    }
+                    return result;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func f(n int) int {
+                    result := 0
+                    for n > 0 {
+                        result = (result << 1) | (n & 1)
+                        n = n >> 1
+                    }
+                    return result
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func f(_ start: Int) -> Int {
+                    var result = 0
+                    var n = start
+                    while n > 0 {
+                        result = (result << 1) | (n & 1)
+                        n = n >> 1
+                    }
+                    return result
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     // -------------------------------------------------------------- union find
@@ -747,6 +1233,136 @@ internal val advancedPatternProblems: List<CodingProblem> = listOf(
         ),
         patternId = "union-find",
         estimatedSeconds = 65,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                1  int find(int[] parent, int x) {
+                2      while (parent[x] != x) {
+                3          x = parent[x];
+                4      }
+                5      return x;
+                6  }
+                7
+                8  void union(int[] parent, int a, int b) {
+                9      parent[a] = b;
+                10 }
+                11
+                12 boolean connected(int[] parent, int a, int b) {
+                13     return find(parent, a) == find(parent, b);
+                14 }
+                """.trimIndent(),
+                choices = unionFindBraceChoicesGroupA,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                1  function find(parent, x) {
+                2      while (parent[x] !== x) {
+                3          x = parent[x];
+                4      }
+                5      return x;
+                6  }
+                7
+                8  function union(parent, a, b) {
+                9      parent[a] = b;
+                10 }
+                11
+                12 function connected(parent, a, b) {
+                13     return find(parent, a) === find(parent, b);
+                14 }
+                """.trimIndent(),
+                choices = unionFindBraceChoicesGroupA,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                1  fun find(parent: IntArray, start: Int): Int {
+                2      var x = start
+                3      while (parent[x] != x) {
+                4          x = parent[x]
+                5      }
+                6      return x
+                7  }
+                8
+                9  fun union(parent: IntArray, a: Int, b: Int) {
+                10     parent[a] = b
+                11 }
+                12
+                13 fun connected(parent: IntArray, a: Int, b: Int): Boolean {
+                14     return find(parent, a) == find(parent, b)
+                15 }
+                """.trimIndent(),
+                choices = unionFindBraceChoicesGroupB,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                1  int find(vector<int>& parent, int x) {
+                2      while (parent[x] != x) {
+                3          x = parent[x];
+                4      }
+                5      return x;
+                6  }
+                7
+                8  void unionSets(vector<int>& parent, int a, int b) {
+                9      parent[a] = b;
+                10 }
+                11
+                12 bool connected(vector<int>& parent, int a, int b) {
+                13     return find(parent, a) == find(parent, b);
+                14 }
+                """.trimIndent(),
+                choices = unionFindBraceChoicesGroupA,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                GO,
+                """
+                1  func find(parent []int, x int) int {
+                2      for parent[x] != x {
+                3          x = parent[x]
+                4      }
+                5      return x
+                6  }
+                7
+                8  func union(parent []int, a int, b int) {
+                9      parent[a] = b
+                10 }
+                11
+                12 func connected(parent []int, a int, b int) bool {
+                13     return find(parent, a) == find(parent, b)
+                14 }
+                """.trimIndent(),
+                choices = unionFindBraceChoicesGroupA,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                1  func find(_ parent: [Int], _ start: Int) -> Int {
+                2      var x = start
+                3      while parent[x] != x {
+                4          x = parent[x]
+                5      }
+                6      return x
+                7  }
+                8
+                9  func union(_ parent: inout [Int], _ a: Int, _ b: Int) {
+                10     parent[a] = b
+                11 }
+                12
+                13 func connected(_ parent: [Int], _ a: Int, _ b: Int) -> Bool {
+                14     return find(parent, a) == find(parent, b)
+                15 }
+                """.trimIndent(),
+                choices = unionFindBraceChoicesGroupB,
+                correctAnswerIds = listOf("a"),
+            ),
+        ),
     ),
 
     // --------------------------------------------------------- topological sort
@@ -908,6 +1524,115 @@ internal val advancedPatternProblems: List<CodingProblem> = listOf(
         ),
         patternId = "heap",
         estimatedSeconds = 50,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                PriorityQueue<Integer> heap = new PriorityQueue<>();
+                for (int n : nums) {
+                    heap.offer(n);
+                    // ___ blank ___
+                }
+                return heap;
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "if (heap.size() > k) heap.poll();", rationale = "Correct: a min-heap's head is its smallest element, so polling when the heap overflows discards the weakest candidate."),
+                    AnswerChoice("b", "if (heap.size() > k) heap.remove(Collections.max(heap));", rationale = "That removes the largest element instead of the smallest, which is exactly backwards for keeping the top k.", insight = "The condition is exactly right; it is the choice of which element to remove that is inverted."),
+                    AnswerChoice("c", "if (heap.size() < k) heap.poll();", rationale = "Backwards: this polls while the heap is still too small, so it never accumulates k elements.", insight = "Right operation, inverted comparison."),
+                    AnswerChoice("d", "heap.poll();", rationale = "Polling unconditionally removes one element for every one pushed, so the heap never grows past one."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                const heap = new MinHeap();
+                for (const n of nums) {
+                    heap.push(n);
+                    // ___ blank ___
+                }
+                return heap;
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "if (heap.size > k) heap.pop();", rationale = "Correct: a min-heap's root is its smallest element, so popping when the heap overflows discards the weakest candidate."),
+                    AnswerChoice("b", "if (heap.size > k) heap.removeMax();", rationale = "That removes the largest element instead of the smallest, which is exactly backwards for keeping the top k.", insight = "The condition is exactly right; it is the choice of which element to remove that is inverted."),
+                    AnswerChoice("c", "if (heap.size < k) heap.pop();", rationale = "Backwards: this pops while the heap is still too small, so it never accumulates k elements.", insight = "Right operation, inverted comparison."),
+                    AnswerChoice("d", "heap.pop();", rationale = "Popping unconditionally removes one element for every one pushed, so the heap never grows past one."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                val heap = PriorityQueue<Int>()
+                for (n in nums) {
+                    heap.offer(n)
+                    // ___ blank ___
+                }
+                return heap
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "if (heap.size > k) heap.poll()", rationale = "Correct: a min-heap's head is its smallest element, so polling when the heap overflows discards the weakest candidate."),
+                    AnswerChoice("b", "if (heap.size > k) heap.remove(heap.max())", rationale = "That removes the largest element instead of the smallest, which is exactly backwards for keeping the top k.", insight = "The condition is exactly right; it is the choice of which element to remove that is inverted."),
+                    AnswerChoice("c", "if (heap.size < k) heap.poll()", rationale = "Backwards: this polls while the heap is still too small, so it never accumulates k elements.", insight = "Right operation, inverted comparison."),
+                    AnswerChoice("d", "heap.poll()", rationale = "Polling unconditionally removes one element for every one pushed, so the heap never grows past one."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                priority_queue<int, vector<int>, greater<int>> heap;
+                for (int n : nums) {
+                    heap.push(n);
+                    // ___ blank ___
+                }
+                return heap;
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "if (heap.size() > k) heap.pop();", rationale = "Correct: a min-heap's top is its smallest element, so popping when the heap overflows discards the weakest candidate."),
+                    AnswerChoice("b", "if (heap.size() > k) { heap.pop(); heap.push(heap.top()); }", rationale = "That pops the smallest and immediately pushes it back, which is a no-op that leaves the heap one too large.", insight = "The overflow check is right; the removal itself undoes nothing useful."),
+                    AnswerChoice("c", "if (heap.size() < k) heap.pop();", rationale = "Backwards: this pops while the heap is still too small, so it never accumulates k elements.", insight = "Right operation, inverted comparison."),
+                    AnswerChoice("d", "heap.pop();", rationale = "Popping unconditionally removes one element for every one pushed, so the heap never grows past one."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                GO,
+                """
+                for _, n := range nums {
+                    heap.Push(h, n)
+                    // ___ blank ___
+                }
+                return h
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "if h.Len() > k { heap.Pop(h) }", rationale = "Correct: heap.Pop re-heapifies after removing the root, so the weakest candidate is discarded correctly."),
+                    AnswerChoice("b", "if h.Len() > k { h.Pop() }", rationale = "Calling the interface's raw Pop directly skips container/heap's re-heapify step, corrupting the heap invariant.", insight = "The condition is exactly right; the removal has to go through the heap package to preserve the invariant."),
+                    AnswerChoice("c", "if h.Len() < k { heap.Pop(h) }", rationale = "Backwards: this pops while the heap is still too small, so it never accumulates k elements.", insight = "Right operation, inverted comparison."),
+                    AnswerChoice("d", "heap.Pop(h)", rationale = "Popping unconditionally removes one element for every one pushed, so the heap never grows past one."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                var heap = MinHeap()
+                for n in nums {
+                    heap.push(n)
+                    // ___ blank ___
+                }
+                return heap
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "if heap.count > k { heap.pop() }", rationale = "Correct: a min-heap's root is its smallest element, so popping when the heap overflows discards the weakest candidate."),
+                    AnswerChoice("b", "if heap.count > k { heap.removeMax() }", rationale = "That removes the largest element instead of the smallest, which is exactly backwards for keeping the top k.", insight = "The condition is exactly right; it is the choice of which element to remove that is inverted."),
+                    AnswerChoice("c", "if heap.count < k { heap.pop() }", rationale = "Backwards: this pops while the heap is still too small, so it never accumulates k elements.", insight = "Right operation, inverted comparison."),
+                    AnswerChoice("d", "heap.pop()", rationale = "Popping unconditionally removes one element for every one pushed, so the heap never grows past one."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -966,6 +1691,92 @@ internal val advancedPatternProblems: List<CodingProblem> = listOf(
         ),
         patternId = "dynamic-programming",
         estimatedSeconds = 55,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                int climb(int n) {
+                    int[] dp = new int[n + 1];
+                    dp[0] = 1;
+                    dp[1] = 1;
+                    for (int i = 2; i <= n; i++) {
+                        dp[i] = dp[i - 1] + dp[i - 2];
+                    }
+                    return dp[n];
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function climb(n) {
+                    const dp = new Array(n + 1).fill(0);
+                    dp[0] = 1;
+                    dp[1] = 1;
+                    for (let i = 2; i <= n; i++) {
+                        dp[i] = dp[i - 1] + dp[i - 2];
+                    }
+                    return dp[n];
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun climb(n: Int): Int {
+                    val dp = IntArray(n + 1)
+                    dp[0] = 1
+                    dp[1] = 1
+                    for (i in 2..n) {
+                        dp[i] = dp[i - 1] + dp[i - 2]
+                    }
+                    return dp[n]
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int climb(int n) {
+                    vector<int> dp(n + 1, 0);
+                    dp[0] = 1;
+                    dp[1] = 1;
+                    for (int i = 2; i <= n; i++) {
+                        dp[i] = dp[i - 1] + dp[i - 2];
+                    }
+                    return dp[n];
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func climb(n int) int {
+                    dp := make([]int, n+1)
+                    dp[0] = 1
+                    dp[1] = 1
+                    for i := 2; i <= n; i++ {
+                        dp[i] = dp[i-1] + dp[i-2]
+                    }
+                    return dp[n]
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func climb(_ n: Int) -> Int {
+                    var dp = [Int](repeating: 0, count: n + 1)
+                    dp[0] = 1
+                    dp[1] = 1
+                    for i in 2...n {
+                        dp[i] = dp[i - 1] + dp[i - 2]
+                    }
+                    return dp[n]
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(

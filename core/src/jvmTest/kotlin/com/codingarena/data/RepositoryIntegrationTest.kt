@@ -401,7 +401,10 @@ class RepositoryIntegrationTest {
 
         assertTrue(destination is StartDestination.Onboarding)
         assertEquals(StarterContent.problems.size, env.problems.all().size)
-        assertEquals("1", env.settings.get(StartAppUseCase.KEY_CONTENT_VERSION))
+        assertEquals(
+            StartAppUseCase.CONTENT_VERSION.toString(),
+            env.settings.get(StartAppUseCase.KEY_CONTENT_VERSION),
+        )
     }
 
     @Test
