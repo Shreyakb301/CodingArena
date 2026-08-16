@@ -1217,6 +1217,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (c in pairs) stack.addLast(c) else { if (stack.isEmpty() || stack.removeLast() != pairs[c]) return false }",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "pairs = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\", \">\": \"<\"}\nopens = set(pairs.values())\nstack = []\nfor c in s:\n    # ???\nreturn len(stack) == 0",
+                choices = listOf(
+                    choice("if c in opens:\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False", true, "Checking membership in opens (derived from the dict's own values) rather than hardcoding a fixed string like \"([{\" means adding a new bracket pair only requires updating the pairs dict, nothing else in the logic.", code = "if c in opens:\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False"),
+                    choice("if c in \"([{\":\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False", false, "Hardcoding \"([{\" misses the newly added '<' character entirely - it would never get pushed onto the stack, so a matching '>' would incorrectly fail to find it.", code = "if c in \"([{\":\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False"),
+                    choice("if c in pairs:\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False", false, "Checking membership in pairs (the dict's keys, which are the closing brackets) instead of its values would push closing brackets onto the stack and try to pop on opening brackets, inverting the intended logic.", code = "if c in pairs:\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Map<Character, Character> pairs = Map.of(')', '(', ']', '[', '}', '{', '>', '<');\nSet<Character> opens = new HashSet<>(pairs.values());\nDeque<Character> stack = new ArrayDeque<>();\nfor (char c : s.toCharArray()) {\n    // ???\n}\nreturn stack.isEmpty();",
+                choices = listOf(
+                    choice("if (opens.contains(c)) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }", true, "Checking membership in opens (derived from the map's own values) rather than hardcoding a fixed string like \"([{\" means adding a new bracket pair only requires updating the pairs map, nothing else in the logic.", code = "if (opens.contains(c)) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }"),
+                    choice("if (\"([{\".indexOf(c) >= 0) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }", false, "Hardcoding \"([{\" misses the newly added '<' character entirely - it would never get pushed onto the stack, so a matching '>' would incorrectly fail to find it.", code = "if (\"([{\".indexOf(c) >= 0) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }"),
+                    choice("if (pairs.containsKey(c)) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }", false, "Checking membership in pairs (the map's keys, which are the closing brackets) instead of its values would push closing brackets onto the stack and try to pop on opening brackets, inverting the intended logic.", code = "if (pairs.containsKey(c)) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const pairs = { ')': '(', ']': '[', '}': '{', '>': '<' };\nconst opens = new Set(Object.values(pairs));\nconst stack = [];\nfor (const c of s) {\n    // ???\n}\nreturn stack.length === 0;",
+                choices = listOf(
+                    choice("if (opens.has(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }", true, "Checking membership in opens (derived from the object's own values) rather than hardcoding a fixed string like \"([{\" means adding a new bracket pair only requires updating the pairs object, nothing else in the logic.", code = "if (opens.has(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }"),
+                    choice("if (\"([{\".includes(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }", false, "Hardcoding \"([{\" misses the newly added '<' character entirely - it would never get pushed onto the stack, so a matching '>' would incorrectly fail to find it.", code = "if (\"([{\".includes(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }"),
+                    choice("if (c in pairs) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }", false, "Checking membership in pairs (the object's keys, which are the closing brackets) instead of its values would push closing brackets onto the stack and try to pop on opening brackets, inverting the intended logic.", code = "if (c in pairs) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "unordered_map<char, char> pairs = {{')', '('}, {']', '['}, {'}', '{'}, {'>', '<'}};\nunordered_set<char> opens;\nfor (auto& kv : pairs) opens.insert(kv.second);\nvector<char> stack;\nfor (char c : s) {\n    // ???\n}\nreturn stack.empty();",
+                choices = listOf(
+                    choice("if (opens.count(c)) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }", true, "Checking membership in opens (derived from the map's own values) rather than hardcoding a fixed string like \"([{\" means adding a new bracket pair only requires updating the pairs map, nothing else in the logic.", code = "if (opens.count(c)) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }"),
+                    choice("if (string(\"([{\").find(c) != string::npos) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }", false, "Hardcoding \"([{\" misses the newly added '<' character entirely - it would never get pushed onto the stack, so a matching '>' would incorrectly fail to find it.", code = "if (string(\"([{\").find(c) != string::npos) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }"),
+                    choice("if (pairs.count(c)) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }", false, "Checking membership in pairs (the map's keys, which are the closing brackets) instead of its values would push closing brackets onto the stack and try to pop on opening brackets, inverting the intended logic.", code = "if (pairs.count(c)) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "pairs := map[byte]byte{')': '(', ']': '[', '}': '{', '>': '<'}\nopens := map[byte]bool{}\nfor _, v := range pairs {\n    opens[v] = true\n}\nstack := []byte{}\nfor i := 0; i < len(s); i++ {\n    c := s[i]\n    // ???\n}\nreturn len(stack) == 0",
+                choices = listOf(
+                    choice("if opens[c] {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}", true, "Checking membership in opens (derived from the map's own values) rather than hardcoding a fixed string like \"([{\" means adding a new bracket pair only requires updating the pairs map, nothing else in the logic.", code = "if opens[c] {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}"),
+                    choice("if strings.ContainsRune(\"([{\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}", false, "Hardcoding \"([{\" misses the newly added '<' character entirely - it would never get pushed onto the stack, so a matching '>' would incorrectly fail to find it.", code = "if strings.ContainsRune(\"([{\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}"),
+                    choice("if _, ok := pairs[c]; ok {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}", false, "Checking membership in pairs (the map's keys, which are the closing brackets) instead of its values would push closing brackets onto the stack and try to pop on opening brackets, inverting the intended logic.", code = "if _, ok := pairs[c]; ok {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "let pairs: [Character: Character] = [\")\": \"(\", \"]\": \"[\", \"}\": \"{\", \">\": \"<\"]\nlet opens = Set(pairs.values)\nvar stack: [Character] = []\nfor c in s {\n    // ???\n}\nreturn stack.isEmpty",
+                choices = listOf(
+                    choice("if opens.contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }", true, "Checking membership in opens (derived from the dictionary's own values) rather than hardcoding a fixed string like \"([{\" means adding a new bracket pair only requires updating the pairs dictionary, nothing else in the logic.", code = "if opens.contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }"),
+                    choice("if \"([{\".contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }", false, "Hardcoding \"([{\" misses the newly added '<' character entirely - it would never get pushed onto the stack, so a matching '>' would incorrectly fail to find it.", code = "if \"([{\".contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }"),
+                    choice("if pairs.keys.contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }", false, "Checking membership in pairs (the dictionary's keys, which are the closing brackets) instead of its values would push closing brackets onto the stack and try to pop on opening brackets, inverting the intended logic.", code = "if pairs.keys.contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }"),
+                ),
+            ),
+        ),
     ),
     step(
         "min-stack", STACK, CODE_BLOCK,
