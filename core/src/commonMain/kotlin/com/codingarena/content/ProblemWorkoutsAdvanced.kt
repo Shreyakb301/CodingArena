@@ -1610,6 +1610,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "return piles.sumOf { (it.bananas + speed - 1) / speed } + piles.sumOf { it.minSpeed }",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "class Pile:\n    def __init__(self, bananas, min_speed):\n        self.bananas = bananas\n        self.min_speed = min_speed\ndef hours_needed(piles, speed):\n    # ???",
+                choices = listOf(
+                    choice("return sum((p.bananas + max(speed, p.min_speed) - 1) // max(speed, p.min_speed) for p in piles)", true, "Clamping the speed used for each pile up to at least that pile's own minimum, computed inline per pile in the same single pass, adds no extra loop or search - the overall binary search still calls this once per candidate speed, unchanged in complexity.", code = "return sum((p.bananas + max(speed, p.min_speed) - 1) // max(speed, p.min_speed) for p in piles)"),
+                    choice("valid_piles = [p for p in piles if speed >= p.min_speed]\nreturn sum((p.bananas + speed - 1) // speed for p in valid_piles)", false, "Filtering out piles whose minimum exceeds the candidate speed silently ignores them entirely instead of still requiring them to be eaten (at their own minimum speed) - every pile must still be accounted for in the total hours.", code = "valid_piles = [p for p in piles if speed >= p.min_speed]\nreturn sum((p.bananas + speed - 1) // speed for p in valid_piles)"),
+                    choice("return sum((p.bananas + speed - 1) // speed for p in piles) + sum(p.min_speed for p in piles)", false, "Adding each pile's min_speed directly onto the hour total conflates a speed value with an hours value - these aren't the same unit, and this doesn't correctly enforce that a pile is eaten at its own minimum speed floor.", code = "return sum((p.bananas + speed - 1) // speed for p in piles) + sum(p.min_speed for p in piles)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "record Pile(int bananas, int minSpeed) {}\nlong hoursNeeded(List<Pile> piles, int speed) {\n    // ???\n}",
+                choices = listOf(
+                    choice("long total = 0;\nfor (Pile p : piles) {\n    int effective = Math.max(speed, p.minSpeed());\n    total += (p.bananas() + effective - 1) / effective;\n}\nreturn total;", true, "Clamping the speed used for each pile up to at least that pile's own minimum, computed inline per pile in the same single pass, adds no extra loop or search - the overall binary search still calls this once per candidate speed, unchanged in complexity.", code = "long total = 0;\nfor (Pile p : piles) {\n    int effective = Math.max(speed, p.minSpeed());\n    total += (p.bananas() + effective - 1) / effective;\n}\nreturn total;"),
+                    choice("long total = 0;\nfor (Pile p : piles) {\n    if (speed >= p.minSpeed()) total += (p.bananas() + speed - 1) / speed;\n}\nreturn total;", false, "Filtering out piles whose minimum exceeds the candidate speed silently ignores them entirely instead of still requiring them to be eaten (at their own minimum speed) - every pile must still be accounted for in the total hours.", code = "long total = 0;\nfor (Pile p : piles) {\n    if (speed >= p.minSpeed()) total += (p.bananas() + speed - 1) / speed;\n}\nreturn total;"),
+                    choice("long total = 0;\nfor (Pile p : piles) total += (p.bananas() + speed - 1) / speed;\nfor (Pile p : piles) total += p.minSpeed();\nreturn total;", false, "Adding each pile's minSpeed directly onto the hour total conflates a speed value with an hours value - these aren't the same unit, and this doesn't correctly enforce that a pile is eaten at its own minimum speed floor.", code = "long total = 0;\nfor (Pile p : piles) total += (p.bananas() + speed - 1) / speed;\nfor (Pile p : piles) total += p.minSpeed();\nreturn total;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "function hoursNeeded(piles, speed) {\n    // piles: [{bananas, minSpeed}, ...]\n    // ???\n}",
+                choices = listOf(
+                    choice("return piles.reduce((sum, p) => {\n    const effective = Math.max(speed, p.minSpeed);\n    return sum + Math.ceil(p.bananas / effective);\n}, 0);", true, "Clamping the speed used for each pile up to at least that pile's own minimum, computed inline per pile in the same single pass, adds no extra loop or search - the overall binary search still calls this once per candidate speed, unchanged in complexity.", code = "return piles.reduce((sum, p) => {\n    const effective = Math.max(speed, p.minSpeed);\n    return sum + Math.ceil(p.bananas / effective);\n}, 0);"),
+                    choice("const validPiles = piles.filter(p => speed >= p.minSpeed);\nreturn validPiles.reduce((sum, p) => sum + Math.ceil(p.bananas / speed), 0);", false, "Filtering out piles whose minimum exceeds the candidate speed silently ignores them entirely instead of still requiring them to be eaten (at their own minimum speed) - every pile must still be accounted for in the total hours.", code = "const validPiles = piles.filter(p => speed >= p.minSpeed);\nreturn validPiles.reduce((sum, p) => sum + Math.ceil(p.bananas / speed), 0);"),
+                    choice("return piles.reduce((sum, p) => sum + Math.ceil(p.bananas / speed), 0) + piles.reduce((sum, p) => sum + p.minSpeed, 0);", false, "Adding each pile's minSpeed directly onto the hour total conflates a speed value with an hours value - these aren't the same unit, and this doesn't correctly enforce that a pile is eaten at its own minimum speed floor.", code = "return piles.reduce((sum, p) => sum + Math.ceil(p.bananas / speed), 0) + piles.reduce((sum, p) => sum + p.minSpeed, 0);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "struct Pile { int bananas; int minSpeed; };\nlong long hoursNeeded(vector<Pile>& piles, int speed) {\n    // ???\n}",
+                choices = listOf(
+                    choice("long long total = 0;\nfor (auto& p : piles) {\n    int effective = max(speed, p.minSpeed);\n    total += (p.bananas + effective - 1) / effective;\n}\nreturn total;", true, "Clamping the speed used for each pile up to at least that pile's own minimum, computed inline per pile in the same single pass, adds no extra loop or search - the overall binary search still calls this once per candidate speed, unchanged in complexity.", code = "long long total = 0;\nfor (auto& p : piles) {\n    int effective = max(speed, p.minSpeed);\n    total += (p.bananas + effective - 1) / effective;\n}\nreturn total;"),
+                    choice("long long total = 0;\nfor (auto& p : piles) {\n    if (speed >= p.minSpeed) total += (p.bananas + speed - 1) / speed;\n}\nreturn total;", false, "Filtering out piles whose minimum exceeds the candidate speed silently ignores them entirely instead of still requiring them to be eaten (at their own minimum speed) - every pile must still be accounted for in the total hours.", code = "long long total = 0;\nfor (auto& p : piles) {\n    if (speed >= p.minSpeed) total += (p.bananas + speed - 1) / speed;\n}\nreturn total;"),
+                    choice("long long total = 0;\nfor (auto& p : piles) total += (p.bananas + speed - 1) / speed;\nfor (auto& p : piles) total += p.minSpeed;\nreturn total;", false, "Adding each pile's minSpeed directly onto the hour total conflates a speed value with an hours value - these aren't the same unit, and this doesn't correctly enforce that a pile is eaten at its own minimum speed floor.", code = "long long total = 0;\nfor (auto& p : piles) total += (p.bananas + speed - 1) / speed;\nfor (auto& p : piles) total += p.minSpeed;\nreturn total;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "type Pile struct {\n    Bananas  int\n    MinSpeed int\n}\nfunc hoursNeeded(piles []Pile, speed int) int64 {\n    // ???\n}",
+                choices = listOf(
+                    choice("var total int64\nfor _, p := range piles {\n    effective := speed\n    if p.MinSpeed > effective {\n        effective = p.MinSpeed\n    }\n    total += int64((p.Bananas + effective - 1) / effective)\n}\nreturn total", true, "Clamping the speed used for each pile up to at least that pile's own minimum, computed inline per pile in the same single pass, adds no extra loop or search - the overall binary search still calls this once per candidate speed, unchanged in complexity.", code = "var total int64\nfor _, p := range piles {\n    effective := speed\n    if p.MinSpeed > effective {\n        effective = p.MinSpeed\n    }\n    total += int64((p.Bananas + effective - 1) / effective)\n}\nreturn total"),
+                    choice("var total int64\nfor _, p := range piles {\n    if speed >= p.MinSpeed {\n        total += int64((p.Bananas + speed - 1) / speed)\n    }\n}\nreturn total", false, "Filtering out piles whose minimum exceeds the candidate speed silently ignores them entirely instead of still requiring them to be eaten (at their own minimum speed) - every pile must still be accounted for in the total hours.", code = "var total int64\nfor _, p := range piles {\n    if speed >= p.MinSpeed {\n        total += int64((p.Bananas + speed - 1) / speed)\n    }\n}\nreturn total"),
+                    choice("var total int64\nfor _, p := range piles {\n    total += int64((p.Bananas + speed - 1) / speed)\n}\nfor _, p := range piles {\n    total += int64(p.MinSpeed)\n}\nreturn total", false, "Adding each pile's MinSpeed directly onto the hour total conflates a speed value with an hours value - these aren't the same unit, and this doesn't correctly enforce that a pile is eaten at its own minimum speed floor.", code = "var total int64\nfor _, p := range piles {\n    total += int64((p.Bananas + speed - 1) / speed)\n}\nfor _, p := range piles {\n    total += int64(p.MinSpeed)\n}\nreturn total"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "struct Pile {\n    let bananas: Int\n    let minSpeed: Int\n}\nfunc hoursNeeded(_ piles: [Pile], _ speed: Int) -> Int {\n    // ???\n}",
+                choices = listOf(
+                    choice("return piles.reduce(0) { sum, p in\n    let effective = max(speed, p.minSpeed)\n    return sum + (p.bananas + effective - 1) / effective\n}", true, "Clamping the speed used for each pile up to at least that pile's own minimum, computed inline per pile in the same single pass, adds no extra loop or search - the overall binary search still calls this once per candidate speed, unchanged in complexity.", code = "return piles.reduce(0) { sum, p in\n    let effective = max(speed, p.minSpeed)\n    return sum + (p.bananas + effective - 1) / effective\n}"),
+                    choice("let validPiles = piles.filter { speed >= \$0.minSpeed }\nreturn validPiles.reduce(0) { \$0 + (\$1.bananas + speed - 1) / speed }", false, "Filtering out piles whose minimum exceeds the candidate speed silently ignores them entirely instead of still requiring them to be eaten (at their own minimum speed) - every pile must still be accounted for in the total hours.", code = "let validPiles = piles.filter { speed >= \$0.minSpeed }\nreturn validPiles.reduce(0) { \$0 + (\$1.bananas + speed - 1) / speed }"),
+                    choice("return piles.reduce(0) { \$0 + (\$1.bananas + speed - 1) / speed } + piles.reduce(0) { \$0 + \$1.minSpeed }", false, "Adding each pile's minSpeed directly onto the hour total conflates a speed value with an hours value - these aren't the same unit, and this doesn't correctly enforce that a pile is eaten at its own minimum speed floor.", code = "return piles.reduce(0) { \$0 + (\$1.bananas + speed - 1) / speed } + piles.reduce(0) { \$0 + \$1.minSpeed }"),
+                ),
+            ),
+        ),
     ),
     step(
         "binary-search", BINARY_SEARCH, CODE_BLOCK,
@@ -1634,6 +1690,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Swapping the argument order to compare(target, get(mid)) inverts the sign of every comparison relative to what the branches below expect, moving the search in the wrong direction whenever the two aren't equal.",
                 code = "val cmp = compare(target, get(mid))\nwhen { cmp < 0 -> low = mid + 1; cmp > 0 -> high = mid - 1; else -> return mid }",
+            ),
+        ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "def search(size, target, get, compare):\n    low = 0\n    high = size - 1\n    while low <= high:\n        mid = low + (high - low) // 2\n        # ???\n    return -1",
+                choices = listOf(
+                    choice("cmp = compare(get(mid), target)\nif cmp < 0:\n    low = mid + 1\nelif cmp > 0:\n    high = mid - 1\nelse:\n    return mid", true, "Routing every comparison through the caller-supplied compare function, rather than assuming < and > work directly on T, is exactly what makes this version reusable for any sorted, indexable collection of any comparable type.", code = "cmp = compare(get(mid), target)\nif cmp < 0:\n    low = mid + 1\nelif cmp > 0:\n    high = mid - 1\nelse:\n    return mid"),
+                    choice("if get(mid) < target:\n    low = mid + 1\nelif get(mid) > target:\n    high = mid - 1\nelse:\n    return mid", false, "Using < and > directly on a generic type T doesn't compile in general - T isn't guaranteed to support those operators, which is exactly why a comparator function was passed in in the first place.", code = "if get(mid) < target:\n    low = mid + 1\nelif get(mid) > target:\n    high = mid - 1\nelse:\n    return mid"),
+                    choice("cmp = compare(target, get(mid))\nif cmp < 0:\n    low = mid + 1\nelif cmp > 0:\n    high = mid - 1\nelse:\n    return mid", false, "Swapping the argument order to compare(target, get(mid)) inverts the sign of every comparison relative to what the branches below expect, moving the search in the wrong direction whenever the two aren't equal.", code = "cmp = compare(target, get(mid))\nif cmp < 0:\n    low = mid + 1\nelif cmp > 0:\n    high = mid - 1\nelse:\n    return mid"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "<T> int search(int size, T target, IntFunction<T> get, Comparator<T> compare) {\n    int low = 0;\n    int high = size - 1;\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        // ???\n    }\n    return -1;\n}",
+                choices = listOf(
+                    choice("int cmp = compare.compare(get.apply(mid), target);\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;", true, "Routing every comparison through the caller-supplied compare function, rather than assuming < and > work directly on T, is exactly what makes this version reusable for any sorted, indexable collection of any comparable type.", code = "int cmp = compare.compare(get.apply(mid), target);\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;"),
+                    choice("if (get.apply(mid) < target) low = mid + 1;\nelse if (get.apply(mid) > target) high = mid - 1;\nelse return mid;", false, "Using < and > directly on a generic type T doesn't compile in general - T isn't guaranteed to support those operators, which is exactly why a comparator function was passed in in the first place.", code = "if (get.apply(mid) < target) low = mid + 1;\nelse if (get.apply(mid) > target) high = mid - 1;\nelse return mid;"),
+                    choice("int cmp = compare.compare(target, get.apply(mid));\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;", false, "Swapping the argument order to compare(target, get(mid)) inverts the sign of every comparison relative to what the branches below expect, moving the search in the wrong direction whenever the two aren't equal.", code = "int cmp = compare.compare(target, get.apply(mid));\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "function search(size, target, get, compare) {\n    let low = 0;\n    let high = size - 1;\n    while (low <= high) {\n        const mid = low + Math.floor((high - low) / 2);\n        // ???\n    }\n    return -1;\n}",
+                choices = listOf(
+                    choice("const cmp = compare(get(mid), target);\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;", true, "Routing every comparison through the caller-supplied compare function, rather than assuming < and > work directly on T, is exactly what makes this version reusable for any sorted, indexable collection of any comparable type.", code = "const cmp = compare(get(mid), target);\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;"),
+                    choice("if (get(mid) < target) low = mid + 1;\nelse if (get(mid) > target) high = mid - 1;\nelse return mid;", false, "Using < and > directly on a generic type T doesn't compile in general - T isn't guaranteed to support those operators, which is exactly why a comparator function was passed in in the first place.", code = "if (get(mid) < target) low = mid + 1;\nelse if (get(mid) > target) high = mid - 1;\nelse return mid;"),
+                    choice("const cmp = compare(target, get(mid));\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;", false, "Swapping the argument order to compare(target, get(mid)) inverts the sign of every comparison relative to what the branches below expect, moving the search in the wrong direction whenever the two aren't equal.", code = "const cmp = compare(target, get(mid));\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "template <typename T, typename Get, typename Compare>\nint search(int size, T target, Get get, Compare compare) {\n    int low = 0;\n    int high = size - 1;\n    while (low <= high) {\n        int mid = low + (high - low) / 2;\n        // ???\n    }\n    return -1;\n}",
+                choices = listOf(
+                    choice("int cmp = compare(get(mid), target);\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;", true, "Routing every comparison through the caller-supplied compare function, rather than assuming < and > work directly on T, is exactly what makes this version reusable for any sorted, indexable collection of any comparable type.", code = "int cmp = compare(get(mid), target);\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;"),
+                    choice("if (get(mid) < target) low = mid + 1;\nelse if (get(mid) > target) high = mid - 1;\nelse return mid;", false, "Using < and > directly on a generic type T doesn't compile in general - T isn't guaranteed to support those operators, which is exactly why a comparator function was passed in in the first place.", code = "if (get(mid) < target) low = mid + 1;\nelse if (get(mid) > target) high = mid - 1;\nelse return mid;"),
+                    choice("int cmp = compare(target, get(mid));\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;", false, "Swapping the argument order to compare(target, get(mid)) inverts the sign of every comparison relative to what the branches below expect, moving the search in the wrong direction whenever the two aren't equal.", code = "int cmp = compare(target, get(mid));\nif (cmp < 0) low = mid + 1;\nelse if (cmp > 0) high = mid - 1;\nelse return mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "func search[T any](size int, target T, get func(int) T, compare func(T, T) int) int {\n    low := 0\n    high := size - 1\n    for low <= high {\n        mid := low + (high-low)/2\n        // ???\n    }\n    return -1\n}",
+                choices = listOf(
+                    choice("cmp := compare(get(mid), target)\nif cmp < 0 {\n    low = mid + 1\n} else if cmp > 0 {\n    high = mid - 1\n} else {\n    return mid\n}", true, "Routing every comparison through the caller-supplied compare function, rather than assuming < and > work directly on T, is exactly what makes this version reusable for any sorted, indexable collection of any comparable type.", code = "cmp := compare(get(mid), target)\nif cmp < 0 {\n    low = mid + 1\n} else if cmp > 0 {\n    high = mid - 1\n} else {\n    return mid\n}"),
+                    choice("if get(mid) < target {\n    low = mid + 1\n} else if get(mid) > target {\n    high = mid - 1\n} else {\n    return mid\n}", false, "Using < and > directly on a generic type T doesn't compile in general - T isn't guaranteed to support those operators, which is exactly why a comparator function was passed in in the first place.", code = "if get(mid) < target {\n    low = mid + 1\n} else if get(mid) > target {\n    high = mid - 1\n} else {\n    return mid\n}"),
+                    choice("cmp := compare(target, get(mid))\nif cmp < 0 {\n    low = mid + 1\n} else if cmp > 0 {\n    high = mid - 1\n} else {\n    return mid\n}", false, "Swapping the argument order to compare(target, get(mid)) inverts the sign of every comparison relative to what the branches below expect, moving the search in the wrong direction whenever the two aren't equal.", code = "cmp := compare(target, get(mid))\nif cmp < 0 {\n    low = mid + 1\n} else if cmp > 0 {\n    high = mid - 1\n} else {\n    return mid\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "func search<T>(_ size: Int, _ target: T, _ get: (Int) -> T, _ compare: (T, T) -> Int) -> Int {\n    var low = 0\n    var high = size - 1\n    while low <= high {\n        let mid = low + (high - low) / 2\n        // ???\n    }\n    return -1\n}",
+                choices = listOf(
+                    choice("let cmp = compare(get(mid), target)\nif cmp < 0 { low = mid + 1 }\nelse if cmp > 0 { high = mid - 1 }\nelse { return mid }", true, "Routing every comparison through the caller-supplied compare function, rather than assuming < and > work directly on T, is exactly what makes this version reusable for any sorted, indexable collection of any comparable type.", code = "let cmp = compare(get(mid), target)\nif cmp < 0 { low = mid + 1 }\nelse if cmp > 0 { high = mid - 1 }\nelse { return mid }"),
+                    choice("if get(mid) < target { low = mid + 1 }\nelse if get(mid) > target { high = mid - 1 }\nelse { return mid }", false, "Using < and > directly on a generic type T doesn't compile in general - T isn't guaranteed to support those operators, which is exactly why a comparator function was passed in in the first place.", code = "if get(mid) < target { low = mid + 1 }\nelse if get(mid) > target { high = mid - 1 }\nelse { return mid }"),
+                    choice("let cmp = compare(target, get(mid))\nif cmp < 0 { low = mid + 1 }\nelse if cmp > 0 { high = mid - 1 }\nelse { return mid }", false, "Swapping the argument order to compare(target, get(mid)) inverts the sign of every comparison relative to what the branches below expect, moving the search in the wrong direction whenever the two aren't equal.", code = "let cmp = compare(target, get(mid))\nif cmp < 0 { low = mid + 1 }\nelse if cmp > 0 { high = mid - 1 }\nelse { return mid }"),
+                ),
             ),
         ),
     ),
