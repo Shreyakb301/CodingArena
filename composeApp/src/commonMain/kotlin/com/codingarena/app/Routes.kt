@@ -23,7 +23,6 @@ object Routes {
     const val ROADMAP = "roadmap"
     const val BLITZ_HOME = "blitzHome"
     const val STRATEGY_BLITZ = "strategyBlitz"
-    const val TEACHER = "teacher"
 
     const val CHALLENGE_ROUTE = "challenge/{problemId}/{source}"
     const val REVIEW_ROUTE = "review/{attemptId}"

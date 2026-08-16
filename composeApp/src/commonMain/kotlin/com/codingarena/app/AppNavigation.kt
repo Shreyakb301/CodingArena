@@ -21,7 +21,6 @@ import com.codingarena.features.blitz.StrategyBlitzScreen
 import com.codingarena.features.course.ChapterScreen
 import com.codingarena.features.course.CourseRoadmapScreen
 import com.codingarena.features.editor.CodeEditorScreen
-import com.codingarena.features.classroom.ClassroomScreen
 import com.codingarena.features.challenge.ChallengeScreen
 import com.codingarena.features.coderush.CodeRushModes
 import com.codingarena.features.coderush.CodeRushSessionScreen
@@ -401,12 +400,7 @@ fun AppNavigation(navController: NavHostController) {
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenRatings = { navController.navigate(Routes.RATINGS) },
                 onOpenPatterns = { navController.navigate(Routes.PATTERNS) },
-                onOpenClassroom = { navController.navigate(Routes.TEACHER) },
             )
-        }
-
-        composable(Routes.TEACHER) {
-            ClassroomScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.SETTINGS) {

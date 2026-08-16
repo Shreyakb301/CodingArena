@@ -126,7 +126,6 @@ fun ProfileScreen(
     onOpenSettings: () -> Unit,
     onOpenRatings: () -> Unit,
     onOpenPatterns: () -> Unit,
-    onOpenClassroom: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

@@ -9,7 +9,6 @@ import com.codingarena.features.editor.CodeEditorViewModel
 import com.codingarena.features.practice.PracticeViewModel
 import com.codingarena.features.practice.TopicFocusViewModel
 import com.codingarena.features.practice.WorkoutRunnerViewModel
-import com.codingarena.features.classroom.ClassroomViewModel
 import com.codingarena.features.challenge.ChallengeViewModel
 import com.codingarena.features.challenge.PracticeResultStore
 import com.codingarena.features.coderush.CodeRushSessionViewModel
@@ -52,7 +51,6 @@ val appModule: Module = module {
     viewModel { CourseRoadmapViewModel(get(), get(), get(), get(), get()) }
     viewModel { ChapterViewModel(get(), get(), get(), get(), get()) }
     viewModel { CodeEditorViewModel(get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { ClassroomViewModel(get(), get()) }
     viewModel { StrategyBlitzViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { PracticeViewModel(get(), get(), get(), get(), get()) }
     viewModel { TopicFocusViewModel(get(), get(), get(), get()) }

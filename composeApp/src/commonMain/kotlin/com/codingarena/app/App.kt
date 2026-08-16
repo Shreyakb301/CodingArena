@@ -129,6 +129,5 @@ private fun TopLevelDestination.owns(route: String?): Boolean = when (this) {
         Routes.RATINGS,
         Routes.ACHIEVEMENTS,
         Routes.SETTINGS,
-        Routes.TEACHER,
     )
 }
