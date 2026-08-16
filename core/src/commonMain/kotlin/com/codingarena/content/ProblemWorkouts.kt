@@ -2067,6 +2067,62 @@ private val containerWithMostWaterWorkout = ProblemWorkout(
                     "Moving both pointers on every step regardless of which height is limiting can skip past the actual best combination of heights and width.",
                     code = "left++\nright--",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "left = 0\nright = len(height) - 1\nmax_area = 0\nwhile left < right:\n    area = min(height[left], height[right]) * (right - left)\n    max_area = max(max_area, area)\n    # ???",
+                    choices = listOf(
+                        choice("if height[left] < height[right]:\n    left += 1\nelse:\n    right -= 1", true, "This moves the pointer at the shorter line inward, the only move that gives the area a chance to improve, matching the current heights correctly.", code = "if height[left] < height[right]:\n    left += 1\nelse:\n    right -= 1"),
+                        choice("if height[left] < height[right]:\n    right -= 1\nelse:\n    left += 1", false, "This moves the pointer at the taller line, which only shrinks the width without any chance of raising the limiting height.", code = "if height[left] < height[right]:\n    right -= 1\nelse:\n    left += 1"),
+                        choice("left += 1\nright -= 1", false, "Moving both pointers on every step regardless of which height is limiting can skip past the actual best combination of heights and width.", code = "left += 1\nright -= 1"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int left = 0;\nint right = height.length - 1;\nint maxArea = 0;\nwhile (left < right) {\n    int area = Math.min(height[left], height[right]) * (right - left);\n    maxArea = Math.max(maxArea, area);\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (height[left] < height[right]) left++; else right--;", true, "This moves the pointer at the shorter line inward, the only move that gives the area a chance to improve, matching the current heights correctly.", code = "if (height[left] < height[right]) left++; else right--;"),
+                        choice("if (height[left] < height[right]) right--; else left++;", false, "This moves the pointer at the taller line, which only shrinks the width without any chance of raising the limiting height.", code = "if (height[left] < height[right]) right--; else left++;"),
+                        choice("left++;\nright--;", false, "Moving both pointers on every step regardless of which height is limiting can skip past the actual best combination of heights and width.", code = "left++;\nright--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let left = 0;\nlet right = height.length - 1;\nlet maxArea = 0;\nwhile (left < right) {\n    const area = Math.min(height[left], height[right]) * (right - left);\n    maxArea = Math.max(maxArea, area);\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (height[left] < height[right]) left++; else right--;", true, "This moves the pointer at the shorter line inward, the only move that gives the area a chance to improve, matching the current heights correctly.", code = "if (height[left] < height[right]) left++; else right--;"),
+                        choice("if (height[left] < height[right]) right--; else left++;", false, "This moves the pointer at the taller line, which only shrinks the width without any chance of raising the limiting height.", code = "if (height[left] < height[right]) right--; else left++;"),
+                        choice("left++;\nright--;", false, "Moving both pointers on every step regardless of which height is limiting can skip past the actual best combination of heights and width.", code = "left++;\nright--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int left = 0;\nint right = height.size() - 1;\nint maxArea = 0;\nwhile (left < right) {\n    int area = min(height[left], height[right]) * (right - left);\n    maxArea = max(maxArea, area);\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (height[left] < height[right]) left++; else right--;", true, "This moves the pointer at the shorter line inward, the only move that gives the area a chance to improve, matching the current heights correctly.", code = "if (height[left] < height[right]) left++; else right--;"),
+                        choice("if (height[left] < height[right]) right--; else left++;", false, "This moves the pointer at the taller line, which only shrinks the width without any chance of raising the limiting height.", code = "if (height[left] < height[right]) right--; else left++;"),
+                        choice("left++;\nright--;", false, "Moving both pointers on every step regardless of which height is limiting can skip past the actual best combination of heights and width.", code = "left++;\nright--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "left := 0\nright := len(height) - 1\nmaxArea := 0\nfor left < right {\n    area := min(height[left], height[right]) * (right - left)\n    if area > maxArea {\n        maxArea = area\n    }\n    // ???\n}",
+                    choices = listOf(
+                        choice("if height[left] < height[right] {\n    left++\n} else {\n    right--\n}", true, "This moves the pointer at the shorter line inward, the only move that gives the area a chance to improve, matching the current heights correctly.", code = "if height[left] < height[right] {\n    left++\n} else {\n    right--\n}"),
+                        choice("if height[left] < height[right] {\n    right--\n} else {\n    left++\n}", false, "This moves the pointer at the taller line, which only shrinks the width without any chance of raising the limiting height.", code = "if height[left] < height[right] {\n    right--\n} else {\n    left++\n}"),
+                        choice("left++\nright--", false, "Moving both pointers on every step regardless of which height is limiting can skip past the actual best combination of heights and width.", code = "left++\nright--"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var left = 0\nvar right = height.count - 1\nvar maxArea = 0\nwhile left < right {\n    let area = min(height[left], height[right]) * (right - left)\n    maxArea = max(maxArea, area)\n    // ???\n}",
+                    choices = listOf(
+                        choice("if height[left] < height[right] { left += 1 } else { right -= 1 }", true, "This moves the pointer at the shorter line inward, the only move that gives the area a chance to improve, matching the current heights correctly.", code = "if height[left] < height[right] { left += 1 } else { right -= 1 }"),
+                        choice("if height[left] < height[right] { right -= 1 } else { left += 1 }", false, "This moves the pointer at the taller line, which only shrinks the width without any chance of raising the limiting height.", code = "if height[left] < height[right] { right -= 1 } else { left += 1 }"),
+                        choice("left += 1\nright -= 1", false, "Moving both pointers on every step regardless of which height is limiting can skip past the actual best combination of heights and width.", code = "left += 1\nright -= 1"),
+                    ),
+                ),
+            ),
         ),
         step(
             "container-with-most-water", TWO_POINTERS, TIME_COMPLEXITY,
@@ -2267,6 +2323,62 @@ private val validPalindromeWorkout = ProblemWorkout(
                     "Without the left < right guard, a string that's entirely punctuation could run a pointer straight past the other end of the string, reading out of bounds.",
                     code = "while (!s[left].isLetterOrDigit()) left++\nwhile (!s[right].isLetterOrDigit()) right--",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "left = 0\nright = len(s) - 1\nwhile left < right:\n    # ???\n    if s[left].lower() != s[right].lower():\n        return False\n    left += 1\n    right -= 1\nreturn True",
+                    choices = listOf(
+                        choice("while left < right and not s[left].isalnum():\n    left += 1\nwhile left < right and not s[right].isalnum():\n    right -= 1", true, "Both while loops guard with left < right and keep skipping past every non-alphanumeric character on each side before the comparison runs, correctly handling runs of punctuation or spaces.", code = "while left < right and not s[left].isalnum():\n    left += 1\nwhile left < right and not s[right].isalnum():\n    right -= 1"),
+                        choice("if not s[left].isalnum():\n    left += 1\nif not s[right].isalnum():\n    right -= 1", false, "Using if instead of while only skips a single character at a time, so a run of two or more non-alphanumeric characters in a row would still leave one unskipped before comparing.", code = "if not s[left].isalnum():\n    left += 1\nif not s[right].isalnum():\n    right -= 1"),
+                        choice("while not s[left].isalnum():\n    left += 1\nwhile not s[right].isalnum():\n    right -= 1", false, "Without the left < right guard, a string that's entirely punctuation could run a pointer straight past the other end of the string, reading out of bounds.", code = "while not s[left].isalnum():\n    left += 1\nwhile not s[right].isalnum():\n    right -= 1"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int left = 0;\nint right = s.length() - 1;\nwhile (left < right) {\n    // ???\n    if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) return false;\n    left++;\n    right--;\n}\nreturn true;",
+                    choices = listOf(
+                        choice("while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;\nwhile (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;", true, "Both while loops guard with left < right and keep skipping past every non-alphanumeric character on each side before the comparison runs, correctly handling runs of punctuation or spaces.", code = "while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;\nwhile (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;"),
+                        choice("if (!Character.isLetterOrDigit(s.charAt(left))) left++;\nif (!Character.isLetterOrDigit(s.charAt(right))) right--;", false, "Using if instead of while only skips a single character at a time, so a run of two or more non-alphanumeric characters in a row would still leave one unskipped before comparing.", code = "if (!Character.isLetterOrDigit(s.charAt(left))) left++;\nif (!Character.isLetterOrDigit(s.charAt(right))) right--;"),
+                        choice("while (!Character.isLetterOrDigit(s.charAt(left))) left++;\nwhile (!Character.isLetterOrDigit(s.charAt(right))) right--;", false, "Without the left < right guard, a string that's entirely punctuation could run a pointer straight past the other end of the string, reading out of bounds.", code = "while (!Character.isLetterOrDigit(s.charAt(left))) left++;\nwhile (!Character.isLetterOrDigit(s.charAt(right))) right--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let left = 0;\nlet right = s.length - 1;\nwhile (left < right) {\n    // ???\n    if (s[left].toLowerCase() !== s[right].toLowerCase()) return false;\n    left++;\n    right--;\n}\nreturn true;",
+                    choices = listOf(
+                        choice("while (left < right && !/[a-z0-9]/i.test(s[left])) left++;\nwhile (left < right && !/[a-z0-9]/i.test(s[right])) right--;", true, "Both while loops guard with left < right and keep skipping past every non-alphanumeric character on each side before the comparison runs, correctly handling runs of punctuation or spaces.", code = "while (left < right && !/[a-z0-9]/i.test(s[left])) left++;\nwhile (left < right && !/[a-z0-9]/i.test(s[right])) right--;"),
+                        choice("if (!/[a-z0-9]/i.test(s[left])) left++;\nif (!/[a-z0-9]/i.test(s[right])) right--;", false, "Using if instead of while only skips a single character at a time, so a run of two or more non-alphanumeric characters in a row would still leave one unskipped before comparing.", code = "if (!/[a-z0-9]/i.test(s[left])) left++;\nif (!/[a-z0-9]/i.test(s[right])) right--;"),
+                        choice("while (!/[a-z0-9]/i.test(s[left])) left++;\nwhile (!/[a-z0-9]/i.test(s[right])) right--;", false, "Without the left < right guard, a string that's entirely punctuation could run a pointer straight past the other end of the string, reading out of bounds.", code = "while (!/[a-z0-9]/i.test(s[left])) left++;\nwhile (!/[a-z0-9]/i.test(s[right])) right--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int left = 0;\nint right = s.size() - 1;\nwhile (left < right) {\n    // ???\n    if (tolower(s[left]) != tolower(s[right])) return false;\n    left++;\n    right--;\n}\nreturn true;",
+                    choices = listOf(
+                        choice("while (left < right && !isalnum(s[left])) left++;\nwhile (left < right && !isalnum(s[right])) right--;", true, "Both while loops guard with left < right and keep skipping past every non-alphanumeric character on each side before the comparison runs, correctly handling runs of punctuation or spaces.", code = "while (left < right && !isalnum(s[left])) left++;\nwhile (left < right && !isalnum(s[right])) right--;"),
+                        choice("if (!isalnum(s[left])) left++;\nif (!isalnum(s[right])) right--;", false, "Using if instead of while only skips a single character at a time, so a run of two or more non-alphanumeric characters in a row would still leave one unskipped before comparing.", code = "if (!isalnum(s[left])) left++;\nif (!isalnum(s[right])) right--;"),
+                        choice("while (!isalnum(s[left])) left++;\nwhile (!isalnum(s[right])) right--;", false, "Without the left < right guard, a string that's entirely punctuation could run a pointer straight past the other end of the string, reading out of bounds.", code = "while (!isalnum(s[left])) left++;\nwhile (!isalnum(s[right])) right--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "left := 0\nright := len(s) - 1\nfor left < right {\n    // ???\n    if unicode.ToLower(rune(s[left])) != unicode.ToLower(rune(s[right])) {\n        return false\n    }\n    left++\n    right--\n}\nreturn true",
+                    choices = listOf(
+                        choice("for left < right && !isAlnum(s[left]) {\n    left++\n}\nfor left < right && !isAlnum(s[right]) {\n    right--\n}", true, "Both loops guard with left < right and keep skipping past every non-alphanumeric character on each side before the comparison runs, correctly handling runs of punctuation or spaces.", code = "for left < right && !isAlnum(s[left]) {\n    left++\n}\nfor left < right && !isAlnum(s[right]) {\n    right--\n}"),
+                        choice("if !isAlnum(s[left]) {\n    left++\n}\nif !isAlnum(s[right]) {\n    right--\n}", false, "Using a single if instead of a loop only skips a single character at a time, so a run of two or more non-alphanumeric characters in a row would still leave one unskipped before comparing.", code = "if !isAlnum(s[left]) {\n    left++\n}\nif !isAlnum(s[right]) {\n    right--\n}"),
+                        choice("for !isAlnum(s[left]) {\n    left++\n}\nfor !isAlnum(s[right]) {\n    right--\n}", false, "Without the left < right guard, a string that's entirely punctuation could run a pointer straight past the other end of the string, reading out of bounds.", code = "for !isAlnum(s[left]) {\n    left++\n}\nfor !isAlnum(s[right]) {\n    right--\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "let chars = Array(s)\nvar left = 0\nvar right = chars.count - 1\nwhile left < right {\n    // ???\n    if Character(chars[left].lowercased()) != Character(chars[right].lowercased()) { return false }\n    left += 1\n    right -= 1\n}\nreturn true",
+                    choices = listOf(
+                        choice("while left < right && !(chars[left].isLetter || chars[left].isNumber) { left += 1 }\nwhile left < right && !(chars[right].isLetter || chars[right].isNumber) { right -= 1 }", true, "Both while loops guard with left < right and keep skipping past every non-alphanumeric character on each side before the comparison runs, correctly handling runs of punctuation or spaces.", code = "while left < right && !(chars[left].isLetter || chars[left].isNumber) { left += 1 }\nwhile left < right && !(chars[right].isLetter || chars[right].isNumber) { right -= 1 }"),
+                        choice("if !(chars[left].isLetter || chars[left].isNumber) { left += 1 }\nif !(chars[right].isLetter || chars[right].isNumber) { right -= 1 }", false, "Using if instead of while only skips a single character at a time, so a run of two or more non-alphanumeric characters in a row would still leave one unskipped before comparing.", code = "if !(chars[left].isLetter || chars[left].isNumber) { left += 1 }\nif !(chars[right].isLetter || chars[right].isNumber) { right -= 1 }"),
+                        choice("while !(chars[left].isLetter || chars[left].isNumber) { left += 1 }\nwhile !(chars[right].isLetter || chars[right].isNumber) { right -= 1 }", false, "Without the left < right guard, a string that's entirely punctuation could run a pointer straight past the other end of the string, reading out of bounds.", code = "while !(chars[left].isLetter || chars[left].isNumber) { left += 1 }\nwhile !(chars[right].isLetter || chars[right].isNumber) { right -= 1 }"),
+                    ),
+                ),
+            ),
         ),
         step(
             "valid-palindrome", TWO_POINTERS, TIME_COMPLEXITY,
@@ -2467,6 +2579,62 @@ private val bestTimeToBuyAndSellStockWorkout = ProblemWorkout(
                     "This tracks the maximum price seen, not the maximum *profit* - it never actually subtracts a buy price, so it doesn't compute profit at all.",
                     code = "maxProfit = maxOf(maxProfit, price)\nminPrice = minOf(minPrice, price)",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "min_price = float(\"inf\")\nmax_profit = 0\nfor price in prices:\n    # ???\nreturn max_profit",
+                    choices = listOf(
+                        choice("max_profit = max(max_profit, price - min_price)\nmin_price = min(min_price, price)", true, "Computing the profit against the minimum from before this day, then updating the minimum afterward, guarantees the buy day is always strictly earlier than the sell day being evaluated.", code = "max_profit = max(max_profit, price - min_price)\nmin_price = min(min_price, price)"),
+                        choice("min_price = min(min_price, price)\nmax_profit = max(max_profit, price - min_price)", false, "Updating the minimum first lets today's own price become the buy price used against today's own sale price, which always yields zero and can hide the true best answer.", code = "min_price = min(min_price, price)\nmax_profit = max(max_profit, price - min_price)"),
+                        choice("max_profit = max(max_profit, price)\nmin_price = min(min_price, price)", false, "This tracks the maximum price seen, not the maximum profit - it never actually subtracts a buy price, so it doesn't compute profit at all.", code = "max_profit = max(max_profit, price)\nmin_price = min(min_price, price)"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int minPrice = Integer.MAX_VALUE;\nint maxProfit = 0;\nfor (int price : prices) {\n    // ???\n}\nreturn maxProfit;",
+                    choices = listOf(
+                        choice("maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);", true, "Computing the profit against the minimum from before this day, then updating the minimum afterward, guarantees the buy day is always strictly earlier than the sell day being evaluated.", code = "maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);"),
+                        choice("minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);", false, "Updating the minimum first lets today's own price become the buy price used against today's own sale price, which always yields zero and can hide the true best answer.", code = "minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);"),
+                        choice("maxProfit = Math.max(maxProfit, price);\nminPrice = Math.min(minPrice, price);", false, "This tracks the maximum price seen, not the maximum profit - it never actually subtracts a buy price, so it doesn't compute profit at all.", code = "maxProfit = Math.max(maxProfit, price);\nminPrice = Math.min(minPrice, price);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let minPrice = Infinity;\nlet maxProfit = 0;\nfor (const price of prices) {\n    // ???\n}\nreturn maxProfit;",
+                    choices = listOf(
+                        choice("maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);", true, "Computing the profit against the minimum from before this day, then updating the minimum afterward, guarantees the buy day is always strictly earlier than the sell day being evaluated.", code = "maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);"),
+                        choice("minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);", false, "Updating the minimum first lets today's own price become the buy price used against today's own sale price, which always yields zero and can hide the true best answer.", code = "minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);"),
+                        choice("maxProfit = Math.max(maxProfit, price);\nminPrice = Math.min(minPrice, price);", false, "This tracks the maximum price seen, not the maximum profit - it never actually subtracts a buy price, so it doesn't compute profit at all.", code = "maxProfit = Math.max(maxProfit, price);\nminPrice = Math.min(minPrice, price);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int minPrice = INT_MAX;\nint maxProfit = 0;\nfor (int price : prices) {\n    // ???\n}\nreturn maxProfit;",
+                    choices = listOf(
+                        choice("maxProfit = max(maxProfit, price - minPrice);\nminPrice = min(minPrice, price);", true, "Computing the profit against the minimum from before this day, then updating the minimum afterward, guarantees the buy day is always strictly earlier than the sell day being evaluated.", code = "maxProfit = max(maxProfit, price - minPrice);\nminPrice = min(minPrice, price);"),
+                        choice("minPrice = min(minPrice, price);\nmaxProfit = max(maxProfit, price - minPrice);", false, "Updating the minimum first lets today's own price become the buy price used against today's own sale price, which always yields zero and can hide the true best answer.", code = "minPrice = min(minPrice, price);\nmaxProfit = max(maxProfit, price - minPrice);"),
+                        choice("maxProfit = max(maxProfit, price);\nminPrice = min(minPrice, price);", false, "This tracks the maximum price seen, not the maximum profit - it never actually subtracts a buy price, so it doesn't compute profit at all.", code = "maxProfit = max(maxProfit, price);\nminPrice = min(minPrice, price);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "minPrice := math.MaxInt32\nmaxProfit := 0\nfor _, price := range prices {\n    // ???\n}\nreturn maxProfit",
+                    choices = listOf(
+                        choice("if price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}\nif price < minPrice {\n    minPrice = price\n}", true, "Computing the profit against the minimum from before this day, then updating the minimum afterward, guarantees the buy day is always strictly earlier than the sell day being evaluated.", code = "if price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}\nif price < minPrice {\n    minPrice = price\n}"),
+                        choice("if price < minPrice {\n    minPrice = price\n}\nif price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}", false, "Updating the minimum first lets today's own price become the buy price used against today's own sale price, which always yields zero and can hide the true best answer.", code = "if price < minPrice {\n    minPrice = price\n}\nif price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}"),
+                        choice("if price > maxProfit {\n    maxProfit = price\n}\nif price < minPrice {\n    minPrice = price\n}", false, "This tracks the maximum price seen, not the maximum profit - it never actually subtracts a buy price, so it doesn't compute profit at all.", code = "if price > maxProfit {\n    maxProfit = price\n}\nif price < minPrice {\n    minPrice = price\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var minPrice = Int.max\nvar maxProfit = 0\nfor price in prices {\n    // ???\n}\nreturn maxProfit",
+                    choices = listOf(
+                        choice("maxProfit = max(maxProfit, price - minPrice)\nminPrice = min(minPrice, price)", true, "Computing the profit against the minimum from before this day, then updating the minimum afterward, guarantees the buy day is always strictly earlier than the sell day being evaluated.", code = "maxProfit = max(maxProfit, price - minPrice)\nminPrice = min(minPrice, price)"),
+                        choice("minPrice = min(minPrice, price)\nmaxProfit = max(maxProfit, price - minPrice)", false, "Updating the minimum first lets today's own price become the buy price used against today's own sale price, which always yields zero and can hide the true best answer.", code = "minPrice = min(minPrice, price)\nmaxProfit = max(maxProfit, price - minPrice)"),
+                        choice("maxProfit = max(maxProfit, price)\nminPrice = min(minPrice, price)", false, "This tracks the maximum price seen, not the maximum profit - it never actually subtracts a buy price, so it doesn't compute profit at all.", code = "maxProfit = max(maxProfit, price)\nminPrice = min(minPrice, price)"),
+                    ),
+                ),
+            ),
         ),
         step(
             "best-time-to-buy-and-sell-stock", SLIDING_WINDOW, TIME_COMPLEXITY,
