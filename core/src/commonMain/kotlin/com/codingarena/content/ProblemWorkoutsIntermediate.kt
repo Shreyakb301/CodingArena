@@ -6,6 +6,13 @@ import com.codingarena.domain.model.PatternGroup.SLIDING_WINDOW
 import com.codingarena.domain.model.PatternGroup.STACK
 import com.codingarena.domain.model.PatternGroup.TWO_POINTERS
 import com.codingarena.domain.model.PracticeDifficulty.INTERMEDIATE
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.PYTHON
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
+import com.codingarena.domain.model.WorkoutCodeVariant
 import com.codingarena.domain.model.WorkoutStep
 import com.codingarena.domain.model.WorkoutStepKind.APPROACH
 import com.codingarena.domain.model.WorkoutStepKind.BOUNDARY_UPDATE
@@ -181,6 +188,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "seen[complement] = i\nif (seen.containsKey(nums[i])) return intArrayOf(seen[nums[i]]!!, i)",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "seen = {}\nfor i in range(len(nums)):\n    complement = target - nums[i]\n    # ???",
+                choices = listOf(
+                    choice("if complement in seen:\n    return [seen[complement], i]\nseen[nums[i]] = i", true, "At i=0, complement is 0-(-3)=3, not yet seen, so -3 is stored; at i=2, complement is 0-3=-3, which is now in the map from i=0, correctly returning [0, 2].", code = "if complement in seen:\n    return [seen[complement], i]\nseen[nums[i]] = i"),
+                    choice("if complement in seen.values():\n    return [seen[complement], i]\nseen[nums[i]] = i", false, "Checking the dict's values instead of its keys searches the stored indices for a match against the complement, rather than its stored values - complement should be looked up as a key.", code = "if complement in seen.values():\n    return [seen[complement], i]\nseen[nums[i]] = i"),
+                    choice("seen[complement] = i\nif nums[i] in seen:\n    return [seen[nums[i]], i]", false, "Storing the complement instead of the current value, and checking for the current value instead of the complement, inverts the whole lookup and won't reliably find matching pairs.", code = "seen[complement] = i\nif nums[i] in seen:\n    return [seen[nums[i]], i]"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Map<Integer, Integer> seen = new HashMap<>();\nfor (int i = 0; i < nums.length; i++) {\n    int complement = target - nums[i];\n    // ???\n}",
+                choices = listOf(
+                    choice("if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);", true, "At i=0, complement is 0-(-3)=3, not yet seen, so -3 is stored; at i=2, complement is 0-3=-3, which is now in the map from i=0, correctly returning [0, 2].", code = "if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);"),
+                    choice("if (seen.containsValue(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);", false, "Checking containsValue instead of containsKey searches the map's indices for a match against the complement, rather than its stored values - complement should be looked up as a value that was stored, i.e. a key.", code = "if (seen.containsValue(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);"),
+                    choice("seen.put(complement, i);\nif (seen.containsKey(nums[i])) return new int[]{seen.get(nums[i]), i};", false, "Storing the complement instead of the current value, and checking for the current value instead of the complement, inverts the whole lookup and won't reliably find matching pairs.", code = "seen.put(complement, i);\nif (seen.containsKey(nums[i])) return new int[]{seen.get(nums[i]), i};"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const seen = new Map();\nfor (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    // ???\n}",
+                choices = listOf(
+                    choice("if (seen.has(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);", true, "At i=0, complement is 0-(-3)=3, not yet seen, so -3 is stored; at i=2, complement is 0-3=-3, which is now in the map from i=0, correctly returning [0, 2].", code = "if (seen.has(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);"),
+                    choice("if ([...seen.values()].includes(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);", false, "Checking the map's values instead of its keys searches the stored indices for a match against the complement, rather than its stored values - complement should be looked up as a key.", code = "if ([...seen.values()].includes(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);"),
+                    choice("seen.set(complement, i);\nif (seen.has(nums[i])) return [seen.get(nums[i]), i];", false, "Storing the complement instead of the current value, and checking for the current value instead of the complement, inverts the whole lookup and won't reliably find matching pairs.", code = "seen.set(complement, i);\nif (seen.has(nums[i])) return [seen.get(nums[i]), i];"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "unordered_map<int, int> seen;\nfor (int i = 0; i < (int)nums.size(); i++) {\n    int complement = target - nums[i];\n    // ???\n}",
+                choices = listOf(
+                    choice("if (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;", true, "At i=0, complement is 0-(-3)=3, not yet seen, so -3 is stored; at i=2, complement is 0-3=-3, which is now in the map from i=0, correctly returning [0, 2].", code = "if (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;"),
+                    choice("bool found = false;\nfor (auto& kv : seen) if (kv.second == complement) found = true;\nif (found) return {seen[complement], i};\nseen[nums[i]] = i;", false, "Scanning the map's stored indices for a match against the complement, rather than its keys, searches the wrong side of the map entirely.", code = "bool found = false;\nfor (auto& kv : seen) if (kv.second == complement) found = true;\nif (found) return {seen[complement], i};\nseen[nums[i]] = i;"),
+                    choice("seen[complement] = i;\nif (seen.count(nums[i])) return {seen[nums[i]], i};", false, "Storing the complement instead of the current value, and checking for the current value instead of the complement, inverts the whole lookup and won't reliably find matching pairs.", code = "seen[complement] = i;\nif (seen.count(nums[i])) return {seen[nums[i]], i};"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "seen := map[int]int{}\nfor i := 0; i < len(nums); i++ {\n    complement := target - nums[i]\n    // ???\n}",
+                choices = listOf(
+                    choice("if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nseen[nums[i]] = i", true, "At i=0, complement is 0-(-3)=3, not yet seen, so -3 is stored; at i=2, complement is 0-3=-3, which is now in the map from i=0, correctly returning [0, 2].", code = "if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nseen[nums[i]] = i"),
+                    choice("found := false\nfor _, v := range seen {\n    if v == complement {\n        found = true\n    }\n}\nif found {\n    return []int{seen[complement], i}\n}\nseen[nums[i]] = i", false, "Scanning the map's stored indices for a match against the complement, rather than its keys, searches the wrong side of the map entirely.", code = "found := false\nfor _, v := range seen {\n    if v == complement {\n        found = true\n    }\n}\nif found {\n    return []int{seen[complement], i}\n}\nseen[nums[i]] = i"),
+                    choice("seen[complement] = i\nif j, ok := seen[nums[i]]; ok {\n    return []int{j, i}\n}", false, "Storing the complement instead of the current value, and checking for the current value instead of the complement, inverts the whole lookup and won't reliably find matching pairs.", code = "seen[complement] = i\nif j, ok := seen[nums[i]]; ok {\n    return []int{j, i}\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var seen: [Int: Int] = [:]\nfor i in 0..<nums.count {\n    let complement = target - nums[i]\n    // ???\n}",
+                choices = listOf(
+                    choice("if let j = seen[complement] { return [j, i] }\nseen[nums[i]] = i", true, "At i=0, complement is 0-(-3)=3, not yet seen, so -3 is stored; at i=2, complement is 0-3=-3, which is now in the map from i=0, correctly returning [0, 2].", code = "if let j = seen[complement] { return [j, i] }\nseen[nums[i]] = i"),
+                    choice("if seen.values.contains(complement) { return [seen[complement]!, i] }\nseen[nums[i]] = i", false, "Checking the dictionary's values instead of its keys searches the stored indices for a match against the complement, rather than its stored values - complement should be looked up as a key.", code = "if seen.values.contains(complement) { return [seen[complement]!, i] }\nseen[nums[i]] = i"),
+                    choice("seen[complement] = i\nif let j = seen[nums[i]] { return [j, i] }", false, "Storing the complement instead of the current value, and checking for the current value instead of the complement, inverts the whole lookup and won't reliably find matching pairs.", code = "seen[complement] = i\nif let j = seen[nums[i]] { return [j, i] }"),
+                ),
+            ),
+        ),
     ),
     step(
         "contains-duplicate", ARRAYS_HASHING, CODE_BLOCK,
@@ -205,6 +268,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Comparing set size against indexOf(num) + 1 is both slow (indexOf is itself a linear scan) and doesn't reliably identify the duplicate value in all cases.",
                 code = "seen.add(num)\nif (seen.size < nums.indexOf(num) + 1) return num",
+            ),
+        ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "seen = set()\nfor num in nums:\n    # ??? return the duplicate value, or None if none\nreturn None",
+                choices = listOf(
+                    choice("if num in seen:\n    return num\nseen.add(num)", true, "Python's set has no add-returns-whether-it-existed trick, so checking membership before adding is the correct single-pass shape - the value is only reported once it has genuinely been seen before.", code = "if num in seen:\n    return num\nseen.add(num)"),
+                    choice("seen.add(num)\nif num in seen:\n    return num", false, "Adding before checking means num is always found in seen immediately after being added, so this would incorrectly report every value as a duplicate on its very first occurrence.", code = "seen.add(num)\nif num in seen:\n    return num"),
+                    choice("seen.add(num)\nif len(seen) < nums.index(num) + 1:\n    return num", false, "Comparing set size against index(num) + 1 is both slow (index is itself a linear scan) and doesn't reliably identify the duplicate value in all cases.", code = "seen.add(num)\nif len(seen) < nums.index(num) + 1:\n    return num"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Set<Integer> seen = new HashSet<>();\nfor (int num : nums) {\n    // ??? return the duplicate value, or null if none\n}\nreturn null;",
+                choices = listOf(
+                    choice("if (!seen.add(num)) return num;", true, "Set.add returns false exactly when the value already existed, so returning num at that moment reports which specific value was the duplicate, in the same single pass.", code = "if (!seen.add(num)) return num;"),
+                    choice("if (seen.contains(num)) return num;\nseen.add(num);", false, "This actually works too, but doing two separate operations (a lookup then an insert) instead of the single add() call is less direct for the same result - not wrong, but worth recognizing as equivalent rather than uniquely correct.", code = "if (seen.contains(num)) return num;\nseen.add(num);"),
+                    choice("seen.add(num);\nif (seen.size() < indexOf(nums, num) + 1) return num;", false, "Comparing set size against the value's index is both slow (a linear scan) and doesn't reliably identify the duplicate value in all cases.", code = "seen.add(num);\nif (seen.size() < indexOf(nums, num) + 1) return num;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const seen = new Set();\nfor (const num of nums) {\n    // ??? return the duplicate value, or null if none\n}\nreturn null;",
+                choices = listOf(
+                    choice("if (seen.has(num)) return num;\nseen.add(num);", true, "JavaScript's Set.add returns the set itself rather than whether the value already existed, so checking membership before adding is the correct single-pass shape - the value is only reported once it has genuinely been seen before.", code = "if (seen.has(num)) return num;\nseen.add(num);"),
+                    choice("seen.add(num);\nif (seen.has(num)) return num;", false, "Adding before checking means num is always found in seen immediately after being added, so this would incorrectly report every value as a duplicate on its very first occurrence.", code = "seen.add(num);\nif (seen.has(num)) return num;"),
+                    choice("seen.add(num);\nif (seen.size < nums.indexOf(num) + 1) return num;", false, "Comparing set size against indexOf(num) + 1 is both slow (indexOf is itself a linear scan) and doesn't reliably identify the duplicate value in all cases.", code = "seen.add(num);\nif (seen.size < nums.indexOf(num) + 1) return num;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "unordered_set<int> seen;\nfor (int num : nums) {\n    // ??? return the duplicate value, or -1 if none\n}\nreturn -1;",
+                choices = listOf(
+                    choice("if (!seen.insert(num).second) return num;", true, "insert's returned bool is false exactly when the value already existed, so returning num at that moment reports which specific value was the duplicate, in the same single pass.", code = "if (!seen.insert(num).second) return num;"),
+                    choice("if (seen.count(num)) return num;\nseen.insert(num);", false, "This actually works too, but doing two separate operations (a lookup then an insert) instead of the single insert() call is less direct for the same result - not wrong, but worth recognizing as equivalent rather than uniquely correct.", code = "if (seen.count(num)) return num;\nseen.insert(num);"),
+                    choice("seen.insert(num);\nif ((int)seen.size() < indexOf(nums, num) + 1) return num;", false, "Comparing set size against the value's index is both slow (a linear scan) and doesn't reliably identify the duplicate value in all cases.", code = "seen.insert(num);\nif ((int)seen.size() < indexOf(nums, num) + 1) return num;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "seen := map[int]bool{}\nfor _, num := range nums {\n    // ??? return the duplicate value once found\n}\nreturn 0, false",
+                choices = listOf(
+                    choice("if seen[num] {\n    return num, true\n}\nseen[num] = true", true, "Go's map has no add-returns-whether-it-existed trick, so checking membership before adding is the correct single-pass shape - the value is only reported once it has genuinely been seen before.", code = "if seen[num] {\n    return num, true\n}\nseen[num] = true"),
+                    choice("seen[num] = true\nif seen[num] {\n    return num, true\n}", false, "Adding before checking means num is always found in seen immediately after being added, so this would incorrectly report every value as a duplicate on its very first occurrence.", code = "seen[num] = true\nif seen[num] {\n    return num, true\n}"),
+                    choice("seen[num] = true\nif len(seen) < indexOf(nums, num)+1 {\n    return num, true\n}", false, "Comparing map size against the value's index is both slow (a linear scan) and doesn't reliably identify the duplicate value in all cases.", code = "seen[num] = true\nif len(seen) < indexOf(nums, num)+1 {\n    return num, true\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var seen = Set<Int>()\nfor num in nums {\n    // ??? return the duplicate value, or nil if none\n}\nreturn nil",
+                choices = listOf(
+                    choice("if !seen.insert(num).inserted { return num }", true, "insert's returned inserted flag is false exactly when the value already existed, so returning num at that moment reports which specific value was the duplicate, in the same single pass.", code = "if !seen.insert(num).inserted { return num }"),
+                    choice("if seen.contains(num) { return num }\nseen.insert(num)", false, "This actually works too, but doing two separate operations (a lookup then an insert) instead of the single insert() call is less direct for the same result - not wrong, but worth recognizing as equivalent rather than uniquely correct.", code = "if seen.contains(num) { return num }\nseen.insert(num)"),
+                    choice("seen.insert(num)\nif seen.count < (nums.firstIndex(of: num) ?? 0) + 1 { return num }", false, "Comparing set size against the value's index is both slow (a linear scan) and doesn't reliably identify the duplicate value in all cases.", code = "seen.insert(num)\nif seen.count < (nums.firstIndex(of: num) ?? 0) + 1 { return num }"),
+                ),
             ),
         ),
     ),
