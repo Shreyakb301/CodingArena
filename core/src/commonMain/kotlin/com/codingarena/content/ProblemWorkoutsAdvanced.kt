@@ -583,6 +583,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "maxArea = maxOf(maxArea, area)\nbestLeft = left\nbestRight = right",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "left = 0\nright = len(height) - 1\nmax_area = 0\nbest_left = 0\nbest_right = len(height) - 1\nwhile left < right:\n    area = min(height[left], height[right]) * (right - left)\n    # ???\n    if height[left] < height[right]:\n        left += 1\n    else:\n        right -= 1",
+                choices = listOf(
+                    choice("if area > max_area:\n    max_area = area\n    best_left = left\n    best_right = right", true, "Recording the current left and right alongside max_area, updated together in the same comparison, adds only O(1) work per step and requires no second pass over the array to recover which indices produced the best area.", code = "if area > max_area:\n    max_area = area\n    best_left = left\n    best_right = right"),
+                    choice("max_area = max(max_area, area)\nif max_area == area:\n    best_left = height.index(height[left])\n    best_right = height.index(height[right])", false, "Using index() to relocate the indices afterward is both redundant (left and right are already known at this point) and unreliable if the same height value appears elsewhere in the array, since index() would find the wrong occurrence.", code = "max_area = max(max_area, area)\nif max_area == area:\n    best_left = height.index(height[left])\n    best_right = height.index(height[right])"),
+                    choice("max_area = max(max_area, area)\nbest_left = left\nbest_right = right", false, "Updating best_left and best_right unconditionally on every step, not just when a new maximum is actually found, would leave them pointing at whichever pair was checked last, not the pair that produced the true maximum area.", code = "max_area = max(max_area, area)\nbest_left = left\nbest_right = right"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int left = 0;\nint right = height.length - 1;\nint maxArea = 0;\nint bestLeft = 0;\nint bestRight = height.length - 1;\nwhile (left < right) {\n    int area = Math.min(height[left], height[right]) * (right - left);\n    // ???\n    if (height[left] < height[right]) left++; else right--;\n}",
+                choices = listOf(
+                    choice("if (area > maxArea) { maxArea = area; bestLeft = left; bestRight = right; }", true, "Recording the current left and right alongside maxArea, updated together in the same comparison, adds only O(1) work per step and requires no second pass over the array to recover which indices produced the best area.", code = "if (area > maxArea) { maxArea = area; bestLeft = left; bestRight = right; }"),
+                    choice("maxArea = Math.max(maxArea, area);\nif (maxArea == area) { bestLeft = indexOf(height, height[left]); bestRight = indexOf(height, height[right]); }", false, "Using a linear search to relocate the indices afterward is both redundant (left and right are already known at this point) and unreliable if the same height value appears elsewhere in the array, since it would find the wrong occurrence.", code = "maxArea = Math.max(maxArea, area);\nif (maxArea == area) { bestLeft = indexOf(height, height[left]); bestRight = indexOf(height, height[right]); }"),
+                    choice("maxArea = Math.max(maxArea, area);\nbestLeft = left;\nbestRight = right;", false, "Updating bestLeft and bestRight unconditionally on every step, not just when a new maximum is actually found, would leave them pointing at whichever pair was checked last, not the pair that produced the true maximum area.", code = "maxArea = Math.max(maxArea, area);\nbestLeft = left;\nbestRight = right;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let left = 0;\nlet right = height.length - 1;\nlet maxArea = 0;\nlet bestLeft = 0;\nlet bestRight = height.length - 1;\nwhile (left < right) {\n    const area = Math.min(height[left], height[right]) * (right - left);\n    // ???\n    if (height[left] < height[right]) left++; else right--;\n}",
+                choices = listOf(
+                    choice("if (area > maxArea) { maxArea = area; bestLeft = left; bestRight = right; }", true, "Recording the current left and right alongside maxArea, updated together in the same comparison, adds only O(1) work per step and requires no second pass over the array to recover which indices produced the best area.", code = "if (area > maxArea) { maxArea = area; bestLeft = left; bestRight = right; }"),
+                    choice("maxArea = Math.max(maxArea, area);\nif (maxArea === area) { bestLeft = height.indexOf(height[left]); bestRight = height.indexOf(height[right]); }", false, "Using indexOf to relocate the indices afterward is both redundant (left and right are already known at this point) and unreliable if the same height value appears elsewhere in the array, since indexOf would find the wrong occurrence.", code = "maxArea = Math.max(maxArea, area);\nif (maxArea === area) { bestLeft = height.indexOf(height[left]); bestRight = height.indexOf(height[right]); }"),
+                    choice("maxArea = Math.max(maxArea, area);\nbestLeft = left;\nbestRight = right;", false, "Updating bestLeft and bestRight unconditionally on every step, not just when a new maximum is actually found, would leave them pointing at whichever pair was checked last, not the pair that produced the true maximum area.", code = "maxArea = Math.max(maxArea, area);\nbestLeft = left;\nbestRight = right;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int left = 0;\nint right = height.size() - 1;\nint maxArea = 0;\nint bestLeft = 0;\nint bestRight = height.size() - 1;\nwhile (left < right) {\n    int area = min(height[left], height[right]) * (right - left);\n    // ???\n    if (height[left] < height[right]) left++; else right--;\n}",
+                choices = listOf(
+                    choice("if (area > maxArea) { maxArea = area; bestLeft = left; bestRight = right; }", true, "Recording the current left and right alongside maxArea, updated together in the same comparison, adds only O(1) work per step and requires no second pass over the array to recover which indices produced the best area.", code = "if (area > maxArea) { maxArea = area; bestLeft = left; bestRight = right; }"),
+                    choice("maxArea = max(maxArea, area);\nif (maxArea == area) { bestLeft = find(height.begin(), height.end(), height[left]) - height.begin(); bestRight = find(height.begin(), height.end(), height[right]) - height.begin(); }", false, "Using find to relocate the indices afterward is both redundant (left and right are already known at this point) and unreliable if the same height value appears elsewhere in the array, since find would locate the wrong occurrence.", code = "maxArea = max(maxArea, area);\nif (maxArea == area) { bestLeft = find(height.begin(), height.end(), height[left]) - height.begin(); bestRight = find(height.begin(), height.end(), height[right]) - height.begin(); }"),
+                    choice("maxArea = max(maxArea, area);\nbestLeft = left;\nbestRight = right;", false, "Updating bestLeft and bestRight unconditionally on every step, not just when a new maximum is actually found, would leave them pointing at whichever pair was checked last, not the pair that produced the true maximum area.", code = "maxArea = max(maxArea, area);\nbestLeft = left;\nbestRight = right;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "left := 0\nright := len(height) - 1\nmaxArea := 0\nbestLeft := 0\nbestRight := len(height) - 1\nfor left < right {\n    area := min(height[left], height[right]) * (right - left)\n    // ???\n    if height[left] < height[right] {\n        left++\n    } else {\n        right--\n    }\n}",
+                choices = listOf(
+                    choice("if area > maxArea {\n    maxArea = area\n    bestLeft = left\n    bestRight = right\n}", true, "Recording the current left and right alongside maxArea, updated together in the same comparison, adds only O(1) work per step and requires no second pass over the array to recover which indices produced the best area.", code = "if area > maxArea {\n    maxArea = area\n    bestLeft = left\n    bestRight = right\n}"),
+                    choice("if area > maxArea {\n    maxArea = area\n}\nif maxArea == area {\n    bestLeft = indexOf(height, height[left])\n    bestRight = indexOf(height, height[right])\n}", false, "Using a linear search to relocate the indices afterward is both redundant (left and right are already known at this point) and unreliable if the same height value appears elsewhere in the array, since it would find the wrong occurrence.", code = "if area > maxArea {\n    maxArea = area\n}\nif maxArea == area {\n    bestLeft = indexOf(height, height[left])\n    bestRight = indexOf(height, height[right])\n}"),
+                    choice("if area > maxArea {\n    maxArea = area\n}\nbestLeft = left\nbestRight = right", false, "Updating bestLeft and bestRight unconditionally on every step, not just when a new maximum is actually found, would leave them pointing at whichever pair was checked last, not the pair that produced the true maximum area.", code = "if area > maxArea {\n    maxArea = area\n}\nbestLeft = left\nbestRight = right"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var left = 0\nvar right = height.count - 1\nvar maxArea = 0\nvar bestLeft = 0\nvar bestRight = height.count - 1\nwhile left < right {\n    let area = min(height[left], height[right]) * (right - left)\n    // ???\n    if height[left] < height[right] { left += 1 } else { right -= 1 }\n}",
+                choices = listOf(
+                    choice("if area > maxArea { maxArea = area; bestLeft = left; bestRight = right }", true, "Recording the current left and right alongside maxArea, updated together in the same comparison, adds only O(1) work per step and requires no second pass over the array to recover which indices produced the best area.", code = "if area > maxArea { maxArea = area; bestLeft = left; bestRight = right }"),
+                    choice("maxArea = max(maxArea, area)\nif maxArea == area { bestLeft = height.firstIndex(of: height[left])!; bestRight = height.firstIndex(of: height[right])! }", false, "Using firstIndex to relocate the indices afterward is both redundant (left and right are already known at this point) and unreliable if the same height value appears elsewhere in the array, since firstIndex would find the wrong occurrence.", code = "maxArea = max(maxArea, area)\nif maxArea == area { bestLeft = height.firstIndex(of: height[left])!; bestRight = height.firstIndex(of: height[right])! }"),
+                    choice("maxArea = max(maxArea, area)\nbestLeft = left\nbestRight = right", false, "Updating bestLeft and bestRight unconditionally on every step, not just when a new maximum is actually found, would leave them pointing at whichever pair was checked last, not the pair that produced the true maximum area.", code = "maxArea = max(maxArea, area)\nbestLeft = left\nbestRight = right"),
+                ),
+            ),
+        ),
     ),
     step(
         "container-with-most-water", TWO_POINTERS, TIME_COMPLEXITY,
