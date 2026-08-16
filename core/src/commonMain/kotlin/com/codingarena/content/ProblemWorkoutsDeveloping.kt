@@ -1182,6 +1182,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (stack.isEmpty()) return false\nstack.removeLast()",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "stack = []\npairs = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\"}\nfor c in s:\n    if c in \"([{\":\n        stack.append(c)\n    else:\n        # ???\nreturn len(stack) == 0",
+                choices = listOf(
+                    choice("if not stack or stack.pop() != pairs[c]:\n    return False", true, "Checking for an empty stack before popping, combined with checking the popped value's type, correctly rejects both an unmatched closing bracket and a mismatched pair.", code = "if not stack or stack.pop() != pairs[c]:\n    return False"),
+                    choice("if stack.pop() != pairs[c]:\n    return False", false, "Without checking for an empty stack first, popping from an empty list throws an exception instead of correctly identifying the string as invalid.", code = "if stack.pop() != pairs[c]:\n    return False"),
+                    choice("if not stack:\n    return False\nstack.pop()", false, "Popping without comparing the result to pairs[c] means a mismatched bracket type, like an opening '(' closed by ']', would be silently accepted as valid.", code = "if not stack:\n    return False\nstack.pop()"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Deque<Character> stack = new ArrayDeque<>();\nMap<Character, Character> pairs = Map.of(')', '(', ']', '[', '}', '{');\nfor (char c : s.toCharArray()) {\n    if (\"([{\".indexOf(c) >= 0) {\n        stack.push(c);\n    } else {\n        // ???\n    }\n}\nreturn stack.isEmpty();",
+                choices = listOf(
+                    choice("if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false;", true, "Checking isEmpty() before popping, combined with checking the popped value's type, correctly rejects both an unmatched closing bracket and a mismatched pair.", code = "if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false;"),
+                    choice("if (stack.pop() != pairs.get(c)) return false;", false, "Without checking isEmpty() first, calling pop() on an empty stack throws an exception instead of correctly identifying the string as invalid.", code = "if (stack.pop() != pairs.get(c)) return false;"),
+                    choice("if (stack.isEmpty()) return false;\nstack.pop();", false, "Popping without comparing the result to pairs[c] means a mismatched bracket type, like an opening '(' closed by ']', would be silently accepted as valid.", code = "if (stack.isEmpty()) return false;\nstack.pop();"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const stack = [];\nconst pairs = { ')': '(', ']': '[', '}': '{' };\nfor (const c of s) {\n    if (\"([{\".includes(c)) {\n        stack.push(c);\n    } else {\n        // ???\n    }\n}\nreturn stack.length === 0;",
+                choices = listOf(
+                    choice("if (stack.length === 0 || stack.pop() !== pairs[c]) return false;", true, "Checking for an empty stack before popping, combined with checking the popped value's type, correctly rejects both an unmatched closing bracket and a mismatched pair.", code = "if (stack.length === 0 || stack.pop() !== pairs[c]) return false;"),
+                    choice("if (stack.pop() !== pairs[c]) return false;", false, "Without checking for an empty stack first, popping from an empty array returns undefined instead of correctly identifying the string as invalid right away.", code = "if (stack.pop() !== pairs[c]) return false;"),
+                    choice("if (stack.length === 0) return false;\nstack.pop();", false, "Popping without comparing the result to pairs[c] means a mismatched bracket type, like an opening '(' closed by ']', would be silently accepted as valid.", code = "if (stack.length === 0) return false;\nstack.pop();"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "vector<char> stack;\nunordered_map<char, char> pairs = {{')', '('}, {']', '['}, {'}', '{'}};\nfor (char c : s) {\n    if (string(\"([{\").find(c) != string::npos) {\n        stack.push_back(c);\n    } else {\n        // ???\n    }\n}\nreturn stack.empty();",
+                choices = listOf(
+                    choice("if (stack.empty()) return false;\nchar top = stack.back(); stack.pop_back();\nif (top != pairs[c]) return false;", true, "Checking for an empty stack before popping, combined with checking the popped value's type, correctly rejects both an unmatched closing bracket and a mismatched pair.", code = "if (stack.empty()) return false;\nchar top = stack.back(); stack.pop_back();\nif (top != pairs[c]) return false;"),
+                    choice("char top = stack.back(); stack.pop_back();\nif (top != pairs[c]) return false;", false, "Without checking for an empty stack first, calling back() on an empty vector is undefined behavior instead of correctly identifying the string as invalid.", code = "char top = stack.back(); stack.pop_back();\nif (top != pairs[c]) return false;"),
+                    choice("if (stack.empty()) return false;\nstack.pop_back();", false, "Popping without comparing the result to pairs[c] means a mismatched bracket type, like an opening '(' closed by ']', would be silently accepted as valid.", code = "if (stack.empty()) return false;\nstack.pop_back();"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "stack := []byte{}\npairs := map[byte]byte{')': '(', ']': '[', '}': '{'}\nfor i := 0; i < len(s); i++ {\n    c := s[i]\n    if strings.ContainsRune(\"([{\", rune(c)) {\n        stack = append(stack, c)\n    } else {\n        // ???\n    }\n}\nreturn len(stack) == 0",
+                choices = listOf(
+                    choice("if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n    return false\n}\nstack = stack[:len(stack)-1]", true, "Checking for an empty stack before popping, combined with checking the popped value's type, correctly rejects both an unmatched closing bracket and a mismatched pair.", code = "if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n    return false\n}\nstack = stack[:len(stack)-1]"),
+                    choice("top := stack[len(stack)-1]\nstack = stack[:len(stack)-1]\nif top != pairs[c] {\n    return false\n}", false, "Without checking for an empty stack first, indexing an empty slice panics instead of correctly identifying the string as invalid.", code = "top := stack[len(stack)-1]\nstack = stack[:len(stack)-1]\nif top != pairs[c] {\n    return false\n}"),
+                    choice("if len(stack) == 0 {\n    return false\n}\nstack = stack[:len(stack)-1]", false, "Popping without comparing the result to pairs[c] means a mismatched bracket type, like an opening '(' closed by ']', would be silently accepted as valid.", code = "if len(stack) == 0 {\n    return false\n}\nstack = stack[:len(stack)-1]"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var stack: [Character] = []\nlet pairs: [Character: Character] = [\")\": \"(\", \"]\": \"[\", \"}\": \"{\"]\nfor c in s {\n    if \"([{\".contains(c) {\n        stack.append(c)\n    } else {\n        // ???\n    }\n}\nreturn stack.isEmpty",
+                choices = listOf(
+                    choice("if stack.isEmpty || stack.removeLast() != pairs[c] { return false }", true, "Checking for an empty stack before popping, combined with checking the popped value's type, correctly rejects both an unmatched closing bracket and a mismatched pair.", code = "if stack.isEmpty || stack.removeLast() != pairs[c] { return false }"),
+                    choice("if stack.removeLast() != pairs[c] { return false }", false, "Without checking for an empty stack first, calling removeLast() on an empty array crashes instead of correctly identifying the string as invalid.", code = "if stack.removeLast() != pairs[c] { return false }"),
+                    choice("if stack.isEmpty { return false }\nstack.removeLast()", false, "Popping without comparing the result to pairs[c] means a mismatched bracket type, like an opening '(' closed by ']', would be silently accepted as valid.", code = "if stack.isEmpty { return false }\nstack.removeLast()"),
+                ),
+            ),
+        ),
     ),
     step(
         "min-stack", STACK, CODE_BLOCK,
