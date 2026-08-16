@@ -844,6 +844,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "minLen = minOf(minLen, right - left + 1)\nbestStart = right - minLen + 1",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "left = 0\nsum_ = 0\nmin_len = float(\"inf\")\nbest_start = 0\nfor right in range(len(nums)):\n    sum_ += nums[right]\n    while sum_ >= target:\n        # ???\n        sum_ -= nums[left]\n        left += 1\nreturn [] if min_len == float(\"inf\") else nums[best_start:best_start + min_len]",
+                choices = listOf(
+                    choice("if right - left + 1 < min_len:\n    min_len = right - left + 1\n    best_start = left", true, "Recording best_start alongside min_len, updated together whenever a shorter window is found, adds only O(1) work per check - the final slice then extracts the actual subarray without needing any additional passes over the array.", code = "if right - left + 1 < min_len:\n    min_len = right - left + 1\n    best_start = left"),
+                    choice("min_len = min(min_len, right - left + 1)\nbest_start = nums.index(nums[left])", false, "Using index() to relocate left's value afterward is both redundant (left is already known) and incorrect if that value repeats earlier in the array, since index() would find the wrong occurrence.", code = "min_len = min(min_len, right - left + 1)\nbest_start = nums.index(nums[left])"),
+                    choice("min_len = min(min_len, right - left + 1)\nbest_start = right - min_len + 1", false, "Deriving best_start from the overall min_len instead of the current window's own left position can produce a start index belonging to a different window than the one whose length was just measured, especially once a shorter window is later found elsewhere.", code = "min_len = min(min_len, right - left + 1)\nbest_start = right - min_len + 1"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int left = 0;\nint sum = 0;\nint minLen = Integer.MAX_VALUE;\nint bestStart = 0;\nfor (int right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    while (sum >= target) {\n        // ???\n        sum -= nums[left];\n        left++;\n    }\n}\nreturn minLen == Integer.MAX_VALUE ? new int[0] : Arrays.copyOfRange(nums, bestStart, bestStart + minLen);",
+                choices = listOf(
+                    choice("if (right - left + 1 < minLen) { minLen = right - left + 1; bestStart = left; }", true, "Recording bestStart alongside minLen, updated together whenever a shorter window is found, adds only O(1) work per check - the final copyOfRange then extracts the actual subarray without needing any additional passes over the array.", code = "if (right - left + 1 < minLen) { minLen = right - left + 1; bestStart = left; }"),
+                    choice("minLen = Math.min(minLen, right - left + 1);\nbestStart = indexOf(nums, nums[left]);", false, "Using a linear search to relocate left's value afterward is both redundant (left is already known) and incorrect if that value repeats earlier in the array, since it would find the wrong occurrence.", code = "minLen = Math.min(minLen, right - left + 1);\nbestStart = indexOf(nums, nums[left]);"),
+                    choice("minLen = Math.min(minLen, right - left + 1);\nbestStart = right - minLen + 1;", false, "Deriving bestStart from the overall minLen instead of the current window's own left position can produce a start index belonging to a different window than the one whose length was just measured, especially once a shorter window is later found elsewhere.", code = "minLen = Math.min(minLen, right - left + 1);\nbestStart = right - minLen + 1;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let left = 0;\nlet sum = 0;\nlet minLen = Infinity;\nlet bestStart = 0;\nfor (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    while (sum >= target) {\n        // ???\n        sum -= nums[left];\n        left++;\n    }\n}\nreturn minLen === Infinity ? [] : nums.slice(bestStart, bestStart + minLen);",
+                choices = listOf(
+                    choice("if (right - left + 1 < minLen) { minLen = right - left + 1; bestStart = left; }", true, "Recording bestStart alongside minLen, updated together whenever a shorter window is found, adds only O(1) work per check - the final slice then extracts the actual subarray without needing any additional passes over the array.", code = "if (right - left + 1 < minLen) { minLen = right - left + 1; bestStart = left; }"),
+                    choice("minLen = Math.min(minLen, right - left + 1);\nbestStart = nums.indexOf(nums[left]);", false, "Using indexOf to relocate left's value afterward is both redundant (left is already known) and incorrect if that value repeats earlier in the array, since indexOf would find the wrong occurrence.", code = "minLen = Math.min(minLen, right - left + 1);\nbestStart = nums.indexOf(nums[left]);"),
+                    choice("minLen = Math.min(minLen, right - left + 1);\nbestStart = right - minLen + 1;", false, "Deriving bestStart from the overall minLen instead of the current window's own left position can produce a start index belonging to a different window than the one whose length was just measured, especially once a shorter window is later found elsewhere.", code = "minLen = Math.min(minLen, right - left + 1);\nbestStart = right - minLen + 1;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int left = 0;\nint sum = 0;\nint minLen = INT_MAX;\nint bestStart = 0;\nfor (int right = 0; right < (int)nums.size(); right++) {\n    sum += nums[right];\n    while (sum >= target) {\n        // ???\n        sum -= nums[left];\n        left++;\n    }\n}\nreturn minLen == INT_MAX ? vector<int>() : vector<int>(nums.begin() + bestStart, nums.begin() + bestStart + minLen);",
+                choices = listOf(
+                    choice("if (right - left + 1 < minLen) { minLen = right - left + 1; bestStart = left; }", true, "Recording bestStart alongside minLen, updated together whenever a shorter window is found, adds only O(1) work per check - the final range copy then extracts the actual subarray without needing any additional passes over the array.", code = "if (right - left + 1 < minLen) { minLen = right - left + 1; bestStart = left; }"),
+                    choice("minLen = min(minLen, right - left + 1);\nbestStart = find(nums.begin(), nums.end(), nums[left]) - nums.begin();", false, "Using find to relocate left's value afterward is both redundant (left is already known) and incorrect if that value repeats earlier in the array, since find would locate the wrong occurrence.", code = "minLen = min(minLen, right - left + 1);\nbestStart = find(nums.begin(), nums.end(), nums[left]) - nums.begin();"),
+                    choice("minLen = min(minLen, right - left + 1);\nbestStart = right - minLen + 1;", false, "Deriving bestStart from the overall minLen instead of the current window's own left position can produce a start index belonging to a different window than the one whose length was just measured, especially once a shorter window is later found elsewhere.", code = "minLen = min(minLen, right - left + 1);\nbestStart = right - minLen + 1;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "left := 0\nsum := 0\nminLen := math.MaxInt32\nbestStart := 0\nfor right := 0; right < len(nums); right++ {\n    sum += nums[right]\n    for sum >= target {\n        // ???\n        sum -= nums[left]\n        left++\n    }\n}\nif minLen == math.MaxInt32 {\n    return []int{}\n}\nreturn nums[bestStart : bestStart+minLen]",
+                choices = listOf(
+                    choice("if right-left+1 < minLen {\n    minLen = right - left + 1\n    bestStart = left\n}", true, "Recording bestStart alongside minLen, updated together whenever a shorter window is found, adds only O(1) work per check - the final slice then extracts the actual subarray without needing any additional passes over the array.", code = "if right-left+1 < minLen {\n    minLen = right - left + 1\n    bestStart = left\n}"),
+                    choice("if right-left+1 < minLen {\n    minLen = right - left + 1\n}\nbestStart = indexOf(nums, nums[left])", false, "Using a linear search to relocate left's value afterward is both redundant (left is already known) and incorrect if that value repeats earlier in the array, since it would find the wrong occurrence.", code = "if right-left+1 < minLen {\n    minLen = right - left + 1\n}\nbestStart = indexOf(nums, nums[left])"),
+                    choice("if right-left+1 < minLen {\n    minLen = right - left + 1\n}\nbestStart = right - minLen + 1", false, "Deriving bestStart from the overall minLen instead of the current window's own left position can produce a start index belonging to a different window than the one whose length was just measured, especially once a shorter window is later found elsewhere.", code = "if right-left+1 < minLen {\n    minLen = right - left + 1\n}\nbestStart = right - minLen + 1"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var left = 0\nvar sum = 0\nvar minLen = Int.max\nvar bestStart = 0\nfor right in 0..<nums.count {\n    sum += nums[right]\n    while sum >= target {\n        // ???\n        sum -= nums[left]\n        left += 1\n    }\n}\nreturn minLen == Int.max ? [] : Array(nums[bestStart..<(bestStart + minLen)])",
+                choices = listOf(
+                    choice("if right - left + 1 < minLen { minLen = right - left + 1; bestStart = left }", true, "Recording bestStart alongside minLen, updated together whenever a shorter window is found, adds only O(1) work per check - the final array slice then extracts the actual subarray without needing any additional passes over the array.", code = "if right - left + 1 < minLen { minLen = right - left + 1; bestStart = left }"),
+                    choice("minLen = min(minLen, right - left + 1)\nbestStart = nums.firstIndex(of: nums[left])!", false, "Using firstIndex to relocate left's value afterward is both redundant (left is already known) and incorrect if that value repeats earlier in the array, since firstIndex would find the wrong occurrence.", code = "minLen = min(minLen, right - left + 1)\nbestStart = nums.firstIndex(of: nums[left])!"),
+                    choice("minLen = min(minLen, right - left + 1)\nbestStart = right - minLen + 1", false, "Deriving bestStart from the overall minLen instead of the current window's own left position can produce a start index belonging to a different window than the one whose length was just measured, especially once a shorter window is later found elsewhere.", code = "minLen = min(minLen, right - left + 1)\nbestStart = right - minLen + 1"),
+                ),
+            ),
+        ),
     ),
     step(
         "best-time-to-buy-and-sell-stock", SLIDING_WINDOW, CODE_BLOCK,
