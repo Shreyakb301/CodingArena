@@ -6,6 +6,13 @@ import com.codingarena.domain.model.PatternGroup.SLIDING_WINDOW
 import com.codingarena.domain.model.PatternGroup.STACK
 import com.codingarena.domain.model.PatternGroup.TWO_POINTERS
 import com.codingarena.domain.model.PracticeDifficulty.ADVANCED
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.PYTHON
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
+import com.codingarena.domain.model.WorkoutCodeVariant
 import com.codingarena.domain.model.WorkoutStep
 import com.codingarena.domain.model.WorkoutStepKind.APPROACH
 import com.codingarena.domain.model.WorkoutStepKind.BOUNDARY_UPDATE
@@ -178,6 +185,33 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Taking the absolute value doesn't address overflow at all, and it also changes the actual value being searched for - a negative complement and its positive counterpart are different values that shouldn't be conflated.",
                 code = "val complement = Math.abs(target - nums[i])\nif (seen.containsKey(complement)) return intArrayOf(seen[complement]!!, i)\nseen[nums[i]] = i",
+            ),
+        ),
+        // Only Java and C++ get a variant: this question is specifically about
+        // 32-bit int overflow. Kotlin's Int and Java's int share that width, and
+        // C++'s int conventionally does too, but Python ints are arbitrary
+        // precision, JS numbers safely cover this range, and Go/Swift's Int is
+        // 64-bit on modern platforms - the scenario doesn't translate for them,
+        // so those languages fall back to the Kotlin version rather than a
+        // fabricated equivalent.
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                JAVA,
+                "Map<Integer, Integer> seen = new HashMap<>();\nfor (int i = 0; i < nums.length; i++) {\n    // ???\n}",
+                choices = listOf(
+                    choice("long complement = (long) target - nums[i];\nif (complement >= Integer.MIN_VALUE && complement <= Integer.MAX_VALUE) {\n    int c = (int) complement;\n    if (seen.containsKey(c)) return new int[]{seen.get(c), i};\n}\nseen.put(nums[i], i);", true, "Computing the subtraction in long avoids the overflow that target - nums[i] could produce in plain int arithmetic when both values sit near the extremes of the int range, then safely checks whether the result even fits back into int before using it as a key.", code = "long complement = (long) target - nums[i];\nif (complement >= Integer.MIN_VALUE && complement <= Integer.MAX_VALUE) {\n    int c = (int) complement;\n    if (seen.containsKey(c)) return new int[]{seen.get(c), i};\n}\nseen.put(nums[i], i);"),
+                    choice("int complement = target - nums[i];\nif (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);", false, "Computing target - nums[i] directly in int arithmetic can silently overflow and wrap around to an incorrect value when both are near int's extremes, producing a wrong complement without any visible error.", code = "int complement = target - nums[i];\nif (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);"),
+                    choice("int complement = Math.abs(target - nums[i]);\nif (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);", false, "Taking the absolute value doesn't address overflow at all, and it also changes the actual value being searched for - a negative complement and its positive counterpart are different values that shouldn't be conflated.", code = "int complement = Math.abs(target - nums[i]);\nif (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "unordered_map<int, int> seen;\nfor (int i = 0; i < (int)nums.size(); i++) {\n    // ???\n}",
+                choices = listOf(
+                    choice("long long complement = (long long)target - nums[i];\nif (complement >= INT_MIN && complement <= INT_MAX) {\n    int c = (int)complement;\n    if (seen.count(c)) return {seen[c], i};\n}\nseen[nums[i]] = i;", true, "Computing the subtraction as a long long avoids the overflow that target - nums[i] could produce in plain int arithmetic when both values sit near the extremes of int's range, then safely checks whether the result even fits back into int before using it as a key.", code = "long long complement = (long long)target - nums[i];\nif (complement >= INT_MIN && complement <= INT_MAX) {\n    int c = (int)complement;\n    if (seen.count(c)) return {seen[c], i};\n}\nseen[nums[i]] = i;"),
+                    choice("int complement = target - nums[i];\nif (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;", false, "Computing target - nums[i] directly in int arithmetic is undefined behavior on overflow and can wrap around to an incorrect value when both are near int's extremes, producing a wrong complement without any visible error.", code = "int complement = target - nums[i];\nif (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;"),
+                    choice("int complement = abs(target - nums[i]);\nif (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;", false, "Taking the absolute value doesn't address overflow at all, and it also changes the actual value being searched for - a negative complement and its positive counterpart are different values that shouldn't be conflated.", code = "int complement = abs(target - nums[i]);\nif (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;"),
+                ),
             ),
         ),
     ),
