@@ -1299,6 +1299,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "minStack.addLast(v)",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "stack = []\nmin_stack = []\ndef push(v):\n    stack.append(v)\n    # ???",
+                choices = listOf(
+                    choice("min_stack.append(min(v, min_stack[-1]) if min_stack else v)", true, "Tracing through: push(3) -> min_stack=[3], push(1) -> min_stack=[3,1], push(2) -> min_stack=[3,1,1] (2 isn't smaller than 1, so 1 repeats); after pop(), min_stack=[3,1], so getMin() correctly returns 1.", code = "min_stack.append(min(v, min_stack[-1]) if min_stack else v)"),
+                    choice("if not min_stack or v < min_stack[-1]:\n    min_stack.append(v)", false, "Only conditionally pushing onto min_stack desynchronizes its size from the main stack - after pop(), it's unclear how many entries to remove from min_stack to correctly undo the push(2) that never added anything to it.", code = "if not min_stack or v < min_stack[-1]:\n    min_stack.append(v)"),
+                    choice("min_stack.append(v)", false, "Pushing the raw value instead of the running minimum onto min_stack means its top after this sequence would be 2 (the most recent push), not 1 (the true minimum of what remains after the pop).", code = "min_stack.append(v)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Deque<Integer> stack = new ArrayDeque<>();\nDeque<Integer> minStack = new ArrayDeque<>();\nvoid push(int v) {\n    stack.addLast(v);\n    // ???\n}",
+                choices = listOf(
+                    choice("minStack.addLast(minStack.isEmpty() ? v : Math.min(v, minStack.peekLast()));", true, "Tracing through: push(3) -> minStack=[3], push(1) -> minStack=[3,1], push(2) -> minStack=[3,1,1] (2 isn't smaller than 1, so 1 repeats); after pop(), minStack=[3,1], so getMin() correctly returns 1.", code = "minStack.addLast(minStack.isEmpty() ? v : Math.min(v, minStack.peekLast()));"),
+                    choice("if (minStack.isEmpty() || v < minStack.peekLast()) minStack.addLast(v);", false, "Only conditionally pushing onto minStack desynchronizes its size from the main stack - after pop(), it's unclear how many entries to remove from minStack to correctly undo the push(2) that never added anything to it.", code = "if (minStack.isEmpty() || v < minStack.peekLast()) minStack.addLast(v);"),
+                    choice("minStack.addLast(v);", false, "Pushing the raw value instead of the running minimum onto minStack means its top after this sequence would be 2 (the most recent push), not 1 (the true minimum of what remains after the pop).", code = "minStack.addLast(v);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const stack = [];\nconst minStack = [];\nfunction push(v) {\n    stack.push(v);\n    // ???\n}",
+                choices = listOf(
+                    choice("minStack.push(minStack.length === 0 ? v : Math.min(v, minStack[minStack.length - 1]));", true, "Tracing through: push(3) -> minStack=[3], push(1) -> minStack=[3,1], push(2) -> minStack=[3,1,1] (2 isn't smaller than 1, so 1 repeats); after pop(), minStack=[3,1], so getMin() correctly returns 1.", code = "minStack.push(minStack.length === 0 ? v : Math.min(v, minStack[minStack.length - 1]));"),
+                    choice("if (minStack.length === 0 || v < minStack[minStack.length - 1]) minStack.push(v);", false, "Only conditionally pushing onto minStack desynchronizes its size from the main stack - after pop(), it's unclear how many entries to remove from minStack to correctly undo the push(2) that never added anything to it.", code = "if (minStack.length === 0 || v < minStack[minStack.length - 1]) minStack.push(v);"),
+                    choice("minStack.push(v);", false, "Pushing the raw value instead of the running minimum onto minStack means its top after this sequence would be 2 (the most recent push), not 1 (the true minimum of what remains after the pop).", code = "minStack.push(v);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "vector<int> stack;\nvector<int> minStack;\nvoid push(int v) {\n    stack.push_back(v);\n    // ???\n}",
+                choices = listOf(
+                    choice("minStack.push_back(minStack.empty() ? v : min(v, minStack.back()));", true, "Tracing through: push(3) -> minStack=[3], push(1) -> minStack=[3,1], push(2) -> minStack=[3,1,1] (2 isn't smaller than 1, so 1 repeats); after pop(), minStack=[3,1], so getMin() correctly returns 1.", code = "minStack.push_back(minStack.empty() ? v : min(v, minStack.back()));"),
+                    choice("if (minStack.empty() || v < minStack.back()) minStack.push_back(v);", false, "Only conditionally pushing onto minStack desynchronizes its size from the main stack - after pop(), it's unclear how many entries to remove from minStack to correctly undo the push(2) that never added anything to it.", code = "if (minStack.empty() || v < minStack.back()) minStack.push_back(v);"),
+                    choice("minStack.push_back(v);", false, "Pushing the raw value instead of the running minimum onto minStack means its top after this sequence would be 2 (the most recent push), not 1 (the true minimum of what remains after the pop).", code = "minStack.push_back(v);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "var stack []int\nvar minStack []int\nfunc push(v int) {\n    stack = append(stack, v)\n    // ???\n}",
+                choices = listOf(
+                    choice("newMin := v\nif len(minStack) > 0 && minStack[len(minStack)-1] < newMin {\n    newMin = minStack[len(minStack)-1]\n}\nminStack = append(minStack, newMin)", true, "Tracing through: push(3) -> minStack=[3], push(1) -> minStack=[3,1], push(2) -> minStack=[3,1,1] (2 isn't smaller than 1, so 1 repeats); after pop(), minStack=[3,1], so getMin() correctly returns 1.", code = "newMin := v\nif len(minStack) > 0 && minStack[len(minStack)-1] < newMin {\n    newMin = minStack[len(minStack)-1]\n}\nminStack = append(minStack, newMin)"),
+                    choice("if len(minStack) == 0 || v < minStack[len(minStack)-1] {\n    minStack = append(minStack, v)\n}", false, "Only conditionally pushing onto minStack desynchronizes its size from the main stack - after pop(), it's unclear how many entries to remove from minStack to correctly undo the push(2) that never added anything to it.", code = "if len(minStack) == 0 || v < minStack[len(minStack)-1] {\n    minStack = append(minStack, v)\n}"),
+                    choice("minStack = append(minStack, v)", false, "Pushing the raw value instead of the running minimum onto minStack means its top after this sequence would be 2 (the most recent push), not 1 (the true minimum of what remains after the pop).", code = "minStack = append(minStack, v)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var stack: [Int] = []\nvar minStack: [Int] = []\nfunc push(_ v: Int) {\n    stack.append(v)\n    // ???\n}",
+                choices = listOf(
+                    choice("minStack.append(minStack.isEmpty ? v : min(v, minStack.last!))", true, "Tracing through: push(3) -> minStack=[3], push(1) -> minStack=[3,1], push(2) -> minStack=[3,1,1] (2 isn't smaller than 1, so 1 repeats); after pop(), minStack=[3,1], so getMin() correctly returns 1.", code = "minStack.append(minStack.isEmpty ? v : min(v, minStack.last!))"),
+                    choice("if minStack.isEmpty || v < minStack.last! { minStack.append(v) }", false, "Only conditionally pushing onto minStack desynchronizes its size from the main stack - after pop(), it's unclear how many entries to remove from minStack to correctly undo the push(2) that never added anything to it.", code = "if minStack.isEmpty || v < minStack.last! { minStack.append(v) }"),
+                    choice("minStack.append(v)", false, "Pushing the raw value instead of the running minimum onto minStack means its top after this sequence would be 2 (the most recent push), not 1 (the true minimum of what remains after the pop).", code = "minStack.append(v)"),
+                ),
+            ),
+        ),
     ),
     step(
         "min-stack", STACK, TIME_COMPLEXITY,
