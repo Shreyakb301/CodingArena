@@ -2835,6 +2835,62 @@ private val longestSubstringWorkout = ProblemWorkout(
                     "Clearing the entire window and jumping left all the way to right throws away every character between the old duplicate and the current position that could still be part of a valid window.",
                     code = "if (s[right] in window) {\n    window.clear()\n    left = right\n}",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "left = 0\nmax_len = 0\nwindow = set()\nfor right in range(len(s)):\n    # ???\n    window.add(s[right])\n    max_len = max(max_len, right - left + 1)",
+                    choices = listOf(
+                        choice("while s[right] in window:\n    window.remove(s[left])\n    left += 1", true, "This shrinks the window from the left, one character at a time, exactly until the specific duplicate character is removed, before the new character is added and the length is recorded.", code = "while s[right] in window:\n    window.remove(s[left])\n    left += 1"),
+                        choice("if s[right] in window:\n    window.remove(s[left])\n    left += 1", false, "A single if only removes one character, which might not actually remove the specific duplicate if it isn't the leftmost character in the window.", code = "if s[right] in window:\n    window.remove(s[left])\n    left += 1"),
+                        choice("if s[right] in window:\n    window.clear()\n    left = right", false, "Clearing the entire window and jumping left all the way to right throws away every character between the old duplicate and the current position that could still be part of a valid window.", code = "if s[right] in window:\n    window.clear()\n    left = right"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int left = 0;\nint maxLen = 0;\nSet<Character> window = new HashSet<>();\nfor (int right = 0; right < s.length(); right++) {\n    // ???\n    window.add(s.charAt(right));\n    maxLen = Math.max(maxLen, right - left + 1);\n}",
+                    choices = listOf(
+                        choice("while (window.contains(s.charAt(right))) {\n    window.remove(s.charAt(left));\n    left++;\n}", true, "This shrinks the window from the left, one character at a time, exactly until the specific duplicate character is removed, before the new character is added and the length is recorded.", code = "while (window.contains(s.charAt(right))) {\n    window.remove(s.charAt(left));\n    left++;\n}"),
+                        choice("if (window.contains(s.charAt(right))) {\n    window.remove(s.charAt(left));\n    left++;\n}", false, "A single if only removes one character, which might not actually remove the specific duplicate if it isn't the leftmost character in the window.", code = "if (window.contains(s.charAt(right))) {\n    window.remove(s.charAt(left));\n    left++;\n}"),
+                        choice("if (window.contains(s.charAt(right))) {\n    window.clear();\n    left = right;\n}", false, "Clearing the entire window and jumping left all the way to right throws away every character between the old duplicate and the current position that could still be part of a valid window.", code = "if (window.contains(s.charAt(right))) {\n    window.clear();\n    left = right;\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let left = 0;\nlet maxLen = 0;\nconst window = new Set();\nfor (let right = 0; right < s.length; right++) {\n    // ???\n    window.add(s[right]);\n    maxLen = Math.max(maxLen, right - left + 1);\n}",
+                    choices = listOf(
+                        choice("while (window.has(s[right])) {\n    window.delete(s[left]);\n    left++;\n}", true, "This shrinks the window from the left, one character at a time, exactly until the specific duplicate character is removed, before the new character is added and the length is recorded.", code = "while (window.has(s[right])) {\n    window.delete(s[left]);\n    left++;\n}"),
+                        choice("if (window.has(s[right])) {\n    window.delete(s[left]);\n    left++;\n}", false, "A single if only removes one character, which might not actually remove the specific duplicate if it isn't the leftmost character in the window.", code = "if (window.has(s[right])) {\n    window.delete(s[left]);\n    left++;\n}"),
+                        choice("if (window.has(s[right])) {\n    window.clear();\n    left = right;\n}", false, "Clearing the entire window and jumping left all the way to right throws away every character between the old duplicate and the current position that could still be part of a valid window.", code = "if (window.has(s[right])) {\n    window.clear();\n    left = right;\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int left = 0;\nint maxLen = 0;\nunordered_set<char> window;\nfor (int right = 0; right < (int)s.size(); right++) {\n    // ???\n    window.insert(s[right]);\n    maxLen = max(maxLen, right - left + 1);\n}",
+                    choices = listOf(
+                        choice("while (window.count(s[right])) {\n    window.erase(s[left]);\n    left++;\n}", true, "This shrinks the window from the left, one character at a time, exactly until the specific duplicate character is removed, before the new character is added and the length is recorded.", code = "while (window.count(s[right])) {\n    window.erase(s[left]);\n    left++;\n}"),
+                        choice("if (window.count(s[right])) {\n    window.erase(s[left]);\n    left++;\n}", false, "A single if only removes one character, which might not actually remove the specific duplicate if it isn't the leftmost character in the window.", code = "if (window.count(s[right])) {\n    window.erase(s[left]);\n    left++;\n}"),
+                        choice("if (window.count(s[right])) {\n    window.clear();\n    left = right;\n}", false, "Clearing the entire window and jumping left all the way to right throws away every character between the old duplicate and the current position that could still be part of a valid window.", code = "if (window.count(s[right])) {\n    window.clear();\n    left = right;\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "left := 0\nmaxLen := 0\nwindow := map[byte]bool{}\nfor right := 0; right < len(s); right++ {\n    // ???\n    window[s[right]] = true\n    if right-left+1 > maxLen {\n        maxLen = right - left + 1\n    }\n}",
+                    choices = listOf(
+                        choice("for window[s[right]] {\n    delete(window, s[left])\n    left++\n}", true, "This shrinks the window from the left, one character at a time, exactly until the specific duplicate character is removed, before the new character is added and the length is recorded.", code = "for window[s[right]] {\n    delete(window, s[left])\n    left++\n}"),
+                        choice("if window[s[right]] {\n    delete(window, s[left])\n    left++\n}", false, "A single if only removes one character, which might not actually remove the specific duplicate if it isn't the leftmost character in the window.", code = "if window[s[right]] {\n    delete(window, s[left])\n    left++\n}"),
+                        choice("if window[s[right]] {\n    window = map[byte]bool{}\n    left = right\n}", false, "Clearing the entire window and jumping left all the way to right throws away every character between the old duplicate and the current position that could still be part of a valid window.", code = "if window[s[right]] {\n    window = map[byte]bool{}\n    left = right\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "let chars = Array(s)\nvar left = 0\nvar maxLen = 0\nvar window = Set<Character>()\nfor right in 0..<chars.count {\n    // ???\n    window.insert(chars[right])\n    maxLen = max(maxLen, right - left + 1)\n}",
+                    choices = listOf(
+                        choice("while window.contains(chars[right]) {\n    window.remove(chars[left])\n    left += 1\n}", true, "This shrinks the window from the left, one character at a time, exactly until the specific duplicate character is removed, before the new character is added and the length is recorded.", code = "while window.contains(chars[right]) {\n    window.remove(chars[left])\n    left += 1\n}"),
+                        choice("if window.contains(chars[right]) {\n    window.remove(chars[left])\n    left += 1\n}", false, "A single if only removes one character, which might not actually remove the specific duplicate if it isn't the leftmost character in the window.", code = "if window.contains(chars[right]) {\n    window.remove(chars[left])\n    left += 1\n}"),
+                        choice("if window.contains(chars[right]) {\n    window.removeAll()\n    left = right\n}", false, "Clearing the entire window and jumping left all the way to right throws away every character between the old duplicate and the current position that could still be part of a valid window.", code = "if window.contains(chars[right]) {\n    window.removeAll()\n    left = right\n}"),
+                    ),
+                ),
+            ),
         ),
         step(
             "longest-substring-without-repeating-characters", SLIDING_WINDOW, TIME_COMPLEXITY,
@@ -3035,6 +3091,62 @@ private val minStackWorkout = ProblemWorkout(
                     "This pushes the raw value instead of the running minimum onto the min-stack, so its top would just be the most recent push, not the smallest value seen so far.",
                     code = "stack.addLast(value)\nminStack.addLast(value)",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "stack = []\nmin_stack = []\ndef push(value):\n    # ???\ndef pop():\n    stack.pop()\n    min_stack.pop()",
+                    choices = listOf(
+                        choice("stack.append(value)\nnew_min = value if not min_stack else min(value, min_stack[-1])\nmin_stack.append(new_min)", true, "Every push adds exactly one entry to both stacks, with the min-stack entry always reflecting the minimum so far - this keeps both stacks the same size and getMin correct at every step.", code = "stack.append(value)\nnew_min = value if not min_stack else min(value, min_stack[-1])\nmin_stack.append(new_min)"),
+                        choice("stack.append(value)\nif not min_stack or value < min_stack[-1]:\n    min_stack.append(value)", false, "Only sometimes pushing onto the min-stack leaves it a different size than the main stack, so popping both together (as pop() does here) would desynchronize them.", code = "stack.append(value)\nif not min_stack or value < min_stack[-1]:\n    min_stack.append(value)"),
+                        choice("stack.append(value)\nmin_stack.append(value)", false, "This pushes the raw value instead of the running minimum onto the min-stack, so its top would just be the most recent push, not the smallest value seen so far.", code = "stack.append(value)\nmin_stack.append(value)"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "Deque<Integer> stack = new ArrayDeque<>();\nDeque<Integer> minStack = new ArrayDeque<>();\nvoid push(int value) {\n    // ???\n}\nvoid pop() {\n    stack.removeLast();\n    minStack.removeLast();\n}",
+                    choices = listOf(
+                        choice("stack.addLast(value);\nint newMin = minStack.isEmpty() ? value : Math.min(value, minStack.peekLast());\nminStack.addLast(newMin);", true, "Every push adds exactly one entry to both stacks, with the min-stack entry always reflecting the minimum so far - this keeps both stacks the same size and getMin correct at every step.", code = "stack.addLast(value);\nint newMin = minStack.isEmpty() ? value : Math.min(value, minStack.peekLast());\nminStack.addLast(newMin);"),
+                        choice("stack.addLast(value);\nif (minStack.isEmpty() || value < minStack.peekLast()) minStack.addLast(value);", false, "Only sometimes pushing onto the min-stack leaves it a different size than the main stack, so popping both together (as pop() does here) would desynchronize them.", code = "stack.addLast(value);\nif (minStack.isEmpty() || value < minStack.peekLast()) minStack.addLast(value);"),
+                        choice("stack.addLast(value);\nminStack.addLast(value);", false, "This pushes the raw value instead of the running minimum onto the min-stack, so its top would just be the most recent push, not the smallest value seen so far.", code = "stack.addLast(value);\nminStack.addLast(value);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "const stack = [];\nconst minStack = [];\nfunction push(value) {\n    // ???\n}\nfunction pop() {\n    stack.pop();\n    minStack.pop();\n}",
+                    choices = listOf(
+                        choice("stack.push(value);\nconst newMin = minStack.length === 0 ? value : Math.min(value, minStack[minStack.length - 1]);\nminStack.push(newMin);", true, "Every push adds exactly one entry to both stacks, with the min-stack entry always reflecting the minimum so far - this keeps both stacks the same size and getMin correct at every step.", code = "stack.push(value);\nconst newMin = minStack.length === 0 ? value : Math.min(value, minStack[minStack.length - 1]);\nminStack.push(newMin);"),
+                        choice("stack.push(value);\nif (minStack.length === 0 || value < minStack[minStack.length - 1]) minStack.push(value);", false, "Only sometimes pushing onto the min-stack leaves it a different size than the main stack, so popping both together (as pop() does here) would desynchronize them.", code = "stack.push(value);\nif (minStack.length === 0 || value < minStack[minStack.length - 1]) minStack.push(value);"),
+                        choice("stack.push(value);\nminStack.push(value);", false, "This pushes the raw value instead of the running minimum onto the min-stack, so its top would just be the most recent push, not the smallest value seen so far.", code = "stack.push(value);\nminStack.push(value);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "vector<int> stack;\nvector<int> minStack;\nvoid push(int value) {\n    // ???\n}\nvoid pop() {\n    stack.pop_back();\n    minStack.pop_back();\n}",
+                    choices = listOf(
+                        choice("stack.push_back(value);\nint newMin = minStack.empty() ? value : min(value, minStack.back());\nminStack.push_back(newMin);", true, "Every push adds exactly one entry to both stacks, with the min-stack entry always reflecting the minimum so far - this keeps both stacks the same size and getMin correct at every step.", code = "stack.push_back(value);\nint newMin = minStack.empty() ? value : min(value, minStack.back());\nminStack.push_back(newMin);"),
+                        choice("stack.push_back(value);\nif (minStack.empty() || value < minStack.back()) minStack.push_back(value);", false, "Only sometimes pushing onto the min-stack leaves it a different size than the main stack, so popping both together (as pop() does here) would desynchronize them.", code = "stack.push_back(value);\nif (minStack.empty() || value < minStack.back()) minStack.push_back(value);"),
+                        choice("stack.push_back(value);\nminStack.push_back(value);", false, "This pushes the raw value instead of the running minimum onto the min-stack, so its top would just be the most recent push, not the smallest value seen so far.", code = "stack.push_back(value);\nminStack.push_back(value);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "var stack []int\nvar minStack []int\nfunc push(value int) {\n    // ???\n}\nfunc pop() {\n    stack = stack[:len(stack)-1]\n    minStack = minStack[:len(minStack)-1]\n}",
+                    choices = listOf(
+                        choice("stack = append(stack, value)\nnewMin := value\nif len(minStack) > 0 && minStack[len(minStack)-1] < newMin {\n    newMin = minStack[len(minStack)-1]\n}\nminStack = append(minStack, newMin)", true, "Every push adds exactly one entry to both stacks, with the min-stack entry always reflecting the minimum so far - this keeps both stacks the same size and getMin correct at every step.", code = "stack = append(stack, value)\nnewMin := value\nif len(minStack) > 0 && minStack[len(minStack)-1] < newMin {\n    newMin = minStack[len(minStack)-1]\n}\nminStack = append(minStack, newMin)"),
+                        choice("stack = append(stack, value)\nif len(minStack) == 0 || value < minStack[len(minStack)-1] {\n    minStack = append(minStack, value)\n}", false, "Only sometimes pushing onto the min-stack leaves it a different size than the main stack, so popping both together (as pop() does here) would desynchronize them.", code = "stack = append(stack, value)\nif len(minStack) == 0 || value < minStack[len(minStack)-1] {\n    minStack = append(minStack, value)\n}"),
+                        choice("stack = append(stack, value)\nminStack = append(minStack, value)", false, "This pushes the raw value instead of the running minimum onto the min-stack, so its top would just be the most recent push, not the smallest value seen so far.", code = "stack = append(stack, value)\nminStack = append(minStack, value)"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var stack: [Int] = []\nvar minStack: [Int] = []\nfunc push(_ value: Int) {\n    // ???\n}\nfunc pop() {\n    stack.removeLast()\n    minStack.removeLast()\n}",
+                    choices = listOf(
+                        choice("stack.append(value)\nlet newMin = minStack.isEmpty ? value : min(value, minStack.last!)\nminStack.append(newMin)", true, "Every push adds exactly one entry to both stacks, with the min-stack entry always reflecting the minimum so far - this keeps both stacks the same size and getMin correct at every step.", code = "stack.append(value)\nlet newMin = minStack.isEmpty ? value : min(value, minStack.last!)\nminStack.append(newMin)"),
+                        choice("stack.append(value)\nif minStack.isEmpty || value < minStack.last! { minStack.append(value) }", false, "Only sometimes pushing onto the min-stack leaves it a different size than the main stack, so popping both together (as pop() does here) would desynchronize them.", code = "stack.append(value)\nif minStack.isEmpty || value < minStack.last! { minStack.append(value) }"),
+                        choice("stack.append(value)\nminStack.append(value)", false, "This pushes the raw value instead of the running minimum onto the min-stack, so its top would just be the most recent push, not the smallest value seen so far.", code = "stack.append(value)\nminStack.append(value)"),
+                    ),
+                ),
+            ),
         ),
         step(
             "min-stack", STACK, TIME_COMPLEXITY,
