@@ -3859,6 +3859,62 @@ private val findMinimumInRotatedSortedArrayWorkout = ProblemWorkout(
                     "Comparing mid against low instead of high doesn't reliably reveal which side currently holds the rotation point, since the left portion can look consistent with either case.",
                     code = "if (nums[mid] > nums[low]) low = mid + 1 else high = mid",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "low = 0\nhigh = len(nums) - 1\nwhile low < high:\n    mid = low + (high - low) // 2\n    # ???\nreturn nums[low]",
+                    choices = listOf(
+                        choice("if nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid", true, "This keeps mid in the range whenever it could still be the minimum, and only excludes it entirely when it's confirmed to be part of the larger, still-sorted left portion.", code = "if nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid"),
+                        choice("if nums[mid] > nums[high]:\n    high = mid - 1\nelse:\n    low = mid + 1", false, "This reverses which direction each comparison moves the bounds, so the search space shrinks toward the wrong end of the array and never actually converges on the minimum.", code = "if nums[mid] > nums[high]:\n    high = mid - 1\nelse:\n    low = mid + 1"),
+                        choice("if nums[mid] > nums[low]:\n    low = mid + 1\nelse:\n    high = mid", false, "Comparing mid against low instead of high doesn't reliably reveal which side currently holds the rotation point, since the left portion can look consistent with either case.", code = "if nums[mid] > nums[low]:\n    low = mid + 1\nelse:\n    high = mid"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int low = 0;\nint high = nums.length - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                    choices = listOf(
+                        choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "This keeps mid in the range whenever it could still be the minimum, and only excludes it entirely when it's confirmed to be part of the larger, still-sorted left portion.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                        choice("if (nums[mid] > nums[high]) high = mid - 1; else low = mid + 1;", false, "This reverses which direction each comparison moves the bounds, so the search space shrinks toward the wrong end of the array and never actually converges on the minimum.", code = "if (nums[mid] > nums[high]) high = mid - 1; else low = mid + 1;"),
+                        choice("if (nums[mid] > nums[low]) low = mid + 1; else high = mid;", false, "Comparing mid against low instead of high doesn't reliably reveal which side currently holds the rotation point, since the left portion can look consistent with either case.", code = "if (nums[mid] > nums[low]) low = mid + 1; else high = mid;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let low = 0;\nlet high = nums.length - 1;\nwhile (low < high) {\n    const mid = low + Math.floor((high - low) / 2);\n    // ???\n}\nreturn nums[low];",
+                    choices = listOf(
+                        choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "This keeps mid in the range whenever it could still be the minimum, and only excludes it entirely when it's confirmed to be part of the larger, still-sorted left portion.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                        choice("if (nums[mid] > nums[high]) high = mid - 1; else low = mid + 1;", false, "This reverses which direction each comparison moves the bounds, so the search space shrinks toward the wrong end of the array and never actually converges on the minimum.", code = "if (nums[mid] > nums[high]) high = mid - 1; else low = mid + 1;"),
+                        choice("if (nums[mid] > nums[low]) low = mid + 1; else high = mid;", false, "Comparing mid against low instead of high doesn't reliably reveal which side currently holds the rotation point, since the left portion can look consistent with either case.", code = "if (nums[mid] > nums[low]) low = mid + 1; else high = mid;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int low = 0;\nint high = nums.size() - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                    choices = listOf(
+                        choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "This keeps mid in the range whenever it could still be the minimum, and only excludes it entirely when it's confirmed to be part of the larger, still-sorted left portion.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                        choice("if (nums[mid] > nums[high]) high = mid - 1; else low = mid + 1;", false, "This reverses which direction each comparison moves the bounds, so the search space shrinks toward the wrong end of the array and never actually converges on the minimum.", code = "if (nums[mid] > nums[high]) high = mid - 1; else low = mid + 1;"),
+                        choice("if (nums[mid] > nums[low]) low = mid + 1; else high = mid;", false, "Comparing mid against low instead of high doesn't reliably reveal which side currently holds the rotation point, since the left portion can look consistent with either case.", code = "if (nums[mid] > nums[low]) low = mid + 1; else high = mid;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "low := 0\nhigh := len(nums) - 1\nfor low < high {\n    mid := low + (high-low)/2\n    // ???\n}\nreturn nums[low]",
+                    choices = listOf(
+                        choice("if nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}", true, "This keeps mid in the range whenever it could still be the minimum, and only excludes it entirely when it's confirmed to be part of the larger, still-sorted left portion.", code = "if nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                        choice("if nums[mid] > nums[high] {\n    high = mid - 1\n} else {\n    low = mid + 1\n}", false, "This reverses which direction each comparison moves the bounds, so the search space shrinks toward the wrong end of the array and never actually converges on the minimum.", code = "if nums[mid] > nums[high] {\n    high = mid - 1\n} else {\n    low = mid + 1\n}"),
+                        choice("if nums[mid] > nums[low] {\n    low = mid + 1\n} else {\n    high = mid\n}", false, "Comparing mid against low instead of high doesn't reliably reveal which side currently holds the rotation point, since the left portion can look consistent with either case.", code = "if nums[mid] > nums[low] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var low = 0\nvar high = nums.count - 1\nwhile low < high {\n    let mid = low + (high - low) / 2\n    // ???\n}\nreturn nums[low]",
+                    choices = listOf(
+                        choice("if nums[mid] > nums[high] { low = mid + 1 } else { high = mid }", true, "This keeps mid in the range whenever it could still be the minimum, and only excludes it entirely when it's confirmed to be part of the larger, still-sorted left portion.", code = "if nums[mid] > nums[high] { low = mid + 1 } else { high = mid }"),
+                        choice("if nums[mid] > nums[high] { high = mid - 1 } else { low = mid + 1 }", false, "This reverses which direction each comparison moves the bounds, so the search space shrinks toward the wrong end of the array and never actually converges on the minimum.", code = "if nums[mid] > nums[high] { high = mid - 1 } else { low = mid + 1 }"),
+                        choice("if nums[mid] > nums[low] { low = mid + 1 } else { high = mid }", false, "Comparing mid against low instead of high doesn't reliably reveal which side currently holds the rotation point, since the left portion can look consistent with either case.", code = "if nums[mid] > nums[low] { low = mid + 1 } else { high = mid }"),
+                    ),
+                ),
+            ),
         ),
         step(
             "find-minimum-in-rotated-sorted-array", BINARY_SEARCH, TIME_COMPLEXITY,
