@@ -275,6 +275,20 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 "Set construction doesn't depend on order at all - values are deduplicated regardless of how the input array is arranged.",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(PYTHON, "return len(set(nums)) == len(nums)"),
+            WorkoutCodeVariant(
+                JAVA,
+                "Set<Integer> set = new HashSet<>();\nfor (int n : nums) set.add(n);\nreturn set.size() == nums.length;",
+            ),
+            WorkoutCodeVariant(JAVASCRIPT, "return new Set(nums).size === nums.length;"),
+            WorkoutCodeVariant(CPP, "return unordered_set<int>(nums.begin(), nums.end()).size() == nums.size();"),
+            WorkoutCodeVariant(
+                GO,
+                "set := map[int]bool{}\nfor _, n := range nums {\n    set[n] = true\n}\nreturn len(set) == len(nums)",
+            ),
+            WorkoutCodeVariant(SWIFT, "return Set(nums).count == nums.count"),
+        ),
     ),
     step(
         "valid-anagram", ARRAYS_HASHING, TIME_COMPLEXITY,
