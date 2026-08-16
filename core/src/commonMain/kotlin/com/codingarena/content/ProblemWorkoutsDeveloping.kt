@@ -1525,6 +1525,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (nums[mid] > nums[0]) low = mid + 1 else high = mid",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "low = 0\nhigh = len(nums) - 1\nwhile low < high:\n    mid = low + (high - low) // 2\n    # ???\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid", true, "This same comparison naturally handles an unrotated array too - nums[mid] is never greater than nums[high] when the whole array is sorted, so the loop just keeps narrowing high down to index 0 without needing separate logic.", code = "if nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid"),
+                    choice("if nums[0] < nums[-1]:\n    return nums[0]\nif nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid", false, "Checking upfront whether the array looks unrotated adds an unnecessary special case - the core comparison already handles that situation correctly on its own.", code = "if nums[0] < nums[-1]:\n    return nums[0]\nif nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid"),
+                    choice("if nums[mid] > nums[0]:\n    low = mid + 1\nelse:\n    high = mid", false, "Comparing against index 0 instead of the current high doesn't reliably identify which half currently holds the rotation point, especially as the search range narrows away from the original bounds.", code = "if nums[mid] > nums[0]:\n    low = mid + 1\nelse:\n    high = mid"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int low = 0;\nint high = nums.length - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "This same comparison naturally handles an unrotated array too - nums[mid] is never greater than nums[high] when the whole array is sorted, so the loop just keeps narrowing high down to index 0 without needing separate logic.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[0] < nums[nums.length - 1]) return nums[0];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;", false, "Checking upfront whether the array looks unrotated adds an unnecessary special case - the core comparison already handles that situation correctly on its own.", code = "if (nums[0] < nums[nums.length - 1]) return nums[0];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[mid] > nums[0]) low = mid + 1; else high = mid;", false, "Comparing against index 0 instead of the current high doesn't reliably identify which half currently holds the rotation point, especially as the search range narrows away from the original bounds.", code = "if (nums[mid] > nums[0]) low = mid + 1; else high = mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let low = 0;\nlet high = nums.length - 1;\nwhile (low < high) {\n    const mid = low + Math.floor((high - low) / 2);\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "This same comparison naturally handles an unrotated array too - nums[mid] is never greater than nums[high] when the whole array is sorted, so the loop just keeps narrowing high down to index 0 without needing separate logic.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[0] < nums[nums.length - 1]) return nums[0];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;", false, "Checking upfront whether the array looks unrotated adds an unnecessary special case - the core comparison already handles that situation correctly on its own.", code = "if (nums[0] < nums[nums.length - 1]) return nums[0];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[mid] > nums[0]) low = mid + 1; else high = mid;", false, "Comparing against index 0 instead of the current high doesn't reliably identify which half currently holds the rotation point, especially as the search range narrows away from the original bounds.", code = "if (nums[mid] > nums[0]) low = mid + 1; else high = mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int low = 0;\nint high = nums.size() - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "This same comparison naturally handles an unrotated array too - nums[mid] is never greater than nums[high] when the whole array is sorted, so the loop just keeps narrowing high down to index 0 without needing separate logic.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[0] < nums[nums.size() - 1]) return nums[0];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;", false, "Checking upfront whether the array looks unrotated adds an unnecessary special case - the core comparison already handles that situation correctly on its own.", code = "if (nums[0] < nums[nums.size() - 1]) return nums[0];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[mid] > nums[0]) low = mid + 1; else high = mid;", false, "Comparing against index 0 instead of the current high doesn't reliably identify which half currently holds the rotation point, especially as the search range narrows away from the original bounds.", code = "if (nums[mid] > nums[0]) low = mid + 1; else high = mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "low := 0\nhigh := len(nums) - 1\nfor low < high {\n    mid := low + (high-low)/2\n    // ???\n}\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}", true, "This same comparison naturally handles an unrotated array too - nums[mid] is never greater than nums[high] when the whole array is sorted, so the loop just keeps narrowing high down to index 0 without needing separate logic.", code = "if nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                    choice("if nums[0] < nums[len(nums)-1] {\n    return nums[0]\n}\nif nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}", false, "Checking upfront whether the array looks unrotated adds an unnecessary special case - the core comparison already handles that situation correctly on its own.", code = "if nums[0] < nums[len(nums)-1] {\n    return nums[0]\n}\nif nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                    choice("if nums[mid] > nums[0] {\n    low = mid + 1\n} else {\n    high = mid\n}", false, "Comparing against index 0 instead of the current high doesn't reliably identify which half currently holds the rotation point, especially as the search range narrows away from the original bounds.", code = "if nums[mid] > nums[0] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var low = 0\nvar high = nums.count - 1\nwhile low < high {\n    let mid = low + (high - low) / 2\n    // ???\n}\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high] { low = mid + 1 } else { high = mid }", true, "This same comparison naturally handles an unrotated array too - nums[mid] is never greater than nums[high] when the whole array is sorted, so the loop just keeps narrowing high down to index 0 without needing separate logic.", code = "if nums[mid] > nums[high] { low = mid + 1 } else { high = mid }"),
+                    choice("if nums[0] < nums[nums.count - 1] { return nums[0] }\nif nums[mid] > nums[high] { low = mid + 1 } else { high = mid }", false, "Checking upfront whether the array looks unrotated adds an unnecessary special case - the core comparison already handles that situation correctly on its own.", code = "if nums[0] < nums[nums.count - 1] { return nums[0] }\nif nums[mid] > nums[high] { low = mid + 1 } else { high = mid }"),
+                    choice("if nums[mid] > nums[0] { low = mid + 1 } else { high = mid }", false, "Comparing against index 0 instead of the current high doesn't reliably identify which half currently holds the rotation point, especially as the search range narrows away from the original bounds.", code = "if nums[mid] > nums[0] { low = mid + 1 } else { high = mid }"),
+                ),
+            ),
+        ),
     ),
     step(
         "binary-search", BINARY_SEARCH, CODE_BLOCK,
@@ -1549,6 +1605,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Returning the value at index low, rather than a sentinel like -1, doesn't signal 'not found' at all and can even throw if low has moved past the array's last valid index.",
                 code = "return nums[low]",
+            ),
+        ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "low = 0\nhigh = len(nums) - 1\nwhile low <= high:\n    mid = low + (high - low) // 2\n    if nums[mid] < target:\n        low = mid + 1\n    elif nums[mid] > target:\n        high = mid - 1\n    else:\n        return mid\n# ???",
+                choices = listOf(
+                    choice("return -1", true, "Once low exceeds high, every possible position has been ruled out and the target genuinely isn't present - returning -1 here, outside the loop, is exactly the signal the problem asks for.", code = "return -1"),
+                    choice("return low", false, "Returning low instead of -1 would report a real array index even when the target was never found, since low still points somewhere valid in (or just past) the array - the caller couldn't distinguish a real match from a non-match.", code = "return low"),
+                    choice("return nums[low]", false, "Returning the value at index low, rather than a sentinel like -1, doesn't signal 'not found' at all and can even throw if low has moved past the array's last valid index.", code = "return nums[low]"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int low = 0;\nint high = nums.length - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (nums[mid] < target) {\n        low = mid + 1;\n    } else if (nums[mid] > target) {\n        high = mid - 1;\n    } else {\n        return mid;\n    }\n}\n// ???",
+                choices = listOf(
+                    choice("return -1;", true, "Once low exceeds high, every possible position has been ruled out and the target genuinely isn't present - returning -1 here, outside the loop, is exactly the signal the problem asks for.", code = "return -1;"),
+                    choice("return low;", false, "Returning low instead of -1 would report a real array index even when the target was never found, since low still points somewhere valid in (or just past) the array - the caller couldn't distinguish a real match from a non-match.", code = "return low;"),
+                    choice("return nums[low];", false, "Returning the value at index low, rather than a sentinel like -1, doesn't signal 'not found' at all and can even throw if low has moved past the array's last valid index.", code = "return nums[low];"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let low = 0;\nlet high = nums.length - 1;\nwhile (low <= high) {\n    const mid = low + Math.floor((high - low) / 2);\n    if (nums[mid] < target) {\n        low = mid + 1;\n    } else if (nums[mid] > target) {\n        high = mid - 1;\n    } else {\n        return mid;\n    }\n}\n// ???",
+                choices = listOf(
+                    choice("return -1;", true, "Once low exceeds high, every possible position has been ruled out and the target genuinely isn't present - returning -1 here, outside the loop, is exactly the signal the problem asks for.", code = "return -1;"),
+                    choice("return low;", false, "Returning low instead of -1 would report a real array index even when the target was never found, since low still points somewhere valid in (or just past) the array - the caller couldn't distinguish a real match from a non-match.", code = "return low;"),
+                    choice("return nums[low];", false, "Returning the value at index low, rather than a sentinel like -1, doesn't signal 'not found' at all and can even throw if low has moved past the array's last valid index.", code = "return nums[low];"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int low = 0;\nint high = nums.size() - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    if (nums[mid] < target) {\n        low = mid + 1;\n    } else if (nums[mid] > target) {\n        high = mid - 1;\n    } else {\n        return mid;\n    }\n}\n// ???",
+                choices = listOf(
+                    choice("return -1;", true, "Once low exceeds high, every possible position has been ruled out and the target genuinely isn't present - returning -1 here, outside the loop, is exactly the signal the problem asks for.", code = "return -1;"),
+                    choice("return low;", false, "Returning low instead of -1 would report a real array index even when the target was never found, since low still points somewhere valid in (or just past) the array - the caller couldn't distinguish a real match from a non-match.", code = "return low;"),
+                    choice("return nums[low];", false, "Returning the value at index low, rather than a sentinel like -1, doesn't signal 'not found' at all and is undefined behavior if low has moved past the array's last valid index.", code = "return nums[low];"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "low := 0\nhigh := len(nums) - 1\nfor low <= high {\n    mid := low + (high-low)/2\n    if nums[mid] < target {\n        low = mid + 1\n    } else if nums[mid] > target {\n        high = mid - 1\n    } else {\n        return mid\n    }\n}\n// ???",
+                choices = listOf(
+                    choice("return -1", true, "Once low exceeds high, every possible position has been ruled out and the target genuinely isn't present - returning -1 here, outside the loop, is exactly the signal the problem asks for.", code = "return -1"),
+                    choice("return low", false, "Returning low instead of -1 would report a real array index even when the target was never found, since low still points somewhere valid in (or just past) the array - the caller couldn't distinguish a real match from a non-match.", code = "return low"),
+                    choice("return nums[low]", false, "Returning the value at index low, rather than a sentinel like -1, doesn't signal 'not found' at all and can even panic if low has moved past the array's last valid index.", code = "return nums[low]"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var low = 0\nvar high = nums.count - 1\nwhile low <= high {\n    let mid = low + (high - low) / 2\n    if nums[mid] < target {\n        low = mid + 1\n    } else if nums[mid] > target {\n        high = mid - 1\n    } else {\n        return mid\n    }\n}\n// ???",
+                choices = listOf(
+                    choice("return -1", true, "Once low exceeds high, every possible position has been ruled out and the target genuinely isn't present - returning -1 here, outside the loop, is exactly the signal the problem asks for.", code = "return -1"),
+                    choice("return low", false, "Returning low instead of -1 would report a real array index even when the target was never found, since low still points somewhere valid in (or just past) the array - the caller couldn't distinguish a real match from a non-match.", code = "return low"),
+                    choice("return nums[low]", false, "Returning the value at index low, rather than a sentinel like -1, doesn't signal 'not found' at all and can even crash if low has moved past the array's last valid index.", code = "return nums[low]"),
+                ),
             ),
         ),
     ),
