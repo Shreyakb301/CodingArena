@@ -874,6 +874,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "while (sum >= target) { sum -= nums[left]; left++; minLen = minOf(minLen, right - left + 1) }",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "left = 0\nsum_ = 0\nmin_len = float(\"inf\")\nfor right in range(len(nums)):\n    sum_ += nums[right]\n    # ???\nreturn 0 if min_len == float(\"inf\") else min_len",
+                choices = listOf(
+                    choice("while sum_ >= target:\n    min_len = min(min_len, right - left + 1)\n    sum_ -= nums[left]\n    left += 1", true, "Tracing through: the window grows to [2,3,1,2] (sum 8, length 4) then shrinks to [3,1,2] (sum 6, stop) - later it grows to include 4 and 3, eventually isolating [4,3] (sum 7, length 2), correctly becoming the new minimum.", code = "while sum_ >= target:\n    min_len = min(min_len, right - left + 1)\n    sum_ -= nums[left]\n    left += 1"),
+                    choice("if sum_ >= target:\n    min_len = min(min_len, right - left + 1)", false, "Without ever shrinking the window, sum keeps growing and the window only ever expands - this would record the first qualifying (and increasingly long) window's length rather than searching for the true minimum.", code = "if sum_ >= target:\n    min_len = min(min_len, right - left + 1)"),
+                    choice("while sum_ >= target:\n    sum_ -= nums[left]\n    left += 1\n    min_len = min(min_len, right - left + 1)", false, "Recording the length after left has already advanced measures the window one position too small at each check, which would report 1 instead of the true minimum of 2 here.", code = "while sum_ >= target:\n    sum_ -= nums[left]\n    left += 1\n    min_len = min(min_len, right - left + 1)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int left = 0;\nint sum = 0;\nint minLen = Integer.MAX_VALUE;\nfor (int right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    // ???\n}\nreturn minLen == Integer.MAX_VALUE ? 0 : minLen;",
+                choices = listOf(
+                    choice("while (sum >= target) { minLen = Math.min(minLen, right - left + 1); sum -= nums[left]; left++; }", true, "Tracing through: the window grows to [2,3,1,2] (sum 8, length 4) then shrinks to [3,1,2] (sum 6, stop) - later it grows to include 4 and 3, eventually isolating [4,3] (sum 7, length 2), correctly becoming the new minimum.", code = "while (sum >= target) { minLen = Math.min(minLen, right - left + 1); sum -= nums[left]; left++; }"),
+                    choice("if (sum >= target) { minLen = Math.min(minLen, right - left + 1); }", false, "Without ever shrinking the window, sum keeps growing and the window only ever expands - this would record the first qualifying (and increasingly long) window's length rather than searching for the true minimum.", code = "if (sum >= target) { minLen = Math.min(minLen, right - left + 1); }"),
+                    choice("while (sum >= target) { sum -= nums[left]; left++; minLen = Math.min(minLen, right - left + 1); }", false, "Recording the length after left has already advanced measures the window one position too small at each check, which would report 1 instead of the true minimum of 2 here.", code = "while (sum >= target) { sum -= nums[left]; left++; minLen = Math.min(minLen, right - left + 1); }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let left = 0;\nlet sum = 0;\nlet minLen = Infinity;\nfor (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    // ???\n}\nreturn minLen === Infinity ? 0 : minLen;",
+                choices = listOf(
+                    choice("while (sum >= target) { minLen = Math.min(minLen, right - left + 1); sum -= nums[left]; left++; }", true, "Tracing through: the window grows to [2,3,1,2] (sum 8, length 4) then shrinks to [3,1,2] (sum 6, stop) - later it grows to include 4 and 3, eventually isolating [4,3] (sum 7, length 2), correctly becoming the new minimum.", code = "while (sum >= target) { minLen = Math.min(minLen, right - left + 1); sum -= nums[left]; left++; }"),
+                    choice("if (sum >= target) { minLen = Math.min(minLen, right - left + 1); }", false, "Without ever shrinking the window, sum keeps growing and the window only ever expands - this would record the first qualifying (and increasingly long) window's length rather than searching for the true minimum.", code = "if (sum >= target) { minLen = Math.min(minLen, right - left + 1); }"),
+                    choice("while (sum >= target) { sum -= nums[left]; left++; minLen = Math.min(minLen, right - left + 1); }", false, "Recording the length after left has already advanced measures the window one position too small at each check, which would report 1 instead of the true minimum of 2 here.", code = "while (sum >= target) { sum -= nums[left]; left++; minLen = Math.min(minLen, right - left + 1); }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int left = 0;\nint sum = 0;\nint minLen = INT_MAX;\nfor (int right = 0; right < (int)nums.size(); right++) {\n    sum += nums[right];\n    // ???\n}\nreturn minLen == INT_MAX ? 0 : minLen;",
+                choices = listOf(
+                    choice("while (sum >= target) { minLen = min(minLen, right - left + 1); sum -= nums[left]; left++; }", true, "Tracing through: the window grows to [2,3,1,2] (sum 8, length 4) then shrinks to [3,1,2] (sum 6, stop) - later it grows to include 4 and 3, eventually isolating [4,3] (sum 7, length 2), correctly becoming the new minimum.", code = "while (sum >= target) { minLen = min(minLen, right - left + 1); sum -= nums[left]; left++; }"),
+                    choice("if (sum >= target) { minLen = min(minLen, right - left + 1); }", false, "Without ever shrinking the window, sum keeps growing and the window only ever expands - this would record the first qualifying (and increasingly long) window's length rather than searching for the true minimum.", code = "if (sum >= target) { minLen = min(minLen, right - left + 1); }"),
+                    choice("while (sum >= target) { sum -= nums[left]; left++; minLen = min(minLen, right - left + 1); }", false, "Recording the length after left has already advanced measures the window one position too small at each check, which would report 1 instead of the true minimum of 2 here.", code = "while (sum >= target) { sum -= nums[left]; left++; minLen = min(minLen, right - left + 1); }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "left := 0\nsum := 0\nminLen := math.MaxInt32\nfor right := 0; right < len(nums); right++ {\n    sum += nums[right]\n    // ???\n}\nif minLen == math.MaxInt32 {\n    return 0\n}\nreturn minLen",
+                choices = listOf(
+                    choice("for sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n    sum -= nums[left]\n    left++\n}", true, "Tracing through: the window grows to [2,3,1,2] (sum 8, length 4) then shrinks to [3,1,2] (sum 6, stop) - later it grows to include 4 and 3, eventually isolating [4,3] (sum 7, length 2), correctly becoming the new minimum.", code = "for sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n    sum -= nums[left]\n    left++\n}"),
+                    choice("if sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n}", false, "Without ever shrinking the window, sum keeps growing and the window only ever expands - this would record the first qualifying (and increasingly long) window's length rather than searching for the true minimum.", code = "if sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n}"),
+                    choice("for sum >= target {\n    sum -= nums[left]\n    left++\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n}", false, "Recording the length after left has already advanced measures the window one position too small at each check, which would report 1 instead of the true minimum of 2 here.", code = "for sum >= target {\n    sum -= nums[left]\n    left++\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var left = 0\nvar sum = 0\nvar minLen = Int.max\nfor right in 0..<nums.count {\n    sum += nums[right]\n    // ???\n}\nreturn minLen == Int.max ? 0 : minLen",
+                choices = listOf(
+                    choice("while sum >= target { minLen = min(minLen, right - left + 1); sum -= nums[left]; left += 1 }", true, "Tracing through: the window grows to [2,3,1,2] (sum 8, length 4) then shrinks to [3,1,2] (sum 6, stop) - later it grows to include 4 and 3, eventually isolating [4,3] (sum 7, length 2), correctly becoming the new minimum.", code = "while sum >= target { minLen = min(minLen, right - left + 1); sum -= nums[left]; left += 1 }"),
+                    choice("if sum >= target { minLen = min(minLen, right - left + 1) }", false, "Without ever shrinking the window, sum keeps growing and the window only ever expands - this would record the first qualifying (and increasingly long) window's length rather than searching for the true minimum.", code = "if sum >= target { minLen = min(minLen, right - left + 1) }"),
+                    choice("while sum >= target { sum -= nums[left]; left += 1; minLen = min(minLen, right - left + 1) }", false, "Recording the length after left has already advanced measures the window one position too small at each check, which would report 1 instead of the true minimum of 2 here.", code = "while sum >= target { sum -= nums[left]; left += 1; minLen = min(minLen, right - left + 1) }"),
+                ),
+            ),
+        ),
     ),
     step(
         "best-time-to-buy-and-sell-stock", SLIDING_WINDOW, CODE_BLOCK,
@@ -898,6 +954,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Computing minPrice - price instead of price - minPrice inverts the profit calculation, producing a positive number exactly when price is below the running minimum, which is backwards from what a profit represents.",
                 code = "maxProfit = maxOf(maxProfit, minPrice - price)\nminPrice = minOf(minPrice, price)",
+            ),
+        ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "min_price = float(\"inf\")\nmax_profit = 0\nfor price in prices:\n    # ???\nreturn max_profit",
+                choices = listOf(
+                    choice("max_profit = max(max_profit, price - min_price)\nmin_price = min(min_price, price)", true, "Tracing through: min_price drops to 1 at the second day; by the time price reaches 6, max_profit is updated to 6-1=5 before min_price could ever be overwritten by anything higher, correctly capturing the true best profit.", code = "max_profit = max(max_profit, price - min_price)\nmin_price = min(min_price, price)"),
+                    choice("min_price = min(min_price, price)\nmax_profit = max(max_profit, price - min_price)", false, "Updating min_price before computing the profit means the day price=1 itself gets compared against its own price as the minimum, and more subtly, every day's profit is computed against a minimum that may include that same day - masking the true historical-only minimum.", code = "min_price = min(min_price, price)\nmax_profit = max(max_profit, price - min_price)"),
+                    choice("max_profit = max(max_profit, min_price - price)\nmin_price = min(min_price, price)", false, "Computing min_price - price instead of price - min_price inverts the profit calculation, producing a positive number exactly when price is below the running minimum, which is backwards from what a profit represents.", code = "max_profit = max(max_profit, min_price - price)\nmin_price = min(min_price, price)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int minPrice = Integer.MAX_VALUE;\nint maxProfit = 0;\nfor (int price : prices) {\n    // ???\n}\nreturn maxProfit;",
+                choices = listOf(
+                    choice("maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);", true, "Tracing through: minPrice drops to 1 at the second day; by the time price reaches 6, maxProfit is updated to 6-1=5 before minPrice could ever be overwritten by anything higher, correctly capturing the true best profit.", code = "maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);"),
+                    choice("minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);", false, "Updating minPrice before computing the profit means the day price=1 itself gets compared against its own price as the minimum, and more subtly, every day's profit is computed against a minimum that may include that same day - masking the true historical-only minimum.", code = "minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);"),
+                    choice("maxProfit = Math.max(maxProfit, minPrice - price);\nminPrice = Math.min(minPrice, price);", false, "Computing minPrice - price instead of price - minPrice inverts the profit calculation, producing a positive number exactly when price is below the running minimum, which is backwards from what a profit represents.", code = "maxProfit = Math.max(maxProfit, minPrice - price);\nminPrice = Math.min(minPrice, price);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let minPrice = Infinity;\nlet maxProfit = 0;\nfor (const price of prices) {\n    // ???\n}\nreturn maxProfit;",
+                choices = listOf(
+                    choice("maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);", true, "Tracing through: minPrice drops to 1 at the second day; by the time price reaches 6, maxProfit is updated to 6-1=5 before minPrice could ever be overwritten by anything higher, correctly capturing the true best profit.", code = "maxProfit = Math.max(maxProfit, price - minPrice);\nminPrice = Math.min(minPrice, price);"),
+                    choice("minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);", false, "Updating minPrice before computing the profit means the day price=1 itself gets compared against its own price as the minimum, and more subtly, every day's profit is computed against a minimum that may include that same day - masking the true historical-only minimum.", code = "minPrice = Math.min(minPrice, price);\nmaxProfit = Math.max(maxProfit, price - minPrice);"),
+                    choice("maxProfit = Math.max(maxProfit, minPrice - price);\nminPrice = Math.min(minPrice, price);", false, "Computing minPrice - price instead of price - minPrice inverts the profit calculation, producing a positive number exactly when price is below the running minimum, which is backwards from what a profit represents.", code = "maxProfit = Math.max(maxProfit, minPrice - price);\nminPrice = Math.min(minPrice, price);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int minPrice = INT_MAX;\nint maxProfit = 0;\nfor (int price : prices) {\n    // ???\n}\nreturn maxProfit;",
+                choices = listOf(
+                    choice("maxProfit = max(maxProfit, price - minPrice);\nminPrice = min(minPrice, price);", true, "Tracing through: minPrice drops to 1 at the second day; by the time price reaches 6, maxProfit is updated to 6-1=5 before minPrice could ever be overwritten by anything higher, correctly capturing the true best profit.", code = "maxProfit = max(maxProfit, price - minPrice);\nminPrice = min(minPrice, price);"),
+                    choice("minPrice = min(minPrice, price);\nmaxProfit = max(maxProfit, price - minPrice);", false, "Updating minPrice before computing the profit means the day price=1 itself gets compared against its own price as the minimum, and more subtly, every day's profit is computed against a minimum that may include that same day - masking the true historical-only minimum.", code = "minPrice = min(minPrice, price);\nmaxProfit = max(maxProfit, price - minPrice);"),
+                    choice("maxProfit = max(maxProfit, minPrice - price);\nminPrice = min(minPrice, price);", false, "Computing minPrice - price instead of price - minPrice inverts the profit calculation, producing a positive number exactly when price is below the running minimum, which is backwards from what a profit represents.", code = "maxProfit = max(maxProfit, minPrice - price);\nminPrice = min(minPrice, price);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "minPrice := math.MaxInt32\nmaxProfit := 0\nfor _, price := range prices {\n    // ???\n}\nreturn maxProfit",
+                choices = listOf(
+                    choice("if price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}\nif price < minPrice {\n    minPrice = price\n}", true, "Tracing through: minPrice drops to 1 at the second day; by the time price reaches 6, maxProfit is updated to 6-1=5 before minPrice could ever be overwritten by anything higher, correctly capturing the true best profit.", code = "if price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}\nif price < minPrice {\n    minPrice = price\n}"),
+                    choice("if price < minPrice {\n    minPrice = price\n}\nif price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}", false, "Updating minPrice before computing the profit means the day price=1 itself gets compared against its own price as the minimum, and more subtly, every day's profit is computed against a minimum that may include that same day - masking the true historical-only minimum.", code = "if price < minPrice {\n    minPrice = price\n}\nif price-minPrice > maxProfit {\n    maxProfit = price - minPrice\n}"),
+                    choice("if minPrice-price > maxProfit {\n    maxProfit = minPrice - price\n}\nif price < minPrice {\n    minPrice = price\n}", false, "Computing minPrice - price instead of price - minPrice inverts the profit calculation, producing a positive number exactly when price is below the running minimum, which is backwards from what a profit represents.", code = "if minPrice-price > maxProfit {\n    maxProfit = minPrice - price\n}\nif price < minPrice {\n    minPrice = price\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var minPrice = Int.max\nvar maxProfit = 0\nfor price in prices {\n    // ???\n}\nreturn maxProfit",
+                choices = listOf(
+                    choice("maxProfit = max(maxProfit, price - minPrice)\nminPrice = min(minPrice, price)", true, "Tracing through: minPrice drops to 1 at the second day; by the time price reaches 6, maxProfit is updated to 6-1=5 before minPrice could ever be overwritten by anything higher, correctly capturing the true best profit.", code = "maxProfit = max(maxProfit, price - minPrice)\nminPrice = min(minPrice, price)"),
+                    choice("minPrice = min(minPrice, price)\nmaxProfit = max(maxProfit, price - minPrice)", false, "Updating minPrice before computing the profit means the day price=1 itself gets compared against its own price as the minimum, and more subtly, every day's profit is computed against a minimum that may include that same day - masking the true historical-only minimum.", code = "minPrice = min(minPrice, price)\nmaxProfit = max(maxProfit, price - minPrice)"),
+                    choice("maxProfit = max(maxProfit, minPrice - price)\nminPrice = min(minPrice, price)", false, "Computing minPrice - price instead of price - minPrice inverts the profit calculation, producing a positive number exactly when price is below the running minimum, which is backwards from what a profit represents.", code = "maxProfit = max(maxProfit, minPrice - price)\nminPrice = min(minPrice, price)"),
+                ),
             ),
         ),
     ),
