@@ -3347,6 +3347,62 @@ private val dailyTemperaturesWorkout = ProblemWorkout(
                     "Popping every day on the stack regardless of temperature would incorrectly resolve days even when today isn't actually warmer than they were.",
                     code = "while (stack.isNotEmpty()) {\n    val prevDay = stack.removeLast()\n    answer[prevDay] = i - prevDay\n}",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "answer = [0] * len(temperatures)\nstack = []\nfor i in range(len(temperatures)):\n    # ???\n    stack.append(i)\nreturn answer",
+                    choices = listOf(
+                        choice("while stack and temperatures[i] > temperatures[stack[-1]]:\n    prev_day = stack.pop()\n    answer[prev_day] = i - prev_day", true, "The while loop resolves every waiting day whose temperature today beats, recording the correct day difference for each one before the current day is pushed.", code = "while stack and temperatures[i] > temperatures[stack[-1]]:\n    prev_day = stack.pop()\n    answer[prev_day] = i - prev_day"),
+                        choice("if stack and temperatures[i] > temperatures[stack[-1]]:\n    prev_day = stack.pop()\n    answer[prev_day] = i - prev_day", false, "Using if instead of while pops only a single waiting day at most, leaving other days that today's warmer temperature could also resolve still stuck on the stack.", code = "if stack and temperatures[i] > temperatures[stack[-1]]:\n    prev_day = stack.pop()\n    answer[prev_day] = i - prev_day"),
+                        choice("while stack:\n    prev_day = stack.pop()\n    answer[prev_day] = i - prev_day", false, "Popping every day on the stack regardless of temperature would incorrectly resolve days even when today isn't actually warmer than they were.", code = "while stack:\n    prev_day = stack.pop()\n    answer[prev_day] = i - prev_day"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int[] answer = new int[temperatures.length];\nDeque<Integer> stack = new ArrayDeque<>();\nfor (int i = 0; i < temperatures.length; i++) {\n    // ???\n    stack.addLast(i);\n}\nreturn answer;",
+                    choices = listOf(
+                        choice("while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peekLast()]) {\n    int prevDay = stack.removeLast();\n    answer[prevDay] = i - prevDay;\n}", true, "The while loop resolves every waiting day whose temperature today beats, recording the correct day difference for each one before the current day is pushed.", code = "while (!stack.isEmpty() && temperatures[i] > temperatures[stack.peekLast()]) {\n    int prevDay = stack.removeLast();\n    answer[prevDay] = i - prevDay;\n}"),
+                        choice("if (!stack.isEmpty() && temperatures[i] > temperatures[stack.peekLast()]) {\n    int prevDay = stack.removeLast();\n    answer[prevDay] = i - prevDay;\n}", false, "Using if instead of while pops only a single waiting day at most, leaving other days that today's warmer temperature could also resolve still stuck on the stack.", code = "if (!stack.isEmpty() && temperatures[i] > temperatures[stack.peekLast()]) {\n    int prevDay = stack.removeLast();\n    answer[prevDay] = i - prevDay;\n}"),
+                        choice("while (!stack.isEmpty()) {\n    int prevDay = stack.removeLast();\n    answer[prevDay] = i - prevDay;\n}", false, "Popping every day on the stack regardless of temperature would incorrectly resolve days even when today isn't actually warmer than they were.", code = "while (!stack.isEmpty()) {\n    int prevDay = stack.removeLast();\n    answer[prevDay] = i - prevDay;\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "const answer = new Array(temperatures.length).fill(0);\nconst stack = [];\nfor (let i = 0; i < temperatures.length; i++) {\n    // ???\n    stack.push(i);\n}\nreturn answer;",
+                    choices = listOf(
+                        choice("while (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {\n    const prevDay = stack.pop();\n    answer[prevDay] = i - prevDay;\n}", true, "The while loop resolves every waiting day whose temperature today beats, recording the correct day difference for each one before the current day is pushed.", code = "while (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {\n    const prevDay = stack.pop();\n    answer[prevDay] = i - prevDay;\n}"),
+                        choice("if (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {\n    const prevDay = stack.pop();\n    answer[prevDay] = i - prevDay;\n}", false, "Using if instead of while pops only a single waiting day at most, leaving other days that today's warmer temperature could also resolve still stuck on the stack.", code = "if (stack.length && temperatures[i] > temperatures[stack[stack.length - 1]]) {\n    const prevDay = stack.pop();\n    answer[prevDay] = i - prevDay;\n}"),
+                        choice("while (stack.length) {\n    const prevDay = stack.pop();\n    answer[prevDay] = i - prevDay;\n}", false, "Popping every day on the stack regardless of temperature would incorrectly resolve days even when today isn't actually warmer than they were.", code = "while (stack.length) {\n    const prevDay = stack.pop();\n    answer[prevDay] = i - prevDay;\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "vector<int> answer(temperatures.size(), 0);\nvector<int> stack;\nfor (int i = 0; i < (int)temperatures.size(); i++) {\n    // ???\n    stack.push_back(i);\n}\nreturn answer;",
+                    choices = listOf(
+                        choice("while (!stack.empty() && temperatures[i] > temperatures[stack.back()]) {\n    int prevDay = stack.back();\n    stack.pop_back();\n    answer[prevDay] = i - prevDay;\n}", true, "The while loop resolves every waiting day whose temperature today beats, recording the correct day difference for each one before the current day is pushed.", code = "while (!stack.empty() && temperatures[i] > temperatures[stack.back()]) {\n    int prevDay = stack.back();\n    stack.pop_back();\n    answer[prevDay] = i - prevDay;\n}"),
+                        choice("if (!stack.empty() && temperatures[i] > temperatures[stack.back()]) {\n    int prevDay = stack.back();\n    stack.pop_back();\n    answer[prevDay] = i - prevDay;\n}", false, "Using if instead of while pops only a single waiting day at most, leaving other days that today's warmer temperature could also resolve still stuck on the stack.", code = "if (!stack.empty() && temperatures[i] > temperatures[stack.back()]) {\n    int prevDay = stack.back();\n    stack.pop_back();\n    answer[prevDay] = i - prevDay;\n}"),
+                        choice("while (!stack.empty()) {\n    int prevDay = stack.back();\n    stack.pop_back();\n    answer[prevDay] = i - prevDay;\n}", false, "Popping every day on the stack regardless of temperature would incorrectly resolve days even when today isn't actually warmer than they were.", code = "while (!stack.empty()) {\n    int prevDay = stack.back();\n    stack.pop_back();\n    answer[prevDay] = i - prevDay;\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "answer := make([]int, len(temperatures))\nstack := []int{}\nfor i := 0; i < len(temperatures); i++ {\n    // ???\n    stack = append(stack, i)\n}\nreturn answer",
+                    choices = listOf(
+                        choice("for len(stack) > 0 && temperatures[i] > temperatures[stack[len(stack)-1]] {\n    prevDay := stack[len(stack)-1]\n    stack = stack[:len(stack)-1]\n    answer[prevDay] = i - prevDay\n}", true, "The loop resolves every waiting day whose temperature today beats, recording the correct day difference for each one before the current day is pushed.", code = "for len(stack) > 0 && temperatures[i] > temperatures[stack[len(stack)-1]] {\n    prevDay := stack[len(stack)-1]\n    stack = stack[:len(stack)-1]\n    answer[prevDay] = i - prevDay\n}"),
+                        choice("if len(stack) > 0 && temperatures[i] > temperatures[stack[len(stack)-1]] {\n    prevDay := stack[len(stack)-1]\n    stack = stack[:len(stack)-1]\n    answer[prevDay] = i - prevDay\n}", false, "Using a single if instead of a loop pops only a single waiting day at most, leaving other days that today's warmer temperature could also resolve still stuck on the stack.", code = "if len(stack) > 0 && temperatures[i] > temperatures[stack[len(stack)-1]] {\n    prevDay := stack[len(stack)-1]\n    stack = stack[:len(stack)-1]\n    answer[prevDay] = i - prevDay\n}"),
+                        choice("for len(stack) > 0 {\n    prevDay := stack[len(stack)-1]\n    stack = stack[:len(stack)-1]\n    answer[prevDay] = i - prevDay\n}", false, "Popping every day on the stack regardless of temperature would incorrectly resolve days even when today isn't actually warmer than they were.", code = "for len(stack) > 0 {\n    prevDay := stack[len(stack)-1]\n    stack = stack[:len(stack)-1]\n    answer[prevDay] = i - prevDay\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var answer = [Int](repeating: 0, count: temperatures.count)\nvar stack: [Int] = []\nfor i in 0..<temperatures.count {\n    // ???\n    stack.append(i)\n}\nreturn answer",
+                    choices = listOf(
+                        choice("while let last = stack.last, temperatures[i] > temperatures[last] {\n    let prevDay = stack.removeLast()\n    answer[prevDay] = i - prevDay\n}", true, "The while loop resolves every waiting day whose temperature today beats, recording the correct day difference for each one before the current day is pushed.", code = "while let last = stack.last, temperatures[i] > temperatures[last] {\n    let prevDay = stack.removeLast()\n    answer[prevDay] = i - prevDay\n}"),
+                        choice("if let last = stack.last, temperatures[i] > temperatures[last] {\n    let prevDay = stack.removeLast()\n    answer[prevDay] = i - prevDay\n}", false, "Using if instead of while pops only a single waiting day at most, leaving other days that today's warmer temperature could also resolve still stuck on the stack.", code = "if let last = stack.last, temperatures[i] > temperatures[last] {\n    let prevDay = stack.removeLast()\n    answer[prevDay] = i - prevDay\n}"),
+                        choice("while !stack.isEmpty {\n    let prevDay = stack.removeLast()\n    answer[prevDay] = i - prevDay\n}", false, "Popping every day on the stack regardless of temperature would incorrectly resolve days even when today isn't actually warmer than they were.", code = "while !stack.isEmpty {\n    let prevDay = stack.removeLast()\n    answer[prevDay] = i - prevDay\n}"),
+                    ),
+                ),
+            ),
         ),
         step(
             "daily-temperatures", STACK, TIME_COMPLEXITY,
@@ -3547,6 +3603,62 @@ private val kokoEatingBananasWorkout = ProblemWorkout(
                     "Using a strict less-than instead of less-than-or-equal would treat a speed that finishes in *exactly* h hours as not feasible, incorrectly ruling it out.",
                     code = "if (hoursNeeded(mid) < h) high = mid else low = mid + 1",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "def hours_needed(speed):\n    return sum((p + speed - 1) // speed for p in piles)\nlow = 1\nhigh = max(piles)\nwhile low < high:\n    mid = low + (high - low) // 2\n    # ???\nreturn low",
+                    choices = listOf(
+                        choice("if hours_needed(mid) <= h:\n    high = mid\nelse:\n    low = mid + 1", true, "When mid is fast enough, keeping it in range and searching slower (high = mid) converges toward the smallest feasible speed; when it isn't fast enough, low must move past it entirely.", code = "if hours_needed(mid) <= h:\n    high = mid\nelse:\n    low = mid + 1"),
+                        choice("if hours_needed(mid) <= h:\n    low = mid + 1\nelse:\n    high = mid", false, "This moves past a speed that already works instead of keeping it as a candidate, converging on a needlessly fast speed rather than the true minimum.", code = "if hours_needed(mid) <= h:\n    low = mid + 1\nelse:\n    high = mid"),
+                        choice("if hours_needed(mid) < h:\n    high = mid\nelse:\n    low = mid + 1", false, "Using a strict less-than instead of less-than-or-equal would treat a speed that finishes in exactly h hours as not feasible, incorrectly ruling it out.", code = "if hours_needed(mid) < h:\n    high = mid\nelse:\n    low = mid + 1"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "long hoursNeeded(int speed) {\n    long hours = 0;\n    for (int p : piles) hours += (p + speed - 1) / speed;\n    return hours;\n}\nint low = 1;\nint high = Arrays.stream(piles).max().getAsInt();\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn low;",
+                    choices = listOf(
+                        choice("if (hoursNeeded(mid) <= h) high = mid; else low = mid + 1;", true, "When mid is fast enough, keeping it in range and searching slower (high = mid) converges toward the smallest feasible speed; when it isn't fast enough, low must move past it entirely.", code = "if (hoursNeeded(mid) <= h) high = mid; else low = mid + 1;"),
+                        choice("if (hoursNeeded(mid) <= h) low = mid + 1; else high = mid;", false, "This moves past a speed that already works instead of keeping it as a candidate, converging on a needlessly fast speed rather than the true minimum.", code = "if (hoursNeeded(mid) <= h) low = mid + 1; else high = mid;"),
+                        choice("if (hoursNeeded(mid) < h) high = mid; else low = mid + 1;", false, "Using a strict less-than instead of less-than-or-equal would treat a speed that finishes in exactly h hours as not feasible, incorrectly ruling it out.", code = "if (hoursNeeded(mid) < h) high = mid; else low = mid + 1;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "function hoursNeeded(speed) {\n    return piles.reduce((sum, p) => sum + Math.ceil(p / speed), 0);\n}\nlet low = 1;\nlet high = Math.max(...piles);\nwhile (low < high) {\n    const mid = low + Math.floor((high - low) / 2);\n    // ???\n}\nreturn low;",
+                    choices = listOf(
+                        choice("if (hoursNeeded(mid) <= h) high = mid; else low = mid + 1;", true, "When mid is fast enough, keeping it in range and searching slower (high = mid) converges toward the smallest feasible speed; when it isn't fast enough, low must move past it entirely.", code = "if (hoursNeeded(mid) <= h) high = mid; else low = mid + 1;"),
+                        choice("if (hoursNeeded(mid) <= h) low = mid + 1; else high = mid;", false, "This moves past a speed that already works instead of keeping it as a candidate, converging on a needlessly fast speed rather than the true minimum.", code = "if (hoursNeeded(mid) <= h) low = mid + 1; else high = mid;"),
+                        choice("if (hoursNeeded(mid) < h) high = mid; else low = mid + 1;", false, "Using a strict less-than instead of less-than-or-equal would treat a speed that finishes in exactly h hours as not feasible, incorrectly ruling it out.", code = "if (hoursNeeded(mid) < h) high = mid; else low = mid + 1;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "long long hoursNeeded(int speed) {\n    long long hours = 0;\n    for (int p : piles) hours += (p + speed - 1) / speed;\n    return hours;\n}\nint low = 1;\nint high = *max_element(piles.begin(), piles.end());\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn low;",
+                    choices = listOf(
+                        choice("if (hoursNeeded(mid) <= h) high = mid; else low = mid + 1;", true, "When mid is fast enough, keeping it in range and searching slower (high = mid) converges toward the smallest feasible speed; when it isn't fast enough, low must move past it entirely.", code = "if (hoursNeeded(mid) <= h) high = mid; else low = mid + 1;"),
+                        choice("if (hoursNeeded(mid) <= h) low = mid + 1; else high = mid;", false, "This moves past a speed that already works instead of keeping it as a candidate, converging on a needlessly fast speed rather than the true minimum.", code = "if (hoursNeeded(mid) <= h) low = mid + 1; else high = mid;"),
+                        choice("if (hoursNeeded(mid) < h) high = mid; else low = mid + 1;", false, "Using a strict less-than instead of less-than-or-equal would treat a speed that finishes in exactly h hours as not feasible, incorrectly ruling it out.", code = "if (hoursNeeded(mid) < h) high = mid; else low = mid + 1;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "hoursNeeded := func(speed int) int {\n    hours := 0\n    for _, p := range piles {\n        hours += (p + speed - 1) / speed\n    }\n    return hours\n}\nlow := 1\nhigh := 0\nfor _, p := range piles {\n    if p > high {\n        high = p\n    }\n}\nfor low < high {\n    mid := low + (high-low)/2\n    // ???\n}\nreturn low",
+                    choices = listOf(
+                        choice("if hoursNeeded(mid) <= h {\n    high = mid\n} else {\n    low = mid + 1\n}", true, "When mid is fast enough, keeping it in range and searching slower (high = mid) converges toward the smallest feasible speed; when it isn't fast enough, low must move past it entirely.", code = "if hoursNeeded(mid) <= h {\n    high = mid\n} else {\n    low = mid + 1\n}"),
+                        choice("if hoursNeeded(mid) <= h {\n    low = mid + 1\n} else {\n    high = mid\n}", false, "This moves past a speed that already works instead of keeping it as a candidate, converging on a needlessly fast speed rather than the true minimum.", code = "if hoursNeeded(mid) <= h {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                        choice("if hoursNeeded(mid) < h {\n    high = mid\n} else {\n    low = mid + 1\n}", false, "Using a strict less-than instead of less-than-or-equal would treat a speed that finishes in exactly h hours as not feasible, incorrectly ruling it out.", code = "if hoursNeeded(mid) < h {\n    high = mid\n} else {\n    low = mid + 1\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "func hoursNeeded(_ speed: Int) -> Int {\n    piles.reduce(0) { \$0 + (\$1 + speed - 1) / speed }\n}\nvar low = 1\nvar high = piles.max()!\nwhile low < high {\n    let mid = low + (high - low) / 2\n    // ???\n}\nreturn low",
+                    choices = listOf(
+                        choice("if hoursNeeded(mid) <= h { high = mid } else { low = mid + 1 }", true, "When mid is fast enough, keeping it in range and searching slower (high = mid) converges toward the smallest feasible speed; when it isn't fast enough, low must move past it entirely.", code = "if hoursNeeded(mid) <= h { high = mid } else { low = mid + 1 }"),
+                        choice("if hoursNeeded(mid) <= h { low = mid + 1 } else { high = mid }", false, "This moves past a speed that already works instead of keeping it as a candidate, converging on a needlessly fast speed rather than the true minimum.", code = "if hoursNeeded(mid) <= h { low = mid + 1 } else { high = mid }"),
+                        choice("if hoursNeeded(mid) < h { high = mid } else { low = mid + 1 }", false, "Using a strict less-than instead of less-than-or-equal would treat a speed that finishes in exactly h hours as not feasible, incorrectly ruling it out.", code = "if hoursNeeded(mid) < h { high = mid } else { low = mid + 1 }"),
+                    ),
+                ),
+            ),
         ),
         step(
             "koko-eating-bananas", BINARY_SEARCH, TIME_COMPLEXITY,
