@@ -63,7 +63,9 @@ import com.codingarena.core.common.TimeProvider
 import com.codingarena.core.design.ArenaChip
 import com.codingarena.core.design.CodeBlock
 import com.codingarena.core.design.ProgressBar
+import com.codingarena.domain.engine.BlitzEngine
 import com.codingarena.domain.engine.StreakEngine
+import com.codingarena.domain.repository.CurriculumRepository
 import com.codingarena.domain.repository.StreakRepository
 import com.codingarena.domain.usecase.CurrentUser
 import com.codingarena.core.design.SectionHeader
@@ -426,10 +428,19 @@ private fun CompletionPage(
     val streaks = koinInject<StreakRepository>()
     val currentUser = koinInject<CurrentUser>()
     val time = koinInject<TimeProvider>()
+    val curriculumRepo = koinInject<CurriculumRepository>()
+    val blitzEngine = koinInject<BlitzEngine>()
     var currentStreak by remember { mutableStateOf<Int?>(null) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(lesson.slug) {
         val userId = currentUser.ensureLoaded()?.id ?: return@LaunchedEffect
         currentStreak = StreakEngine().refresh(streaks.load(userId), time.epochDay()).currentStreak
+        val existing = curriculumRepo.record(userId, lesson.slug)
+        if (existing?.solved != true) {
+            curriculumRepo.save(
+                userId,
+                blitzEngine.markSolved(existing, lesson.slug, solved = true, now = time.nowMillis()),
+            )
+        }
     }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 18.dp)) {

@@ -72,6 +72,10 @@ data class RoadmapUiState(
 ) {
     val curriculum: Curriculum
         get() = if (showBlind75) NeetCode150.blind75 else NeetCode150.curriculum
+
+    /** At least one problem solved/completed - a weak-spots blitz needs something to draw from. */
+    val hasCompletedLesson: Boolean
+        get() = records.values.any { it.solved }
 }
 
 class RoadmapViewModel(
@@ -172,7 +176,7 @@ fun RoadmapScreen(
                     onClick = { onStartBlitz(BlitzMode.DueToday.storageKey) },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 ) { Text("Review ${progress.due} due card(s)") }
-            } else {
+            } else if (state.hasCompletedLesson) {
                 Button(
                     onClick = { onStartBlitz(BlitzMode.WeakestFirst.storageKey) },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),

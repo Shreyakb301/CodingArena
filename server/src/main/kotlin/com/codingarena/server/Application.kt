@@ -119,6 +119,12 @@ fun Application.module(overrides: ServerDependencies? = null) {
                 dependencies.store.saveProgress(principal.userId, call.receive<ProgressSyncPayload>())
                 call.respond(HttpStatusCode.NoContent)
             }
+            get("/v1/progress") {
+                val principal = call.principal<ArenaPrincipal>()!!
+                val payload = dependencies.store.progress(listOf(principal.userId))[principal.userId]
+                    ?: return@get call.respond(HttpStatusCode.NotFound, ApiError("No saved progress"))
+                call.respond(payload)
+            }
             route("/v1/submissions") {
                 post {
                     val principal = call.principal<ArenaPrincipal>()!!

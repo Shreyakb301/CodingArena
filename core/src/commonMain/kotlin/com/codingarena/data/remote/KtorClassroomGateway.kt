@@ -19,6 +19,8 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 
 class KtorClassroomGateway(
@@ -27,13 +29,17 @@ class KtorClassroomGateway(
     private val settings: SettingsRepository,
 ) : ClassroomGateway {
     override suspend fun register(request: RegisterRequest): AuthResponse {
-        val response = client.post("${config.baseUrl}/v1/auth/register") { setBody(request) }.authBody()
+        val response = client.post("${config.baseUrl}/v1/auth/register") {
+            contentType(ContentType.Application.Json); setBody(request)
+        }.authBody()
         saveAuth(response)
         return response
     }
 
     override suspend fun login(request: LoginRequest): AuthResponse {
-        val response = client.post("${config.baseUrl}/v1/auth/login") { setBody(request) }.authBody()
+        val response = client.post("${config.baseUrl}/v1/auth/login") {
+            contentType(ContentType.Application.Json); setBody(request)
+        }.authBody()
         saveAuth(response)
         return response
     }
@@ -43,19 +49,20 @@ class KtorClassroomGateway(
 
     override suspend fun createClassroom(name: String): Classroom =
         client.post("${config.baseUrl}/v1/classes") {
-            authenticate(); setBody(CreateClassroomRequest(name))
+            authenticate(); contentType(ContentType.Application.Json); setBody(CreateClassroomRequest(name))
         }.checkedBody()
 
     override suspend fun join(inviteCode: String, displayName: String): Classroom =
         client.post("${config.baseUrl}/v1/classes/join") {
-            authenticate(); setBody(JoinClassroomRequest(inviteCode, displayName))
+            authenticate(); contentType(ContentType.Application.Json)
+            setBody(JoinClassroomRequest(inviteCode, displayName))
         }.checkedBody()
 
     override suspend fun createAssignment(
         classroomId: String,
         request: CreateAssignmentRequest,
     ): Assignment = client.post("${config.baseUrl}/v1/classes/$classroomId/assignments") {
-        authenticate(); setBody(request)
+        authenticate(); contentType(ContentType.Application.Json); setBody(request)
     }.checkedBody()
 
     override suspend fun assignments(classroomId: String): List<Assignment> =
@@ -65,15 +72,30 @@ class KtorClassroomGateway(
         client.get("${config.baseUrl}/v1/classes/$classroomId/members") { authenticate() }.checkedBody()
 
     override suspend fun pushProgress(payload: ProgressSyncPayload) {
-        val response = client.post("${config.baseUrl}/v1/progress") { authenticate(); setBody(payload) }
+        val response = client.post("${config.baseUrl}/v1/progress") {
+            authenticate(); contentType(ContentType.Application.Json); setBody(payload)
+        }
         if (!response.status.isSuccess()) error("Progress sync failed: ${response.status.value}")
+    }
+
+    override suspend fun fetchProgress(): ProgressSyncPayload? {
+        val response = client.get("${config.baseUrl}/v1/progress") { authenticate() }
+        if (response.status == io.ktor.http.HttpStatusCode.NotFound) return null
+        if (!response.status.isSuccess()) error("Fetching progress failed: ${response.status.value}")
+        return response.body()
     }
 
     override suspend fun dashboard(classroomId: String): ClassroomDashboard =
         client.get("${config.baseUrl}/v1/classes/$classroomId/dashboard") { authenticate() }.checkedBody()
 
+    override suspend fun signOut() {
+        settings.put(AUTH_TOKEN, "")
+        settings.put(AUTH_ROLE, "")
+        settings.put(AUTH_NAME, "")
+    }
+
     private suspend fun io.ktor.client.request.HttpRequestBuilder.authenticate() {
-        val token = settings.get(AUTH_TOKEN) ?: error("Sign in first")
+        val token = settings.get(AUTH_TOKEN)?.takeIf { it.isNotBlank() } ?: error("Sign in first")
         bearerAuth(token)
     }
 

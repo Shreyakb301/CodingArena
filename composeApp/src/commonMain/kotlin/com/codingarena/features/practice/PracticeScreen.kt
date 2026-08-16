@@ -47,6 +47,7 @@ import org.koin.compose.viewmodel.koinViewModel
 data class PracticeUiState(
     val currentTopic: PatternGroup? = null,
     val recommendedAvailable: Boolean = false,
+    val hasCompletedLesson: Boolean = false,
 )
 
 class PracticeViewModel(
@@ -68,6 +69,7 @@ class PracticeViewModel(
             _state.value = PracticeUiState(
                 currentTopic = workoutEngine.currentTopic(curriculum, progress),
                 recommendedAvailable = ProblemWorkouts.workouts.isNotEmpty(),
+                hasCompletedLesson = records.values.any { it.solved },
             )
         }
     }
@@ -116,7 +118,9 @@ fun PracticeScreen(
             PracticeModeRow(
                 mark = "{ }",
                 title = "Work on weak spots",
-                subtitle = "Start with what needs attention",
+                subtitle = if (state.hasCompletedLesson) "Start with what needs attention"
+                    else "Complete a lesson to unlock this",
+                enabled = state.hasCompletedLesson,
                 onClick = { onStartBlitz(BlitzMode.WeakestFirst.storageKey) },
             )
         }
@@ -211,8 +215,10 @@ private fun PracticeModeRow(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
+    enabled: Boolean = true,
 ) {
-    Column(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    val contentAlpha = if (enabled) 1f else 0.4f
+    Column(Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = onClick)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -220,7 +226,7 @@ private fun PracticeModeRow(
         ) {
             Box(
                 modifier = Modifier.size(40.dp).background(
-                    MaterialTheme.colorScheme.primaryContainer,
+                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = contentAlpha),
                     RoundedCornerShape(12.dp),
                 ),
                 contentAlignment = Alignment.Center,
@@ -229,19 +235,28 @@ private fun PracticeModeRow(
                     mark,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = contentAlpha),
                 )
             }
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Medium)
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha),
+                )
                 Text(
                     subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = contentAlpha),
                     modifier = Modifier.padding(top = 3.dp),
                 )
             }
-            Text("›", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(
+                "›",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = contentAlpha),
+            )
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
     }

@@ -45,7 +45,7 @@ val appModule: Module = module {
     viewModel { CodeRushSessionViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { AchievementsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { RoadmapViewModel(get(), get(), get(), get(), get()) }
     viewModel { BlitzViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { CourseRoadmapViewModel(get(), get(), get(), get(), get()) }

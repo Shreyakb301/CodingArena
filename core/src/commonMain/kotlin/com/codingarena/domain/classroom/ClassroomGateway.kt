@@ -20,5 +20,9 @@ interface ClassroomGateway {
     suspend fun assignments(classroomId: String): List<Assignment>
     suspend fun members(classroomId: String): List<ClassMembership>
     suspend fun pushProgress(payload: ProgressSyncPayload)
+
+    /** The signed-in user's own saved progress, or null if nothing has been synced yet. */
+    suspend fun fetchProgress(): ProgressSyncPayload?
     suspend fun dashboard(classroomId: String): ClassroomDashboard
+    suspend fun signOut()
 }
