@@ -1560,6 +1560,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (nums[mid] < nums[high]) low = mid + 1 else high = mid",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "low = 0\nhigh = len(nums) - 1\nwhile low < high:\n    mid = low + (high - low) // 2\n    # ???\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid", true, "Since the array is effectively sorted, nums[mid] is never greater than nums[high] at any step, so high keeps narrowing down to index 0 every time - correctly converging on 11 without needing any special unrotated-case handling.", code = "if nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid"),
+                    choice("if nums[low] < nums[high]:\n    return nums[low]\nif nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid", false, "Adding an early-return special case for the already-sorted-looking scenario is unnecessary - the core comparison already converges correctly on its own without it, and the special case adds complexity for no benefit.", code = "if nums[low] < nums[high]:\n    return nums[low]\nif nums[mid] > nums[high]:\n    low = mid + 1\nelse:\n    high = mid"),
+                    choice("if nums[mid] < nums[high]:\n    low = mid + 1\nelse:\n    high = mid", false, "This flips the comparison direction entirely - it would move low forward when the middle is smaller, which is exactly backward from what's needed to narrow toward the true minimum.", code = "if nums[mid] < nums[high]:\n    low = mid + 1\nelse:\n    high = mid"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int low = 0;\nint high = nums.length - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "Since the array is effectively sorted, nums[mid] is never greater than nums[high] at any step, so high keeps narrowing down to index 0 every time - correctly converging on 11 without needing any special unrotated-case handling.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[low] < nums[high]) return nums[low];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;", false, "Adding an early-return special case for the already-sorted-looking scenario is unnecessary - the core comparison already converges correctly on its own without it, and the special case adds complexity for no benefit.", code = "if (nums[low] < nums[high]) return nums[low];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[mid] < nums[high]) low = mid + 1; else high = mid;", false, "This flips the comparison direction entirely - it would move low forward when the middle is smaller, which is exactly backward from what's needed to narrow toward the true minimum.", code = "if (nums[mid] < nums[high]) low = mid + 1; else high = mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let low = 0;\nlet high = nums.length - 1;\nwhile (low < high) {\n    const mid = low + Math.floor((high - low) / 2);\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "Since the array is effectively sorted, nums[mid] is never greater than nums[high] at any step, so high keeps narrowing down to index 0 every time - correctly converging on 11 without needing any special unrotated-case handling.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[low] < nums[high]) return nums[low];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;", false, "Adding an early-return special case for the already-sorted-looking scenario is unnecessary - the core comparison already converges correctly on its own without it, and the special case adds complexity for no benefit.", code = "if (nums[low] < nums[high]) return nums[low];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[mid] < nums[high]) low = mid + 1; else high = mid;", false, "This flips the comparison direction entirely - it would move low forward when the middle is smaller, which is exactly backward from what's needed to narrow toward the true minimum.", code = "if (nums[mid] < nums[high]) low = mid + 1; else high = mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int low = 0;\nint high = nums.size() - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else high = mid;", true, "Since the array is effectively sorted, nums[mid] is never greater than nums[high] at any step, so high keeps narrowing down to index 0 every time - correctly converging on 11 without needing any special unrotated-case handling.", code = "if (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[low] < nums[high]) return nums[low];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;", false, "Adding an early-return special case for the already-sorted-looking scenario is unnecessary - the core comparison already converges correctly on its own without it, and the special case adds complexity for no benefit.", code = "if (nums[low] < nums[high]) return nums[low];\nif (nums[mid] > nums[high]) low = mid + 1; else high = mid;"),
+                    choice("if (nums[mid] < nums[high]) low = mid + 1; else high = mid;", false, "This flips the comparison direction entirely - it would move low forward when the middle is smaller, which is exactly backward from what's needed to narrow toward the true minimum.", code = "if (nums[mid] < nums[high]) low = mid + 1; else high = mid;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "low := 0\nhigh := len(nums) - 1\nfor low < high {\n    mid := low + (high-low)/2\n    // ???\n}\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}", true, "Since the array is effectively sorted, nums[mid] is never greater than nums[high] at any step, so high keeps narrowing down to index 0 every time - correctly converging on 11 without needing any special unrotated-case handling.", code = "if nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                    choice("if nums[low] < nums[high] {\n    return nums[low]\n}\nif nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}", false, "Adding an early-return special case for the already-sorted-looking scenario is unnecessary - the core comparison already converges correctly on its own without it, and the special case adds complexity for no benefit.", code = "if nums[low] < nums[high] {\n    return nums[low]\n}\nif nums[mid] > nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                    choice("if nums[mid] < nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}", false, "This flips the comparison direction entirely - it would move low forward when the middle is smaller, which is exactly backward from what's needed to narrow toward the true minimum.", code = "if nums[mid] < nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var low = 0\nvar high = nums.count - 1\nwhile low < high {\n    let mid = low + (high - low) / 2\n    // ???\n}\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high] { low = mid + 1 } else { high = mid }", true, "Since the array is effectively sorted, nums[mid] is never greater than nums[high] at any step, so high keeps narrowing down to index 0 every time - correctly converging on 11 without needing any special unrotated-case handling.", code = "if nums[mid] > nums[high] { low = mid + 1 } else { high = mid }"),
+                    choice("if nums[low] < nums[high] { return nums[low] }\nif nums[mid] > nums[high] { low = mid + 1 } else { high = mid }", false, "Adding an early-return special case for the already-sorted-looking scenario is unnecessary - the core comparison already converges correctly on its own without it, and the special case adds complexity for no benefit.", code = "if nums[low] < nums[high] { return nums[low] }\nif nums[mid] > nums[high] { low = mid + 1 } else { high = mid }"),
+                    choice("if nums[mid] < nums[high] { low = mid + 1 } else { high = mid }", false, "This flips the comparison direction entirely - it would move low forward when the middle is smaller, which is exactly backward from what's needed to narrow toward the true minimum.", code = "if nums[mid] < nums[high] { low = mid + 1 } else { high = mid }"),
+                ),
+            ),
+        ),
     ),
     step(
         "binary-search", BINARY_SEARCH, CODE_BLOCK,
@@ -1584,6 +1640,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Removing the exact-match branch and folding it into the 'too small' case means the loop never explicitly returns mid on a match - it would keep narrowing right past the target instead of stopping there.",
                 code = "when { nums[mid] <= target -> low = mid + 1; nums[mid] > target -> high = mid - 1 }",
+            ),
+        ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "low = 0\nhigh = len(nums) - 1\nwhile low <= high:\n    mid = low + (high - low) // 2\n    # ???\nreturn -1",
+                choices = listOf(
+                    choice("if nums[mid] < target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1\nelse:\n    return mid", true, "Tracing through: low=0, high=4, mid=2 (value 5, too big, high=1); mid=0 (value 1, exact match) - the inclusive low <= high condition correctly allows the search to still check index 0 even after high has shrunk down to it.", code = "if nums[mid] < target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1\nelse:\n    return mid"),
+                    choice("# with while low < high instead of low <= high\nif nums[mid] < target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1\nelse:\n    return mid", false, "With a strict less-than loop condition, once low and high both equal 0, the loop exits before ever comparing nums[0] to target, incorrectly missing a target that happens to be the very first element.", code = "# with while low < high instead of low <= high\nif nums[mid] < target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1\nelse:\n    return mid"),
+                    choice("if nums[mid] <= target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1", false, "Removing the exact-match branch and folding it into the 'too small' case means the loop never explicitly returns mid on a match - it would keep narrowing right past the target instead of stopping there.", code = "if nums[mid] <= target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int low = 0;\nint high = nums.length - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn -1;",
+                choices = listOf(
+                    choice("if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", true, "Tracing through: low=0, high=4, mid=2 (value 5, too big, high=1); mid=0 (value 1, exact match) - the inclusive low <= high condition correctly allows the search to still check index 0 even after high has shrunk down to it.", code = "if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                    choice("// with while (low < high) instead of low <= high\nif (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", false, "With a strict less-than loop condition, once low and high both equal 0, the loop exits before ever comparing nums[0] to target, incorrectly missing a target that happens to be the very first element.", code = "// with while (low < high) instead of low <= high\nif (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                    choice("if (nums[mid] <= target) low = mid + 1; else if (nums[mid] > target) high = mid - 1;", false, "Removing the exact-match branch and folding it into the 'too small' case means the loop never explicitly returns mid on a match - it would keep narrowing right past the target instead of stopping there.", code = "if (nums[mid] <= target) low = mid + 1; else if (nums[mid] > target) high = mid - 1;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let low = 0;\nlet high = nums.length - 1;\nwhile (low <= high) {\n    const mid = low + Math.floor((high - low) / 2);\n    // ???\n}\nreturn -1;",
+                choices = listOf(
+                    choice("if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", true, "Tracing through: low=0, high=4, mid=2 (value 5, too big, high=1); mid=0 (value 1, exact match) - the inclusive low <= high condition correctly allows the search to still check index 0 even after high has shrunk down to it.", code = "if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                    choice("// with while (low < high) instead of low <= high\nif (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", false, "With a strict less-than loop condition, once low and high both equal 0, the loop exits before ever comparing nums[0] to target, incorrectly missing a target that happens to be the very first element.", code = "// with while (low < high) instead of low <= high\nif (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                    choice("if (nums[mid] <= target) low = mid + 1; else if (nums[mid] > target) high = mid - 1;", false, "Removing the exact-match branch and folding it into the 'too small' case means the loop never explicitly returns mid on a match - it would keep narrowing right past the target instead of stopping there.", code = "if (nums[mid] <= target) low = mid + 1; else if (nums[mid] > target) high = mid - 1;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int low = 0;\nint high = nums.size() - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn -1;",
+                choices = listOf(
+                    choice("if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", true, "Tracing through: low=0, high=4, mid=2 (value 5, too big, high=1); mid=0 (value 1, exact match) - the inclusive low <= high condition correctly allows the search to still check index 0 even after high has shrunk down to it.", code = "if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                    choice("// with while (low < high) instead of low <= high\nif (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", false, "With a strict less-than loop condition, once low and high both equal 0, the loop exits before ever comparing nums[0] to target, incorrectly missing a target that happens to be the very first element.", code = "// with while (low < high) instead of low <= high\nif (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                    choice("if (nums[mid] <= target) low = mid + 1; else if (nums[mid] > target) high = mid - 1;", false, "Removing the exact-match branch and folding it into the 'too small' case means the loop never explicitly returns mid on a match - it would keep narrowing right past the target instead of stopping there.", code = "if (nums[mid] <= target) low = mid + 1; else if (nums[mid] > target) high = mid - 1;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "low := 0\nhigh := len(nums) - 1\nfor low <= high {\n    mid := low + (high-low)/2\n    // ???\n}\nreturn -1",
+                choices = listOf(
+                    choice("if nums[mid] < target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n} else {\n    return mid\n}", true, "Tracing through: low=0, high=4, mid=2 (value 5, too big, high=1); mid=0 (value 1, exact match) - the inclusive low <= high condition correctly allows the search to still check index 0 even after high has shrunk down to it.", code = "if nums[mid] < target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n} else {\n    return mid\n}"),
+                    choice("// with for low < high instead of low <= high\nif nums[mid] < target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n} else {\n    return mid\n}", false, "With a strict less-than loop condition, once low and high both equal 0, the loop exits before ever comparing nums[0] to target, incorrectly missing a target that happens to be the very first element.", code = "// with for low < high instead of low <= high\nif nums[mid] < target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n} else {\n    return mid\n}"),
+                    choice("if nums[mid] <= target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n}", false, "Removing the exact-match branch and folding it into the 'too small' case means the loop never explicitly returns mid on a match - it would keep narrowing right past the target instead of stopping there.", code = "if nums[mid] <= target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var low = 0\nvar high = nums.count - 1\nwhile low <= high {\n    let mid = low + (high - low) / 2\n    // ???\n}\nreturn -1",
+                choices = listOf(
+                    choice("if nums[mid] < target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 } else { return mid }", true, "Tracing through: low=0, high=4, mid=2 (value 5, too big, high=1); mid=0 (value 1, exact match) - the inclusive low <= high condition correctly allows the search to still check index 0 even after high has shrunk down to it.", code = "if nums[mid] < target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 } else { return mid }"),
+                    choice("// with while low < high instead of low <= high\nif nums[mid] < target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 } else { return mid }", false, "With a strict less-than loop condition, once low and high both equal 0, the loop exits before ever comparing nums[0] to target, incorrectly missing a target that happens to be the very first element.", code = "// with while low < high instead of low <= high\nif nums[mid] < target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 } else { return mid }"),
+                    choice("if nums[mid] <= target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 }", false, "Removing the exact-match branch and folding it into the 'too small' case means the loop never explicitly returns mid on a match - it would keep narrowing right past the target instead of stopping there.", code = "if nums[mid] <= target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 }"),
+                ),
             ),
         ),
     ),
