@@ -1299,6 +1299,62 @@ private val binarySearchWorkout = ProblemWorkout(
                     "This swaps the two branches, so a too-small middle value shrinks the range from the top instead of searching further right where the target actually is.",
                     code = "when {\n    nums[mid] < target -> high = mid - 1\n    nums[mid] > target -> low = mid + 1\n    else -> return mid\n}",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "low = 0\nhigh = len(nums) - 1\nwhile low <= high:\n    mid = low + (high - low) // 2\n    # ???\nreturn -1",
+                    choices = listOf(
+                        choice("if nums[mid] < target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1\nelse:\n    return mid", true, "Each branch moves the correct bound strictly past mid, and an exact match returns immediately - together these guarantee both correctness and termination.", code = "if nums[mid] < target:\n    low = mid + 1\nelif nums[mid] > target:\n    high = mid - 1\nelse:\n    return mid"),
+                        choice("if nums[mid] < target:\n    low = mid\nelif nums[mid] > target:\n    high = mid\nelse:\n    return mid", false, "Leaving mid inside the next range on both branches can stall the loop once low and high are adjacent, since neither bound is guaranteed to move past mid.", code = "if nums[mid] < target:\n    low = mid\nelif nums[mid] > target:\n    high = mid\nelse:\n    return mid"),
+                        choice("if nums[mid] < target:\n    high = mid - 1\nelif nums[mid] > target:\n    low = mid + 1\nelse:\n    return mid", false, "This swaps the two branches, so a too-small middle value shrinks the range from the top instead of searching further right where the target actually is.", code = "if nums[mid] < target:\n    high = mid - 1\nelif nums[mid] > target:\n    low = mid + 1\nelse:\n    return mid"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int low = 0;\nint high = nums.length - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn -1;",
+                    choices = listOf(
+                        choice("if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", true, "Each branch moves the correct bound strictly past mid, and an exact match returns immediately - together these guarantee both correctness and termination.", code = "if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                        choice("if (nums[mid] < target) low = mid; else if (nums[mid] > target) high = mid; else return mid;", false, "Leaving mid inside the next range on both branches can stall the loop once low and high are adjacent, since neither bound is guaranteed to move past mid.", code = "if (nums[mid] < target) low = mid; else if (nums[mid] > target) high = mid; else return mid;"),
+                        choice("if (nums[mid] < target) high = mid - 1; else if (nums[mid] > target) low = mid + 1; else return mid;", false, "This swaps the two branches, so a too-small middle value shrinks the range from the top instead of searching further right where the target actually is.", code = "if (nums[mid] < target) high = mid - 1; else if (nums[mid] > target) low = mid + 1; else return mid;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let low = 0;\nlet high = nums.length - 1;\nwhile (low <= high) {\n    const mid = low + Math.floor((high - low) / 2);\n    // ???\n}\nreturn -1;",
+                    choices = listOf(
+                        choice("if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", true, "Each branch moves the correct bound strictly past mid, and an exact match returns immediately - together these guarantee both correctness and termination.", code = "if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                        choice("if (nums[mid] < target) low = mid; else if (nums[mid] > target) high = mid; else return mid;", false, "Leaving mid inside the next range on both branches can stall the loop once low and high are adjacent, since neither bound is guaranteed to move past mid.", code = "if (nums[mid] < target) low = mid; else if (nums[mid] > target) high = mid; else return mid;"),
+                        choice("if (nums[mid] < target) high = mid - 1; else if (nums[mid] > target) low = mid + 1; else return mid;", false, "This swaps the two branches, so a too-small middle value shrinks the range from the top instead of searching further right where the target actually is.", code = "if (nums[mid] < target) high = mid - 1; else if (nums[mid] > target) low = mid + 1; else return mid;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int low = 0;\nint high = nums.size() - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn -1;",
+                    choices = listOf(
+                        choice("if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;", true, "Each branch moves the correct bound strictly past mid, and an exact match returns immediately - together these guarantee both correctness and termination.", code = "if (nums[mid] < target) low = mid + 1; else if (nums[mid] > target) high = mid - 1; else return mid;"),
+                        choice("if (nums[mid] < target) low = mid; else if (nums[mid] > target) high = mid; else return mid;", false, "Leaving mid inside the next range on both branches can stall the loop once low and high are adjacent, since neither bound is guaranteed to move past mid.", code = "if (nums[mid] < target) low = mid; else if (nums[mid] > target) high = mid; else return mid;"),
+                        choice("if (nums[mid] < target) high = mid - 1; else if (nums[mid] > target) low = mid + 1; else return mid;", false, "This swaps the two branches, so a too-small middle value shrinks the range from the top instead of searching further right where the target actually is.", code = "if (nums[mid] < target) high = mid - 1; else if (nums[mid] > target) low = mid + 1; else return mid;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "low := 0\nhigh := len(nums) - 1\nfor low <= high {\n    mid := low + (high-low)/2\n    // ???\n}\nreturn -1",
+                    choices = listOf(
+                        choice("if nums[mid] < target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n} else {\n    return mid\n}", true, "Each branch moves the correct bound strictly past mid, and an exact match returns immediately - together these guarantee both correctness and termination.", code = "if nums[mid] < target {\n    low = mid + 1\n} else if nums[mid] > target {\n    high = mid - 1\n} else {\n    return mid\n}"),
+                        choice("if nums[mid] < target {\n    low = mid\n} else if nums[mid] > target {\n    high = mid\n} else {\n    return mid\n}", false, "Leaving mid inside the next range on both branches can stall the loop once low and high are adjacent, since neither bound is guaranteed to move past mid.", code = "if nums[mid] < target {\n    low = mid\n} else if nums[mid] > target {\n    high = mid\n} else {\n    return mid\n}"),
+                        choice("if nums[mid] < target {\n    high = mid - 1\n} else if nums[mid] > target {\n    low = mid + 1\n} else {\n    return mid\n}", false, "This swaps the two branches, so a too-small middle value shrinks the range from the top instead of searching further right where the target actually is.", code = "if nums[mid] < target {\n    high = mid - 1\n} else if nums[mid] > target {\n    low = mid + 1\n} else {\n    return mid\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var low = 0\nvar high = nums.count - 1\nwhile low <= high {\n    let mid = low + (high - low) / 2\n    // ???\n}\nreturn -1",
+                    choices = listOf(
+                        choice("if nums[mid] < target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 } else { return mid }", true, "Each branch moves the correct bound strictly past mid, and an exact match returns immediately - together these guarantee both correctness and termination.", code = "if nums[mid] < target { low = mid + 1 } else if nums[mid] > target { high = mid - 1 } else { return mid }"),
+                        choice("if nums[mid] < target { low = mid } else if nums[mid] > target { high = mid } else { return mid }", false, "Leaving mid inside the next range on both branches can stall the loop once low and high are adjacent, since neither bound is guaranteed to move past mid.", code = "if nums[mid] < target { low = mid } else if nums[mid] > target { high = mid } else { return mid }"),
+                        choice("if nums[mid] < target { high = mid - 1 } else if nums[mid] > target { low = mid + 1 } else { return mid }", false, "This swaps the two branches, so a too-small middle value shrinks the range from the top instead of searching further right where the target actually is.", code = "if nums[mid] < target { high = mid - 1 } else if nums[mid] > target { low = mid + 1 } else { return mid }"),
+                    ),
+                ),
+            ),
         ),
         step(
             "binary-search", BINARY_SEARCH, TIME_COMPLEXITY,
@@ -1499,6 +1555,62 @@ private val twoSumWorkout = ProblemWorkout(
                     "This checks for the current number itself rather than its complement, and stores the complement instead of the number, which looks up and inserts the wrong values entirely.",
                     code = "if (seen.containsKey(nums[i])) return intArrayOf(seen[nums[i]]!!, i)\nseen[complement] = i",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "seen = {}\nfor i in range(len(nums)):\n    complement = target - nums[i]\n    # ???",
+                    choices = listOf(
+                        choice("if complement in seen:\n    return [seen[complement], i]\nseen[nums[i]] = i", true, "This checks for the complement before touching the map for the current index, then records the current number afterward - exactly the check-then-insert order that avoids pairing an index with itself.", code = "if complement in seen:\n    return [seen[complement], i]\nseen[nums[i]] = i"),
+                        choice("seen[nums[i]] = i\nif complement in seen:\n    return [seen[complement], i]", false, "Inserting the current number before checking for its complement means, when target is exactly double the current value, the number can be found as its own complement.", code = "seen[nums[i]] = i\nif complement in seen:\n    return [seen[complement], i]"),
+                        choice("if nums[i] in seen:\n    return [seen[nums[i]], i]\nseen[complement] = i", false, "This checks for the current number itself rather than its complement, and stores the complement instead of the number, which looks up and inserts the wrong values entirely.", code = "if nums[i] in seen:\n    return [seen[nums[i]], i]\nseen[complement] = i"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "Map<Integer, Integer> seen = new HashMap<>();\nfor (int i = 0; i < nums.length; i++) {\n    int complement = target - nums[i];\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);", true, "This checks for the complement before touching the map for the current index, then records the current number afterward - exactly the check-then-insert order that avoids pairing an index with itself.", code = "if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);"),
+                        choice("seen.put(nums[i], i);\nif (seen.containsKey(complement)) return new int[]{seen.get(complement), i};", false, "Inserting the current number before checking for its complement means, when target is exactly double the current value, the number can be found as its own complement.", code = "seen.put(nums[i], i);\nif (seen.containsKey(complement)) return new int[]{seen.get(complement), i};"),
+                        choice("if (seen.containsKey(nums[i])) return new int[]{seen.get(nums[i]), i};\nseen.put(complement, i);", false, "This checks for the current number itself rather than its complement, and stores the complement instead of the number, which looks up and inserts the wrong values entirely.", code = "if (seen.containsKey(nums[i])) return new int[]{seen.get(nums[i]), i};\nseen.put(complement, i);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "const seen = new Map();\nfor (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (seen.has(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);", true, "This checks for the complement before touching the map for the current index, then records the current number afterward - exactly the check-then-insert order that avoids pairing an index with itself.", code = "if (seen.has(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);"),
+                        choice("seen.set(nums[i], i);\nif (seen.has(complement)) return [seen.get(complement), i];", false, "Inserting the current number before checking for its complement means, when target is exactly double the current value, the number can be found as its own complement.", code = "seen.set(nums[i], i);\nif (seen.has(complement)) return [seen.get(complement), i];"),
+                        choice("if (seen.has(nums[i])) return [seen.get(nums[i]), i];\nseen.set(complement, i);", false, "This checks for the current number itself rather than its complement, and stores the complement instead of the number, which looks up and inserts the wrong values entirely.", code = "if (seen.has(nums[i])) return [seen.get(nums[i]), i];\nseen.set(complement, i);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "unordered_map<int, int> seen;\nfor (int i = 0; i < (int)nums.size(); i++) {\n    int complement = target - nums[i];\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;", true, "This checks for the complement before touching the map for the current index, then records the current number afterward - exactly the check-then-insert order that avoids pairing an index with itself.", code = "if (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;"),
+                        choice("seen[nums[i]] = i;\nif (seen.count(complement)) return {seen[complement], i};", false, "Inserting the current number before checking for its complement means, when target is exactly double the current value, the number can be found as its own complement.", code = "seen[nums[i]] = i;\nif (seen.count(complement)) return {seen[complement], i};"),
+                        choice("if (seen.count(nums[i])) return {seen[nums[i]], i};\nseen[complement] = i;", false, "This checks for the current number itself rather than its complement, and stores the complement instead of the number, which looks up and inserts the wrong values entirely.", code = "if (seen.count(nums[i])) return {seen[nums[i]], i};\nseen[complement] = i;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "seen := map[int]int{}\nfor i := 0; i < len(nums); i++ {\n    complement := target - nums[i]\n    // ???\n}",
+                    choices = listOf(
+                        choice("if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nseen[nums[i]] = i", true, "This checks for the complement before touching the map for the current index, then records the current number afterward - exactly the check-then-insert order that avoids pairing an index with itself.", code = "if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nseen[nums[i]] = i"),
+                        choice("seen[nums[i]] = i\nif j, ok := seen[complement]; ok {\n    return []int{j, i}\n}", false, "Inserting the current number before checking for its complement means, when target is exactly double the current value, the number can be found as its own complement.", code = "seen[nums[i]] = i\nif j, ok := seen[complement]; ok {\n    return []int{j, i}\n}"),
+                        choice("if j, ok := seen[nums[i]]; ok {\n    return []int{j, i}\n}\nseen[complement] = i", false, "This checks for the current number itself rather than its complement, and stores the complement instead of the number, which looks up and inserts the wrong values entirely.", code = "if j, ok := seen[nums[i]]; ok {\n    return []int{j, i}\n}\nseen[complement] = i"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var seen: [Int: Int] = [:]\nfor i in 0..<nums.count {\n    let complement = target - nums[i]\n    // ???\n}",
+                    choices = listOf(
+                        choice("if let j = seen[complement] { return [j, i] }\nseen[nums[i]] = i", true, "This checks for the complement before touching the map for the current index, then records the current number afterward - exactly the check-then-insert order that avoids pairing an index with itself.", code = "if let j = seen[complement] { return [j, i] }\nseen[nums[i]] = i"),
+                        choice("seen[nums[i]] = i\nif let j = seen[complement] { return [j, i] }", false, "Inserting the current number before checking for its complement means, when target is exactly double the current value, the number can be found as its own complement.", code = "seen[nums[i]] = i\nif let j = seen[complement] { return [j, i] }"),
+                        choice("if let j = seen[nums[i]] { return [j, i] }\nseen[complement] = i", false, "This checks for the current number itself rather than its complement, and stores the complement instead of the number, which looks up and inserts the wrong values entirely.", code = "if let j = seen[nums[i]] { return [j, i] }\nseen[complement] = i"),
+                    ),
+                ),
+            ),
         ),
         step(
             "two-sum", ARRAYS_HASHING, TIME_COMPLEXITY,
@@ -1699,6 +1811,62 @@ private val containsDuplicateWorkout = ProblemWorkout(
                     "Checking whether the set is merely non-empty has nothing to do with whether the *current* value specifically is a repeat - this would return true after the very first element is added.",
                     code = "if (seen.size > 0) return true\nseen.add(num)",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "seen = set()\nfor num in nums:\n    # ???\nreturn False",
+                    choices = listOf(
+                        choice("if num in seen:\n    return True\nseen.add(num)", true, "This checks for the value before touching the set, so it correctly returns True the moment a repeat is found, and keeps adding new values otherwise.", code = "if num in seen:\n    return True\nseen.add(num)"),
+                        choice("seen.add(num)\nif num in seen:\n    return True", false, "Adding before checking means the value is always found present immediately after being added, so this would incorrectly return True on the very first element.", code = "seen.add(num)\nif num in seen:\n    return True"),
+                        choice("if len(seen) > 0:\n    return True\nseen.add(num)", false, "Checking whether the set is merely non-empty has nothing to do with whether the current value specifically is a repeat - this would return True after the very first element is added.", code = "if len(seen) > 0:\n    return True\nseen.add(num)"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "Set<Integer> seen = new HashSet<>();\nfor (int num : nums) {\n    // ???\n}\nreturn false;",
+                    choices = listOf(
+                        choice("if (!seen.add(num)) return true;", true, "Set.add returns false when the value was already present, so this correctly returns true the moment a repeat is found, and keeps adding new values otherwise.", code = "if (!seen.add(num)) return true;"),
+                        choice("seen.add(num);\nif (seen.contains(num)) return true;", false, "Adding before checking means the value is always found present immediately after being added, so this would incorrectly return true on the very first element.", code = "seen.add(num);\nif (seen.contains(num)) return true;"),
+                        choice("if (seen.size() > 0) return true;\nseen.add(num);", false, "Checking whether the set is merely non-empty has nothing to do with whether the current value specifically is a repeat - this would return true after the very first element is added.", code = "if (seen.size() > 0) return true;\nseen.add(num);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "const seen = new Set();\nfor (const num of nums) {\n    // ???\n}\nreturn false;",
+                    choices = listOf(
+                        choice("if (seen.has(num)) return true;\nseen.add(num);", true, "This checks for the value before touching the set, so it correctly returns true the moment a repeat is found, and keeps adding new values otherwise.", code = "if (seen.has(num)) return true;\nseen.add(num);"),
+                        choice("seen.add(num);\nif (seen.has(num)) return true;", false, "Adding before checking means the value is always found present immediately after being added, so this would incorrectly return true on the very first element.", code = "seen.add(num);\nif (seen.has(num)) return true;"),
+                        choice("if (seen.size > 0) return true;\nseen.add(num);", false, "Checking whether the set is merely non-empty has nothing to do with whether the current value specifically is a repeat - this would return true after the very first element is added.", code = "if (seen.size > 0) return true;\nseen.add(num);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "unordered_set<int> seen;\nfor (int num : nums) {\n    // ???\n}\nreturn false;",
+                    choices = listOf(
+                        choice("if (!seen.insert(num).second) return true;", true, "insert's returned bool is false when the value was already present, so this correctly returns true the moment a repeat is found, and keeps adding new values otherwise.", code = "if (!seen.insert(num).second) return true;"),
+                        choice("seen.insert(num);\nif (seen.count(num)) return true;", false, "Adding before checking means the value is always found present immediately after being added, so this would incorrectly return true on the very first element.", code = "seen.insert(num);\nif (seen.count(num)) return true;"),
+                        choice("if (seen.size() > 0) return true;\nseen.insert(num);", false, "Checking whether the set is merely non-empty has nothing to do with whether the current value specifically is a repeat - this would return true after the very first element is added.", code = "if (seen.size() > 0) return true;\nseen.insert(num);"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "seen := map[int]bool{}\nfor _, num := range nums {\n    // ???\n}\nreturn false",
+                    choices = listOf(
+                        choice("if seen[num] {\n    return true\n}\nseen[num] = true", true, "This checks for the value before touching the map, so it correctly returns true the moment a repeat is found, and keeps adding new values otherwise.", code = "if seen[num] {\n    return true\n}\nseen[num] = true"),
+                        choice("seen[num] = true\nif seen[num] {\n    return true\n}", false, "Adding before checking means the value is always found present immediately after being added, so this would incorrectly return true on the very first element.", code = "seen[num] = true\nif seen[num] {\n    return true\n}"),
+                        choice("if len(seen) > 0 {\n    return true\n}\nseen[num] = true", false, "Checking whether the map is merely non-empty has nothing to do with whether the current value specifically is a repeat - this would return true after the very first element is added.", code = "if len(seen) > 0 {\n    return true\n}\nseen[num] = true"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var seen = Set<Int>()\nfor num in nums {\n    // ???\n}\nreturn false",
+                    choices = listOf(
+                        choice("if seen.contains(num) { return true }\nseen.insert(num)", true, "This checks for the value before touching the set, so it correctly returns true the moment a repeat is found, and keeps adding new values otherwise.", code = "if seen.contains(num) { return true }\nseen.insert(num)"),
+                        choice("seen.insert(num)\nif seen.contains(num) { return true }", false, "Adding before checking means the value is always found present immediately after being added, so this would incorrectly return true on the very first element.", code = "seen.insert(num)\nif seen.contains(num) { return true }"),
+                        choice("if seen.count > 0 { return true }\nseen.insert(num)", false, "Checking whether the set is merely non-empty has nothing to do with whether the current value specifically is a repeat - this would return true after the very first element is added.", code = "if seen.count > 0 { return true }\nseen.insert(num)"),
+                    ),
+                ),
+            ),
         ),
         step(
             "contains-duplicate", ARRAYS_HASHING, TIME_COMPLEXITY,
