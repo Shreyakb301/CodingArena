@@ -920,6 +920,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (lastSeen.containsKey(s[right]) && lastSeen[s[right]]!! >= left) left = lastSeen[s[right]]!!",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "left = 0\nmax_len = 0\nlast_seen = {}\nfor right in range(len(s)):\n    # ???\n    last_seen[s[right]] = right\n    max_len = max(max_len, right - left + 1)",
+                choices = listOf(
+                    choice("if s[right] in last_seen and last_seen[s[right]] >= left:\n    left = last_seen[s[right]] + 1", true, "Checking that the duplicate's last seen index is still inside the current window (>= left) before jumping avoids jumping backward on a duplicate that's already outside the window.", code = "if s[right] in last_seen and last_seen[s[right]] >= left:\n    left = last_seen[s[right]] + 1"),
+                    choice("if s[right] in last_seen:\n    left = last_seen[s[right]] + 1", false, "Without checking that the duplicate's last position is still within the current window, this can jump left backward on a character that was already excluded, silently growing the window incorrectly.", code = "if s[right] in last_seen:\n    left = last_seen[s[right]] + 1"),
+                    choice("if s[right] in last_seen and last_seen[s[right]] >= left:\n    left = last_seen[s[right]]", false, "Jumping to exactly the duplicate's old position instead of one past it would leave the duplicate character itself still inside the window, not actually resolving the repeat.", code = "if s[right] in last_seen and last_seen[s[right]] >= left:\n    left = last_seen[s[right]]"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int left = 0;\nint maxLen = 0;\nMap<Character, Integer> lastSeen = new HashMap<>();\nfor (int right = 0; right < s.length(); right++) {\n    // ???\n    lastSeen.put(s.charAt(right), right);\n    maxLen = Math.max(maxLen, right - left + 1);\n}",
+                choices = listOf(
+                    choice("if (lastSeen.containsKey(s.charAt(right)) && lastSeen.get(s.charAt(right)) >= left) left = lastSeen.get(s.charAt(right)) + 1;", true, "Checking that the duplicate's last seen index is still inside the current window (>= left) before jumping avoids jumping backward on a duplicate that's already outside the window.", code = "if (lastSeen.containsKey(s.charAt(right)) && lastSeen.get(s.charAt(right)) >= left) left = lastSeen.get(s.charAt(right)) + 1;"),
+                    choice("if (lastSeen.containsKey(s.charAt(right))) left = lastSeen.get(s.charAt(right)) + 1;", false, "Without checking that the duplicate's last position is still within the current window, this can jump left backward on a character that was already excluded, silently growing the window incorrectly.", code = "if (lastSeen.containsKey(s.charAt(right))) left = lastSeen.get(s.charAt(right)) + 1;"),
+                    choice("if (lastSeen.containsKey(s.charAt(right)) && lastSeen.get(s.charAt(right)) >= left) left = lastSeen.get(s.charAt(right));", false, "Jumping to exactly the duplicate's old position instead of one past it would leave the duplicate character itself still inside the window, not actually resolving the repeat.", code = "if (lastSeen.containsKey(s.charAt(right)) && lastSeen.get(s.charAt(right)) >= left) left = lastSeen.get(s.charAt(right));"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let left = 0;\nlet maxLen = 0;\nconst lastSeen = new Map();\nfor (let right = 0; right < s.length; right++) {\n    // ???\n    lastSeen.set(s[right], right);\n    maxLen = Math.max(maxLen, right - left + 1);\n}",
+                choices = listOf(
+                    choice("if (lastSeen.has(s[right]) && lastSeen.get(s[right]) >= left) left = lastSeen.get(s[right]) + 1;", true, "Checking that the duplicate's last seen index is still inside the current window (>= left) before jumping avoids jumping backward on a duplicate that's already outside the window.", code = "if (lastSeen.has(s[right]) && lastSeen.get(s[right]) >= left) left = lastSeen.get(s[right]) + 1;"),
+                    choice("if (lastSeen.has(s[right])) left = lastSeen.get(s[right]) + 1;", false, "Without checking that the duplicate's last position is still within the current window, this can jump left backward on a character that was already excluded, silently growing the window incorrectly.", code = "if (lastSeen.has(s[right])) left = lastSeen.get(s[right]) + 1;"),
+                    choice("if (lastSeen.has(s[right]) && lastSeen.get(s[right]) >= left) left = lastSeen.get(s[right]);", false, "Jumping to exactly the duplicate's old position instead of one past it would leave the duplicate character itself still inside the window, not actually resolving the repeat.", code = "if (lastSeen.has(s[right]) && lastSeen.get(s[right]) >= left) left = lastSeen.get(s[right]);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int left = 0;\nint maxLen = 0;\nunordered_map<char, int> lastSeen;\nfor (int right = 0; right < (int)s.size(); right++) {\n    // ???\n    lastSeen[s[right]] = right;\n    maxLen = max(maxLen, right - left + 1);\n}",
+                choices = listOf(
+                    choice("if (lastSeen.count(s[right]) && lastSeen[s[right]] >= left) left = lastSeen[s[right]] + 1;", true, "Checking that the duplicate's last seen index is still inside the current window (>= left) before jumping avoids jumping backward on a duplicate that's already outside the window.", code = "if (lastSeen.count(s[right]) && lastSeen[s[right]] >= left) left = lastSeen[s[right]] + 1;"),
+                    choice("if (lastSeen.count(s[right])) left = lastSeen[s[right]] + 1;", false, "Without checking that the duplicate's last position is still within the current window, this can jump left backward on a character that was already excluded, silently growing the window incorrectly.", code = "if (lastSeen.count(s[right])) left = lastSeen[s[right]] + 1;"),
+                    choice("if (lastSeen.count(s[right]) && lastSeen[s[right]] >= left) left = lastSeen[s[right]];", false, "Jumping to exactly the duplicate's old position instead of one past it would leave the duplicate character itself still inside the window, not actually resolving the repeat.", code = "if (lastSeen.count(s[right]) && lastSeen[s[right]] >= left) left = lastSeen[s[right]];"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "left := 0\nmaxLen := 0\nlastSeen := map[byte]int{}\nfor right := 0; right < len(s); right++ {\n    // ???\n    lastSeen[s[right]] = right\n    if right-left+1 > maxLen {\n        maxLen = right - left + 1\n    }\n}",
+                choices = listOf(
+                    choice("if idx, ok := lastSeen[s[right]]; ok && idx >= left {\n    left = idx + 1\n}", true, "Checking that the duplicate's last seen index is still inside the current window (>= left) before jumping avoids jumping backward on a duplicate that's already outside the window.", code = "if idx, ok := lastSeen[s[right]]; ok && idx >= left {\n    left = idx + 1\n}"),
+                    choice("if idx, ok := lastSeen[s[right]]; ok {\n    left = idx + 1\n}", false, "Without checking that the duplicate's last position is still within the current window, this can jump left backward on a character that was already excluded, silently growing the window incorrectly.", code = "if idx, ok := lastSeen[s[right]]; ok {\n    left = idx + 1\n}"),
+                    choice("if idx, ok := lastSeen[s[right]]; ok && idx >= left {\n    left = idx\n}", false, "Jumping to exactly the duplicate's old position instead of one past it would leave the duplicate character itself still inside the window, not actually resolving the repeat.", code = "if idx, ok := lastSeen[s[right]]; ok && idx >= left {\n    left = idx\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "let chars = Array(s)\nvar left = 0\nvar maxLen = 0\nvar lastSeen: [Character: Int] = [:]\nfor right in 0..<chars.count {\n    // ???\n    lastSeen[chars[right]] = right\n    maxLen = max(maxLen, right - left + 1)\n}",
+                choices = listOf(
+                    choice("if let idx = lastSeen[chars[right]], idx >= left { left = idx + 1 }", true, "Checking that the duplicate's last seen index is still inside the current window (>= left) before jumping avoids jumping backward on a duplicate that's already outside the window.", code = "if let idx = lastSeen[chars[right]], idx >= left { left = idx + 1 }"),
+                    choice("if let idx = lastSeen[chars[right]] { left = idx + 1 }", false, "Without checking that the duplicate's last position is still within the current window, this can jump left backward on a character that was already excluded, silently growing the window incorrectly.", code = "if let idx = lastSeen[chars[right]] { left = idx + 1 }"),
+                    choice("if let idx = lastSeen[chars[right]], idx >= left { left = idx }", false, "Jumping to exactly the duplicate's old position instead of one past it would leave the duplicate character itself still inside the window, not actually resolving the repeat.", code = "if let idx = lastSeen[chars[right]], idx >= left { left = idx }"),
+                ),
+            ),
+        ),
     ),
     step(
         "best-time-to-buy-and-sell-stock", SLIDING_WINDOW, TIME_COMPLEXITY,
