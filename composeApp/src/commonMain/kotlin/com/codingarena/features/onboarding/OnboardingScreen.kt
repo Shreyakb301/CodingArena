@@ -36,6 +36,7 @@ import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.CodingTopic
 import com.codingarena.domain.model.ExperienceLevel
 import com.codingarena.domain.model.OnboardingAnswers
+import com.codingarena.domain.model.forLanguage
 import com.codingarena.domain.model.ProgrammingLanguage
 import com.codingarena.domain.model.SessionLength
 import com.codingarena.domain.model.TargetJobLevel
@@ -117,8 +118,10 @@ class OnboardingViewModel(
     fun preparePlacement() {
         if (_state.value.placementQuestions.isNotEmpty()) return
         viewModelScope.launch {
+            val language = _state.value.answers.preferredLanguage
             _state.value = _state.value.copy(
-                placementQuestions = placementEngine.buildTest(problems.all()),
+                placementQuestions = placementEngine.buildTest(problems.all())
+                    .map { it.forLanguage(language) },
             )
         }
     }

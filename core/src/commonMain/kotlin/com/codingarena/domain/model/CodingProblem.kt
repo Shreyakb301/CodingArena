@@ -26,6 +26,23 @@ data class AnswerChoice(
 )
 
 /**
+ * An alternate-language rendering of a problem's [CodingProblem.codeSnippet].
+ *
+ * Trace/output questions are not pure syntax translation: integer division,
+ * string slicing and similar semantics differ across languages, which can
+ * change the correct answer. [choices] and [correctAnswerIds] only need to be
+ * supplied when the translated snippet's behaviour actually diverges from the
+ * base (Python) version - leave them empty to reuse the base problem's.
+ */
+@Serializable
+data class CodeVariant(
+    val language: ProgrammingLanguage,
+    val codeSnippet: String,
+    val choices: List<AnswerChoice> = emptyList(),
+    val correctAnswerIds: List<String> = emptyList(),
+)
+
+/**
  * A single curated challenge.
  *
  * Problems are content, not user data: they ship inside the app (see
@@ -54,6 +71,7 @@ data class CodingProblem(
     val patternId: String? = null,
     val estimatedSeconds: Int = 60,
     val isPublished: Boolean = true,
+    val languageVariants: List<CodeVariant> = emptyList(),
 ) {
     val difficulty: Difficulty get() = Difficulty.forRating(difficultyRating)
 
@@ -92,5 +110,28 @@ data class CodingProblem(
             "Problem $id references unknown answer ids"
         }
         require(hints.size <= 3) { "Problem $id declares more than three hints" }
+        languageVariants.forEach { variant ->
+            require(variant.choices.isEmpty() == variant.correctAnswerIds.isEmpty()) {
+                "Problem $id variant ${variant.language} must override both choices and " +
+                    "correctAnswerIds together, or neither"
+            }
+        }
     }
+}
+
+/**
+ * The problem as it should be shown to a user who prefers [language].
+ *
+ * Falls back to the base (Python) content when no variant is authored yet -
+ * that is the common case today, since only a subset of trace/output
+ * questions have been translated so far.
+ */
+fun CodingProblem.forLanguage(language: ProgrammingLanguage): CodingProblem {
+    if (codeSnippet == null) return this
+    val variant = languageVariants.firstOrNull { it.language == language } ?: return this
+    return copy(
+        codeSnippet = variant.codeSnippet,
+        choices = variant.choices.ifEmpty { choices },
+        correctAnswerIds = variant.correctAnswerIds.ifEmpty { correctAnswerIds },
+    )
 }

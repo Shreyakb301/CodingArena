@@ -35,6 +35,8 @@ import com.codingarena.core.design.CodeBlock
 import com.codingarena.domain.model.AnswerChoice
 import com.codingarena.domain.model.AttemptSource
 import com.codingarena.domain.model.CodingProblem
+import com.codingarena.domain.model.ProgrammingLanguage
+import com.codingarena.domain.model.forLanguage
 import com.codingarena.domain.repository.ProblemRepository
 import com.codingarena.domain.session.ChallengeSession
 import com.codingarena.domain.session.ChallengeState
@@ -87,12 +89,13 @@ class ChallengeViewModel(
         source = attemptSource
         viewModelScope.launch {
             val problem = problems.byId(problemId)
+            val language = currentUser.ensureLoaded()?.onboarding?.preferredLanguage ?: ProgrammingLanguage.PYTHON
             _state.value = if (problem == null) {
                 ChallengeUiState(loading = false, error = "That problem is no longer available.")
             } else {
                 ChallengeUiState(
                     loading = false,
-                    challenge = session.start(problem, time.nowMillis()),
+                    challenge = session.start(problem.forLanguage(language), time.nowMillis()),
                 )
             }
         }

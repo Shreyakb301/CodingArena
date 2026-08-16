@@ -40,6 +40,7 @@ import com.codingarena.domain.model.AttemptSource
 import com.codingarena.domain.model.CodeRushMode
 import com.codingarena.domain.model.CodeRushSession
 import com.codingarena.domain.model.CodingProblem
+import com.codingarena.domain.model.forLanguage
 import com.codingarena.domain.model.RushEndReason
 import com.codingarena.domain.model.StreakActivity
 import com.codingarena.domain.repository.CodeRushRepository
@@ -103,8 +104,10 @@ class CodeRushSessionViewModel(
     fun start(mode: CodeRushMode) {
         if (_state.value.session != null) return
         viewModelScope.launch {
-            val userId = currentUser.ensureLoaded()?.id ?: return@launch
-            candidates = problems.all()
+            val profile = currentUser.ensureLoaded() ?: return@launch
+            val userId = profile.id
+            val language = profile.onboarding.preferredLanguage
+            candidates = problems.all().map { it.forLanguage(language) }
             val session = engine.start(ids.newId(), userId, mode, time.nowMillis())
             _state.value = RushUiState(
                 session = session,

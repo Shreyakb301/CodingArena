@@ -2,8 +2,15 @@ package com.codingarena.content
 
 import com.codingarena.domain.model.AnswerChoice
 import com.codingarena.domain.model.ChallengeType
+import com.codingarena.domain.model.CodeVariant
 import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.CodingTopic
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.KOTLIN
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
 
 /**
  * Starter content, part one: array and string fundamentals.
@@ -61,6 +68,84 @@ internal val arraysAndStringsProblems: List<CodingProblem> = listOf(
         ),
         patternId = "array-traversal",
         estimatedSeconds = 40,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                static int total(int[] nums) {
+                    int result = 0;
+                    for (int i = 0; i < nums.length; i += 2) {
+                        result += nums[i];
+                    }
+                    return result;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function total(nums) {
+                    let result = 0;
+                    for (let i = 0; i < nums.length; i += 2) {
+                        result += nums[i];
+                    }
+                    return result;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun total(nums: IntArray): Int {
+                    var result = 0
+                    var i = 0
+                    while (i < nums.size) {
+                        result += nums[i]
+                        i += 2
+                    }
+                    return result
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int total(vector<int>& nums) {
+                    int result = 0;
+                    for (int i = 0; i < (int)nums.size(); i += 2) {
+                        result += nums[i];
+                    }
+                    return result;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func total(nums []int) int {
+                    result := 0
+                    for i := 0; i < len(nums); i += 2 {
+                        result += nums[i]
+                    }
+                    return result
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func total(_ nums: [Int]) -> Int {
+                    var result = 0
+                    var i = 0
+                    while i < nums.count {
+                        result += nums[i]
+                        i += 2
+                    }
+                    return result
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -275,6 +360,141 @@ internal val arraysAndStringsProblems: List<CodingProblem> = listOf(
         ),
         patternId = "sliding-window",
         estimatedSeconds = 55,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                static int maxWindowSum(int[] nums, int k) {
+                    int window = 0;
+                    for (int i = 0; i < k; i++) window += nums[i];
+                    int best = window;
+                    for (int i = k; i < nums.length; i++) {
+                        // ___ blank ___
+                        best = Math.max(best, window);
+                    }
+                    return best;
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "window += nums[i] - nums[i - k];", rationale = "Correct: add the element entering the window, remove the one leaving it."),
+                    AnswerChoice("b", "window += nums[i];", rationale = "The window would keep growing - nothing ever leaves it, so this computes a prefix sum instead.", insight = "Adding the incoming element is half of the update. The other half is removing the one that fell out."),
+                    AnswerChoice("c", "window = Arrays.stream(nums, i - k, i).sum();", rationale = "Correct results, but re-summing the window each step makes it O(n*k) and throws away the whole point of the pattern.", insight = "The window boundaries are right - it is the cost that is wrong."),
+                    AnswerChoice("d", "window += nums[i] - nums[i - k + 1];", rationale = "Off by one: the element leaving a k-wide window ending at i is at index i - k, not i - k + 1.", insight = "You have the right shape for the update - only the departing index is off."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function maxWindowSum(nums, k) {
+                    let window = nums.slice(0, k).reduce((a, b) => a + b, 0);
+                    let best = window;
+                    for (let i = k; i < nums.length; i++) {
+                        // ___ blank ___
+                        best = Math.max(best, window);
+                    }
+                    return best;
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "window += nums[i] - nums[i - k];", rationale = "Correct: add the element entering the window, remove the one leaving it."),
+                    AnswerChoice("b", "window += nums[i];", rationale = "The window would keep growing - nothing ever leaves it, so this computes a prefix sum instead.", insight = "Adding the incoming element is half of the update. The other half is removing the one that fell out."),
+                    AnswerChoice("c", "window = nums.slice(i - k, i).reduce((a, b) => a + b, 0);", rationale = "Correct results, but re-summing the window each step makes it O(n*k) and throws away the whole point of the pattern.", insight = "The window boundaries are right - it is the cost that is wrong."),
+                    AnswerChoice("d", "window += nums[i] - nums[i - k + 1];", rationale = "Off by one: the element leaving a k-wide window ending at i is at index i - k, not i - k + 1.", insight = "You have the right shape for the update - only the departing index is off."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun maxWindowSum(nums: IntArray, k: Int): Int {
+                    var window = nums.take(k).sum()
+                    var best = window
+                    for (i in k until nums.size) {
+                        // ___ blank ___
+                        best = maxOf(best, window)
+                    }
+                    return best
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "window += nums[i] - nums[i - k]", rationale = "Correct: add the element entering the window, remove the one leaving it."),
+                    AnswerChoice("b", "window += nums[i]", rationale = "The window would keep growing - nothing ever leaves it, so this computes a prefix sum instead.", insight = "Adding the incoming element is half of the update. The other half is removing the one that fell out."),
+                    AnswerChoice("c", "window = nums.slice(i - k until i).sum()", rationale = "Correct results, but re-summing the window each step makes it O(n*k) and throws away the whole point of the pattern.", insight = "The window boundaries are right - it is the cost that is wrong."),
+                    AnswerChoice("d", "window += nums[i] - nums[i - k + 1]", rationale = "Off by one: the element leaving a k-wide window ending at i is at index i - k, not i - k + 1.", insight = "You have the right shape for the update - only the departing index is off."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int maxWindowSum(vector<int>& nums, int k) {
+                    int window = 0;
+                    for (int i = 0; i < k; i++) window += nums[i];
+                    int best = window;
+                    for (int i = k; i < (int)nums.size(); i++) {
+                        // ___ blank ___
+                        best = max(best, window);
+                    }
+                    return best;
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "window += nums[i] - nums[i - k];", rationale = "Correct: add the element entering the window, remove the one leaving it."),
+                    AnswerChoice("b", "window += nums[i];", rationale = "The window would keep growing - nothing ever leaves it, so this computes a prefix sum instead.", insight = "Adding the incoming element is half of the update. The other half is removing the one that fell out."),
+                    AnswerChoice("c", "window = accumulate(nums.begin() + i - k, nums.begin() + i, 0);", rationale = "Correct results, but re-summing the window each step makes it O(n*k) and throws away the whole point of the pattern.", insight = "The window boundaries are right - it is the cost that is wrong."),
+                    AnswerChoice("d", "window += nums[i] - nums[i - k + 1];", rationale = "Off by one: the element leaving a k-wide window ending at i is at index i - k, not i - k + 1.", insight = "You have the right shape for the update - only the departing index is off."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func maxWindowSum(nums []int, k int) int {
+                    window := 0
+                    for i := 0; i < k; i++ {
+                        window += nums[i]
+                    }
+                    best := window
+                    for i := k; i < len(nums); i++ {
+                        // ___ blank ___
+                        if window > best {
+                            best = window
+                        }
+                    }
+                    return best
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "window += nums[i] - nums[i-k]", rationale = "Correct: add the element entering the window, remove the one leaving it."),
+                    AnswerChoice("b", "window += nums[i]", rationale = "The window would keep growing - nothing ever leaves it, so this computes a prefix sum instead.", insight = "Adding the incoming element is half of the update. The other half is removing the one that fell out."),
+                    AnswerChoice("c", "window = sumRange(nums, i-k, i)", rationale = "Correct results, but re-summing the window each step makes it O(n*k) and throws away the whole point of the pattern.", insight = "The window boundaries are right - it is the cost that is wrong."),
+                    AnswerChoice("d", "window += nums[i] - nums[i-k+1]", rationale = "Off by one: the element leaving a k-wide window ending at i is at index i - k, not i - k + 1.", insight = "You have the right shape for the update - only the departing index is off."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func maxWindowSum(_ nums: [Int], _ k: Int) -> Int {
+                    var window = nums[0..<k].reduce(0, +)
+                    var best = window
+                    for i in k..<nums.count {
+                        // ___ blank ___
+                        best = max(best, window)
+                    }
+                    return best
+                }
+                """.trimIndent(),
+                choices = listOf(
+                    AnswerChoice("a", "window += nums[i] - nums[i - k]", rationale = "Correct: add the element entering the window, remove the one leaving it."),
+                    AnswerChoice("b", "window += nums[i]", rationale = "The window would keep growing - nothing ever leaves it, so this computes a prefix sum instead.", insight = "Adding the incoming element is half of the update. The other half is removing the one that fell out."),
+                    AnswerChoice("c", "window = nums[(i - k)..<i].reduce(0, +)", rationale = "Correct results, but re-summing the window each step makes it O(n*k) and throws away the whole point of the pattern.", insight = "The window boundaries are right - it is the cost that is wrong."),
+                    AnswerChoice("d", "window += nums[i] - nums[i - k + 1]", rationale = "Off by one: the element leaving a k-wide window ending at i is at index i - k, not i - k + 1.", insight = "You have the right shape for the update - only the departing index is off."),
+                ),
+                correctAnswerIds = listOf("a"),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -483,6 +703,82 @@ internal val arraysAndStringsProblems: List<CodingProblem> = listOf(
         ),
         patternId = "array-traversal",
         estimatedSeconds = 45,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                static int largest(int[] nums) {
+                    int best = 0;
+                    for (int n : nums) {
+                        if (n > best) best = n;
+                    }
+                    return best;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function largest(nums) {
+                    let best = 0;
+                    for (const n of nums) {
+                        if (n > best) best = n;
+                    }
+                    return best;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun largest(nums: IntArray): Int {
+                    var best = 0
+                    for (n in nums) {
+                        if (n > best) best = n
+                    }
+                    return best
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int largest(vector<int>& nums) {
+                    int best = 0;
+                    for (int n : nums) {
+                        if (n > best) best = n;
+                    }
+                    return best;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func largest(nums []int) int {
+                    best := 0
+                    for _, n := range nums {
+                        if n > best {
+                            best = n
+                        }
+                    }
+                    return best
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func largest(_ nums: [Int]) -> Int {
+                    var best = 0
+                    for n in nums {
+                        if n > best { best = n }
+                    }
+                    return best
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -524,5 +820,49 @@ internal val arraysAndStringsProblems: List<CodingProblem> = listOf(
         hints = listOf("Index the string on paper first, including the negative positions."),
         patternId = "array-traversal",
         estimatedSeconds = 40,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                String s = "interview";
+                System.out.println(s.substring(2, 5) + s.substring(s.length() - 2));
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                const s = "interview";
+                console.log(s.slice(2, 5) + s.slice(-2));
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                val s = "interview"
+                println(s.substring(2, 5) + s.substring(s.length - 2))
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                string s = "interview";
+                cout << s.substr(2, 3) + s.substr(s.size() - 2);
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                s := "interview"
+                fmt.Println(s[2:5] + s[len(s)-2:])
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                let s = Array("interview")
+                print(String(s[2..<5]) + String(s[(s.count - 2)...]))
+                """.trimIndent(),
+            ),
+        ),
     ),
 )

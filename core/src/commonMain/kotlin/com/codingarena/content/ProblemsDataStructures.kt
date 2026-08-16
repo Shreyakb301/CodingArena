@@ -2,8 +2,15 @@ package com.codingarena.content
 
 import com.codingarena.domain.model.AnswerChoice
 import com.codingarena.domain.model.ChallengeType
+import com.codingarena.domain.model.CodeVariant
 import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.CodingTopic
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.KOTLIN
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
 
 /** Starter content, part two: stacks, queues, lists, trees, graphs and heaps. */
 internal val dataStructureProblems: List<CodingProblem> = listOf(
@@ -60,6 +67,94 @@ internal val dataStructureProblems: List<CodingProblem> = listOf(
         hints = listOf("Write the stack contents after each character."),
         patternId = "monotonic-stack",
         estimatedSeconds = 40,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                List<Character> stack = new ArrayList<>();
+                for (char c : "abcd".toCharArray()) {
+                    if (c == 'c') {
+                        stack.remove(stack.size() - 1);
+                    } else {
+                        stack.add(c);
+                    }
+                }
+                StringBuilder sb = new StringBuilder();
+                for (char c : stack) sb.append(c);
+                System.out.println(sb);
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                let stack = [];
+                for (const c of "abcd") {
+                    if (c === "c") {
+                        stack.pop();
+                    } else {
+                        stack.push(c);
+                    }
+                }
+                console.log(stack.join(""));
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                val stack = mutableListOf<Char>()
+                for (c in "abcd") {
+                    if (c == 'c') {
+                        stack.removeAt(stack.size - 1)
+                    } else {
+                        stack.add(c)
+                    }
+                }
+                println(stack.joinToString(""))
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                vector<char> stack;
+                for (char c : string("abcd")) {
+                    if (c == 'c') {
+                        stack.pop_back();
+                    } else {
+                        stack.push_back(c);
+                    }
+                }
+                for (char c : stack) cout << c;
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                stack := []byte{}
+                for _, c := range "abcd" {
+                    if c == 'c' {
+                        stack = stack[:len(stack)-1]
+                    } else {
+                        stack = append(stack, byte(c))
+                    }
+                }
+                fmt.Println(string(stack))
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                var stack: [Character] = []
+                for c in "abcd" {
+                    if c == "c" {
+                        stack.removeLast()
+                    } else {
+                        stack.append(c)
+                    }
+                }
+                print(String(stack))
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -158,6 +253,74 @@ internal val dataStructureProblems: List<CodingProblem> = listOf(
         ),
         patternId = "array-traversal",
         estimatedSeconds = 45,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                1  void printAll(Node head) {
+                2      Node node = head;
+                3      while (node != null) {
+                4          System.out.println(node.value);
+                5          node = head.next;
+                6      }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                1  function printAll(head) {
+                2      let node = head;
+                3      while (node !== null) {
+                4          console.log(node.value);
+                5          node = head.next;
+                6      }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                1  fun printAll(head: Node?) {
+                2      var node = head
+                3      while (node != null) {
+                4          println(node.value)
+                5          node = head?.next
+                6      }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                1  void printAll(Node* head) {
+                2      Node* node = head;
+                3      while (node != nullptr) {
+                4          cout << node->value << endl;
+                5          node = head->next;
+                6      }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                1  func printAll(head *Node) {
+                2      node := head
+                3      for node != nil {
+                4          fmt.Println(node.Value)
+                5          node = head.Next
+                6      }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                1  func printAll(_ head: Node?) {
+                2      var node = head
+                3      while node != nil {
+                4          print(node!.value)
+                5          node = head?.next
+                6      }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -221,6 +384,76 @@ internal val dataStructureProblems: List<CodingProblem> = listOf(
         ),
         patternId = "dfs",
         estimatedSeconds = 50,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                void inorder(Node node) {
+                    if (node == null) return;
+                    inorder(node.left);
+                    System.out.println(node.value);
+                    inorder(node.right);
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function inorder(node) {
+                    if (node === null) return;
+                    inorder(node.left);
+                    console.log(node.value);
+                    inorder(node.right);
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun inorder(node: Node?) {
+                    if (node == null) return
+                    inorder(node.left)
+                    println(node.value)
+                    inorder(node.right)
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                void inorder(Node* node) {
+                    if (node == nullptr) return;
+                    inorder(node->left);
+                    cout << node->value << " ";
+                    inorder(node->right);
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func inorder(node *Node) {
+                    if node == nil {
+                        return
+                    }
+                    inorder(node.Left)
+                    fmt.Println(node.Value)
+                    inorder(node.Right)
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func inorder(_ node: Node?) {
+                    guard let node = node else { return }
+                    inorder(node.left)
+                    print(node.value)
+                    inorder(node.right)
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(

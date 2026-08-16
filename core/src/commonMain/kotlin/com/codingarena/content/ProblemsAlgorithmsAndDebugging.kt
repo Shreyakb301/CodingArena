@@ -2,8 +2,38 @@ package com.codingarena.content
 
 import com.codingarena.domain.model.AnswerChoice
 import com.codingarena.domain.model.ChallengeType
+import com.codingarena.domain.model.CodeVariant
 import com.codingarena.domain.model.CodingProblem
 import com.codingarena.domain.model.CodingTopic
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.KOTLIN
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
+
+/**
+ * Brace-language line numbers shift relative to Python for `debug-index-01`:
+ * closing the loop before the final `return` pushes it from line 5 to line 7.
+ * Every C-family variant of that problem uses the same numbering, so the
+ * shifted choice list is shared rather than repeated six times.
+ */
+private val debugIndexBraceChoices = listOf(
+    AnswerChoice(
+        "a", "Line 2", tag = "2",
+        rationale = "Correct: because the body reads nums[i + 1], the loop must stop at " +
+            "len(nums) - 1.",
+    ),
+    AnswerChoice(
+        "b", "Line 3", tag = "3",
+        rationale = "Comparing neighbours is exactly the right check - it is the range " +
+            "that permits an out-of-bounds i.",
+        insight = "This is where the crash surfaces, so suspecting it is natural. The " +
+            "fix belongs at the loop bound.",
+    ),
+    AnswerChoice("c", "Line 4", tag = "4", rationale = "Returning false on the first inversion is correct."),
+    AnswerChoice("d", "Line 7", tag = "7", rationale = "Returning true after finding no inversion is correct."),
+)
 
 /**
  * Starter content, part three: searching, sorting, recursion, complexity and
@@ -74,6 +104,104 @@ internal val algorithmAndDebuggingProblems: List<CodingProblem> = listOf(
         ),
         patternId = "binary-search",
         estimatedSeconds = 60,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                1  int search(int[] nums, int target) {
+                2      int lo = 0, hi = nums.length - 1;
+                3      while (lo <= hi) {
+                4          int mid = (lo + hi) / 2;
+                5          if (nums[mid] == target) {
+                6              return mid;
+                7          } else if (nums[mid] < target) {
+                8              lo = mid;
+                9          } else {
+                10             hi = mid - 1;
+                11         }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                1  function search(nums, target) {
+                2      let lo = 0, hi = nums.length - 1;
+                3      while (lo <= hi) {
+                4          const mid = Math.floor((lo + hi) / 2);
+                5          if (nums[mid] === target) {
+                6              return mid;
+                7          } else if (nums[mid] < target) {
+                8              lo = mid;
+                9          } else {
+                10             hi = mid - 1;
+                11         }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                1  fun search(nums: IntArray, target: Int): Int {
+                2      var lo = 0; var hi = nums.size - 1
+                3      while (lo <= hi) {
+                4          val mid = (lo + hi) / 2
+                5          if (nums[mid] == target) {
+                6              return mid
+                7          } else if (nums[mid] < target) {
+                8              lo = mid
+                9          } else {
+                10             hi = mid - 1
+                11         }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                1  int search(vector<int>& nums, int target) {
+                2      int lo = 0, hi = nums.size() - 1;
+                3      while (lo <= hi) {
+                4          int mid = (lo + hi) / 2;
+                5          if (nums[mid] == target) {
+                6              return mid;
+                7          } else if (nums[mid] < target) {
+                8              lo = mid;
+                9          } else {
+                10             hi = mid - 1;
+                11         }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                1  func search(nums []int, target int) int {
+                2      lo, hi := 0, len(nums)-1
+                3      for lo <= hi {
+                4          mid := (lo + hi) / 2
+                5          if nums[mid] == target {
+                6              return mid
+                7          } else if nums[mid] < target {
+                8              lo = mid
+                9          } else {
+                10             hi = mid - 1
+                11         }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                1  func search(_ nums: [Int], _ target: Int) -> Int {
+                2      var lo = 0, hi = nums.count - 1
+                3      while lo <= hi {
+                4          let mid = (lo + hi) / 2
+                5          if nums[mid] == target {
+                6              return mid
+                7          } else if nums[mid] < target {
+                8              lo = mid
+                9          } else {
+                10             hi = mid - 1
+                11         }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -170,6 +298,70 @@ internal val algorithmAndDebuggingProblems: List<CodingProblem> = listOf(
         ),
         patternId = "dfs",
         estimatedSeconds = 45,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                void f(int n) {
+                    if (n == 0) return;
+                    f(n - 1);
+                    System.out.print(n + " ");
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function f(n) {
+                    if (n === 0) return;
+                    f(n - 1);
+                    process.stdout.write(n + " ");
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun f(n: Int) {
+                    if (n == 0) return
+                    f(n - 1)
+                    print("${'$'}n ")
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                void f(int n) {
+                    if (n == 0) return;
+                    f(n - 1);
+                    cout << n << " ";
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func f(n int) {
+                    if n == 0 {
+                        return
+                    }
+                    f(n - 1)
+                    fmt.Print(n, " ")
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func f(_ n: Int) {
+                    if n == 0 { return }
+                    f(n - 1)
+                    print(n, terminator: " ")
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -280,6 +472,104 @@ internal val algorithmAndDebuggingProblems: List<CodingProblem> = listOf(
         ),
         patternId = "complexity",
         estimatedSeconds = 45,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                int f(int n) {
+                    int total = 0;
+                    for (int i = 0; i < n; i++) {
+                        int j = 1;
+                        while (j < n) {
+                            total += 1;
+                            j *= 2;
+                        }
+                    }
+                    return total;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function f(n) {
+                    let total = 0;
+                    for (let i = 0; i < n; i++) {
+                        let j = 1;
+                        while (j < n) {
+                            total += 1;
+                            j *= 2;
+                        }
+                    }
+                    return total;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun f(n: Int): Int {
+                    var total = 0
+                    for (i in 0 until n) {
+                        var j = 1
+                        while (j < n) {
+                            total += 1
+                            j *= 2
+                        }
+                    }
+                    return total
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int f(int n) {
+                    int total = 0;
+                    for (int i = 0; i < n; i++) {
+                        int j = 1;
+                        while (j < n) {
+                            total += 1;
+                            j *= 2;
+                        }
+                    }
+                    return total;
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func f(n int) int {
+                    total := 0
+                    for i := 0; i < n; i++ {
+                        j := 1
+                        for j < n {
+                            total++
+                            j *= 2
+                        }
+                    }
+                    return total
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func f(_ n: Int) -> Int {
+                    var total = 0
+                    for _ in 0..<n {
+                        var j = 1
+                        while j < n {
+                            total += 1
+                            j *= 2
+                        }
+                    }
+                    return total
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -336,6 +626,64 @@ internal val algorithmAndDebuggingProblems: List<CodingProblem> = listOf(
         ),
         patternId = "complexity",
         estimatedSeconds = 45,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                int total(int[] nums, int i) {
+                    if (i == nums.length) return 0;
+                    return nums[i] + total(nums, i + 1);
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                function total(nums, i = 0) {
+                    if (i === nums.length) return 0;
+                    return nums[i] + total(nums, i + 1);
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                fun total(nums: IntArray, i: Int = 0): Int {
+                    if (i == nums.size) return 0
+                    return nums[i] + total(nums, i + 1)
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                int total(vector<int>& nums, int i = 0) {
+                    if (i == (int)nums.size()) return 0;
+                    return nums[i] + total(nums, i + 1);
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                func total(nums []int, i int) int {
+                    if i == len(nums) {
+                        return 0
+                    }
+                    return nums[i] + total(nums, i+1)
+                }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                func total(_ nums: [Int], _ i: Int = 0) -> Int {
+                    if i == nums.count { return 0 }
+                    return nums[i] + total(nums, i + 1)
+                }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -393,6 +741,92 @@ internal val algorithmAndDebuggingProblems: List<CodingProblem> = listOf(
         ),
         patternId = "array-traversal",
         estimatedSeconds = 40,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                1  int total(int[] nums) {
+                2      int result = 0;
+                3      int i = 0;
+                4      while (i < nums.length - 1) {
+                5          result += nums[i];
+                6          i += 1;
+                7      }
+                8      return result;
+                9  }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                1  function total(nums) {
+                2      let result = 0;
+                3      let i = 0;
+                4      while (i < nums.length - 1) {
+                5          result += nums[i];
+                6          i += 1;
+                7      }
+                8      return result;
+                9  }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                1  fun total(nums: IntArray): Int {
+                2      var result = 0
+                3      var i = 0
+                4      while (i < nums.size - 1) {
+                5          result += nums[i]
+                6          i += 1
+                7      }
+                8      return result
+                9  }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                1  int total(vector<int>& nums) {
+                2      int result = 0;
+                3      int i = 0;
+                4      while (i < (int)nums.size() - 1) {
+                5          result += nums[i];
+                6          i += 1;
+                7      }
+                8      return result;
+                9  }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                GO,
+                """
+                1  func total(nums []int) int {
+                2      result := 0
+                3      i := 0
+                4      for i < len(nums)-1 {
+                5          result += nums[i]
+                6          i++
+                7      }
+                8      return result
+                9  }
+                """.trimIndent(),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                1  func total(_ nums: [Int]) -> Int {
+                2      var result = 0
+                3      var i = 0
+                4      while i < nums.count - 1 {
+                5          result += nums[i]
+                6          i += 1
+                7      }
+                8      return result
+                9  }
+                """.trimIndent(),
+            ),
+        ),
     ),
 
     CodingProblem(
@@ -451,6 +885,98 @@ internal val algorithmAndDebuggingProblems: List<CodingProblem> = listOf(
         ),
         patternId = "array-traversal",
         estimatedSeconds = 45,
+        languageVariants = listOf(
+            CodeVariant(
+                JAVA,
+                """
+                1  boolean isSorted(int[] nums) {
+                2      for (int i = 0; i < nums.length; i++) {
+                3          if (nums[i] > nums[i + 1]) {
+                4              return false;
+                5          }
+                6      }
+                7      return true;
+                8  }
+                """.trimIndent(),
+                choices = debugIndexBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                JAVASCRIPT,
+                """
+                1  function isSorted(nums) {
+                2      for (let i = 0; i < nums.length; i++) {
+                3          if (nums[i] > nums[i + 1]) {
+                4              return false;
+                5          }
+                6      }
+                7      return true;
+                8  }
+                """.trimIndent(),
+                choices = debugIndexBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                KOTLIN,
+                """
+                1  fun isSorted(nums: IntArray): Boolean {
+                2      for (i in nums.indices) {
+                3          if (nums[i] > nums[i + 1]) {
+                4              return false
+                5          }
+                6      }
+                7      return true
+                8  }
+                """.trimIndent(),
+                choices = debugIndexBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                CPP,
+                """
+                1  bool isSorted(vector<int>& nums) {
+                2      for (int i = 0; i < (int)nums.size(); i++) {
+                3          if (nums[i] > nums[i + 1]) {
+                4              return false;
+                5          }
+                6      }
+                7      return true;
+                8  }
+                """.trimIndent(),
+                choices = debugIndexBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                GO,
+                """
+                1  func isSorted(nums []int) bool {
+                2      for i := 0; i < len(nums); i++ {
+                3          if nums[i] > nums[i+1] {
+                4              return false
+                5          }
+                6      }
+                7      return true
+                8  }
+                """.trimIndent(),
+                choices = debugIndexBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+            CodeVariant(
+                SWIFT,
+                """
+                1  func isSorted(_ nums: [Int]) -> Bool {
+                2      for i in 0..<nums.count {
+                3          if nums[i] > nums[i + 1] {
+                4              return false
+                5          }
+                6      }
+                7      return true
+                8  }
+                """.trimIndent(),
+                choices = debugIndexBraceChoices,
+                correctAnswerIds = listOf("a"),
+            ),
+        ),
     ),
 
     CodingProblem(
