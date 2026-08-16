@@ -240,6 +240,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "return items.toSet().size == items.size",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "def has_duplicate(items):\n    # ???",
+                choices = listOf(
+                    choice("seen = set()\nfor item in items:\n    if item in seen:\n        return True\n    seen.add(item)\nreturn False", true, "A plain set relies only on the item's own equality and hashing, exactly like the original int-array version relied on int's built-in equality - this version is structurally identical, just untyped, since Python generalizes over element type for free.", code = "seen = set()\nfor item in items:\n    if item in seen:\n        return True\n    seen.add(item)\nreturn False"),
+                    choice("seen = set()\nfor item in items:\n    key = str(item)\n    if key in seen:\n        return True\n    seen.add(key)\nreturn False", false, "Deduplicating by str(item) instead of the item itself risks false positives from different values that stringify the same way, like the integer 1 and the string \"1\" - the item's own equality must be honored, which a plain set does automatically and this doesn't.", code = "seen = set()\nfor item in items:\n    key = str(item)\n    if key in seen:\n        return True\n    seen.add(key)\nreturn False"),
+                    choice("return len(set(items)) != len(items)", false, "This is actually also correct and equivalent in behavior - it's a reasonable alternative, but it builds the entire set before comparing sizes rather than being able to return as soon as a duplicate is found, unlike the early-exit version.", code = "return len(set(items)) != len(items)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "static <T> boolean hasDuplicate(List<T> items) {\n    // ???\n}",
+                choices = listOf(
+                    choice("Set<T> seen = new HashSet<>();\nfor (T item : items) if (!seen.add(item)) return true;\nreturn false;", true, "A HashSet<T> relies only on T's equals/hashCode contract, exactly like the original int-array version relied on Integer's built-in equality - the generic version is structurally identical, just parameterized over the element type.", code = "Set<T> seen = new HashSet<>();\nfor (T item : items) if (!seen.add(item)) return true;\nreturn false;"),
+                    choice("Set<Integer> seen = new HashSet<>();\nfor (T item : items) if (!seen.add(item.hashCode())) return true;\nreturn false;", false, "Using only the hash code as the set's element risks false positives from hash collisions between genuinely different objects that happen to share a hash code - equals() must also be honored, which a plain HashSet<T> does automatically and this doesn't.", code = "Set<Integer> seen = new HashSet<>();\nfor (T item : items) if (!seen.add(item.hashCode())) return true;\nreturn false;"),
+                    choice("return new HashSet<>(items).size() != items.size();", false, "This is actually also correct and equivalent in behavior - it's a reasonable alternative, but it builds the entire set before comparing sizes rather than being able to return as soon as a duplicate is found, unlike the early-exit version.", code = "return new HashSet<>(items).size() != items.size();"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "function hasDuplicate(items) {\n    // ???\n}",
+                choices = listOf(
+                    choice("const seen = new Set();\nfor (const item of items) {\n    if (seen.has(item)) return true;\n    seen.add(item);\n}\nreturn false;", true, "A Set relies only on the item's own equality, exactly like the original number-array version relied on that equality for numbers - this version is structurally identical, just untyped, since JavaScript generalizes over element type for free.", code = "const seen = new Set();\nfor (const item of items) {\n    if (seen.has(item)) return true;\n    seen.add(item);\n}\nreturn false;"),
+                    choice("const seen = new Set();\nfor (const item of items) {\n    const key = String(item);\n    if (seen.has(key)) return true;\n    seen.add(key);\n}\nreturn false;", false, "Deduplicating by String(item) instead of the item itself risks false positives from different values that stringify the same way, like the number 1 and the string \"1\" - the item's own equality must be honored, which a plain Set does automatically and this doesn't.", code = "const seen = new Set();\nfor (const item of items) {\n    const key = String(item);\n    if (seen.has(key)) return true;\n    seen.add(key);\n}\nreturn false;"),
+                    choice("return new Set(items).size !== items.length;", false, "This is actually also correct and equivalent in behavior - it's a reasonable alternative, but it builds the entire set before comparing sizes rather than being able to return as soon as a duplicate is found, unlike the early-exit version.", code = "return new Set(items).size !== items.length;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "template <typename T>\nbool hasDuplicate(vector<T>& items) {\n    // ???\n}",
+                choices = listOf(
+                    choice("unordered_set<T> seen;\nfor (auto& item : items) {\n    if (!seen.insert(item).second) return true;\n}\nreturn false;", true, "An unordered_set<T> relies only on T's own equality and hash, exactly like the original int-vector version relied on int's built-in equality - the templated version is structurally identical, just parameterized over the element type.", code = "unordered_set<T> seen;\nfor (auto& item : items) {\n    if (!seen.insert(item).second) return true;\n}\nreturn false;"),
+                    choice("unordered_set<size_t> seen;\nfor (auto& item : items) {\n    size_t h = std::hash<T>{}(item);\n    if (!seen.insert(h).second) return true;\n}\nreturn false;", false, "Using only the hash value as the set's element risks false positives from hash collisions between genuinely different objects that happen to share a hash - equality must also be honored, which a plain unordered_set<T> does automatically and this doesn't.", code = "unordered_set<size_t> seen;\nfor (auto& item : items) {\n    size_t h = std::hash<T>{}(item);\n    if (!seen.insert(h).second) return true;\n}\nreturn false;"),
+                    choice("return unordered_set<T>(items.begin(), items.end()).size() != items.size();", false, "This is actually also correct and equivalent in behavior - it's a reasonable alternative, but it builds the entire set before comparing sizes rather than being able to return as soon as a duplicate is found, unlike the early-exit version.", code = "return unordered_set<T>(items.begin(), items.end()).size() != items.size();"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "func hasDuplicate[T comparable](items []T) bool {\n    // ???\n}",
+                choices = listOf(
+                    choice("seen := map[T]bool{}\nfor _, item := range items {\n    if seen[item] {\n        return true\n    }\n    seen[item] = true\n}\nreturn false", true, "A map keyed by T relies only on T's own equality, exactly like the original int-slice version relied on int's built-in equality - the generic version is structurally identical, just parameterized over the element type via the comparable constraint.", code = "seen := map[T]bool{}\nfor _, item := range items {\n    if seen[item] {\n        return true\n    }\n    seen[item] = true\n}\nreturn false"),
+                    choice("seen := map[string]bool{}\nfor _, item := range items {\n    key := fmt.Sprintf(\"%v\", item)\n    if seen[key] {\n        return true\n    }\n    seen[key] = true\n}\nreturn false", false, "Deduplicating by a formatted string instead of the item itself risks false positives from different values that format the same way - the item's own equality must be honored, which a map keyed by T does automatically and this doesn't.", code = "seen := map[string]bool{}\nfor _, item := range items {\n    key := fmt.Sprintf(\"%v\", item)\n    if seen[key] {\n        return true\n    }\n    seen[key] = true\n}\nreturn false"),
+                    choice("set := map[T]bool{}\nfor _, item := range items {\n    set[item] = true\n}\nreturn len(set) != len(items)", false, "This is actually also correct and equivalent in behavior - it's a reasonable alternative, but it builds the entire set before comparing sizes rather than being able to return as soon as a duplicate is found, unlike the early-exit version.", code = "set := map[T]bool{}\nfor _, item := range items {\n    set[item] = true\n}\nreturn len(set) != len(items)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "func hasDuplicate<T: Hashable>(_ items: [T]) -> Bool {\n    // ???\n}",
+                choices = listOf(
+                    choice("var seen = Set<T>()\nfor item in items {\n    if seen.contains(item) { return true }\n    seen.insert(item)\n}\nreturn false", true, "A Set<T> relies only on T's own Hashable conformance, exactly like the original int-array version relied on Int's built-in equality - the generic version is structurally identical, just parameterized over the element type.", code = "var seen = Set<T>()\nfor item in items {\n    if seen.contains(item) { return true }\n    seen.insert(item)\n}\nreturn false"),
+                    choice("var seen = Set<Int>()\nfor item in items {\n    let h = item.hashValue\n    if seen.contains(h) { return true }\n    seen.insert(h)\n}\nreturn false", false, "Using only the hash value as the set's element risks false positives from hash collisions between genuinely different values that happen to share a hash - equality must also be honored, which a plain Set<T> does automatically and this doesn't.", code = "var seen = Set<Int>()\nfor item in items {\n    let h = item.hashValue\n    if seen.contains(h) { return true }\n    seen.insert(h)\n}\nreturn false"),
+                    choice("return Set(items).count != items.count", false, "This is actually also correct and equivalent in behavior - it's a reasonable alternative, but it builds the entire set before comparing sizes rather than being able to return as soon as a duplicate is found, unlike the early-exit version.", code = "return Set(items).count != items.count"),
+                ),
+            ),
+        ),
     ),
     step(
         "valid-anagram", ARRAYS_HASHING, TIME_COMPLEXITY,
