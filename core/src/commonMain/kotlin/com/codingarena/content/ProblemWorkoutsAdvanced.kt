@@ -1528,6 +1528,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "high--",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "low = 0\nhigh = len(nums) - 1\nwhile low < high:\n    mid = low + (high - low) // 2\n    # ???\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high]:\n    low = mid + 1\nelif nums[mid] < nums[high]:\n    high = mid\nelse:\n    high -= 1", true, "This keeps the standard fast comparison for the two informative cases (strictly greater or strictly less) and only falls back to the slow, safe high -= 1 step specifically when a tie makes the direction genuinely ambiguous - the worst case degrades to O(n) only when it truly must.", code = "if nums[mid] > nums[high]:\n    low = mid + 1\nelif nums[mid] < nums[high]:\n    high = mid\nelse:\n    high -= 1"),
+                    choice("if nums[mid] >= nums[high]:\n    low = mid + 1\nelse:\n    high = mid", false, "Treating a tie the same as \"mid is greater\" can incorrectly discard the side that actually contains the minimum - a tie specifically needs its own cautious handling, not folding into one of the two directional branches.", code = "if nums[mid] >= nums[high]:\n    low = mid + 1\nelse:\n    high = mid"),
+                    choice("high -= 1", false, "Always shrinking high by one, ignoring the comparison entirely, abandons the fast comparison-based narrowing for every single step, degrading every case to O(n) instead of only the specific tied cases that actually require it.", code = "high -= 1"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int low = 0;\nint high = nums.length - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else if (nums[mid] < nums[high]) high = mid; else high--;", true, "This keeps the standard fast comparison for the two informative cases (strictly greater or strictly less) and only falls back to the slow, safe high-- step specifically when a tie makes the direction genuinely ambiguous - the worst case degrades to O(n) only when it truly must.", code = "if (nums[mid] > nums[high]) low = mid + 1; else if (nums[mid] < nums[high]) high = mid; else high--;"),
+                    choice("if (nums[mid] >= nums[high]) low = mid + 1; else high = mid;", false, "Treating a tie the same as \"mid is greater\" can incorrectly discard the side that actually contains the minimum - a tie specifically needs its own cautious handling, not folding into one of the two directional branches.", code = "if (nums[mid] >= nums[high]) low = mid + 1; else high = mid;"),
+                    choice("high--;", false, "Always shrinking high by one, ignoring the comparison entirely, abandons the fast comparison-based narrowing for every single step, degrading every case to O(n) instead of only the specific tied cases that actually require it.", code = "high--;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let low = 0;\nlet high = nums.length - 1;\nwhile (low < high) {\n    const mid = low + Math.floor((high - low) / 2);\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else if (nums[mid] < nums[high]) high = mid; else high--;", true, "This keeps the standard fast comparison for the two informative cases (strictly greater or strictly less) and only falls back to the slow, safe high-- step specifically when a tie makes the direction genuinely ambiguous - the worst case degrades to O(n) only when it truly must.", code = "if (nums[mid] > nums[high]) low = mid + 1; else if (nums[mid] < nums[high]) high = mid; else high--;"),
+                    choice("if (nums[mid] >= nums[high]) low = mid + 1; else high = mid;", false, "Treating a tie the same as \"mid is greater\" can incorrectly discard the side that actually contains the minimum - a tie specifically needs its own cautious handling, not folding into one of the two directional branches.", code = "if (nums[mid] >= nums[high]) low = mid + 1; else high = mid;"),
+                    choice("high--;", false, "Always shrinking high by one, ignoring the comparison entirely, abandons the fast comparison-based narrowing for every single step, degrading every case to O(n) instead of only the specific tied cases that actually require it.", code = "high--;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int low = 0;\nint high = nums.size() - 1;\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    // ???\n}\nreturn nums[low];",
+                choices = listOf(
+                    choice("if (nums[mid] > nums[high]) low = mid + 1; else if (nums[mid] < nums[high]) high = mid; else high--;", true, "This keeps the standard fast comparison for the two informative cases (strictly greater or strictly less) and only falls back to the slow, safe high-- step specifically when a tie makes the direction genuinely ambiguous - the worst case degrades to O(n) only when it truly must.", code = "if (nums[mid] > nums[high]) low = mid + 1; else if (nums[mid] < nums[high]) high = mid; else high--;"),
+                    choice("if (nums[mid] >= nums[high]) low = mid + 1; else high = mid;", false, "Treating a tie the same as \"mid is greater\" can incorrectly discard the side that actually contains the minimum - a tie specifically needs its own cautious handling, not folding into one of the two directional branches.", code = "if (nums[mid] >= nums[high]) low = mid + 1; else high = mid;"),
+                    choice("high--;", false, "Always shrinking high by one, ignoring the comparison entirely, abandons the fast comparison-based narrowing for every single step, degrading every case to O(n) instead of only the specific tied cases that actually require it.", code = "high--;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "low := 0\nhigh := len(nums) - 1\nfor low < high {\n    mid := low + (high-low)/2\n    // ???\n}\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high] {\n    low = mid + 1\n} else if nums[mid] < nums[high] {\n    high = mid\n} else {\n    high--\n}", true, "This keeps the standard fast comparison for the two informative cases (strictly greater or strictly less) and only falls back to the slow, safe high-- step specifically when a tie makes the direction genuinely ambiguous - the worst case degrades to O(n) only when it truly must.", code = "if nums[mid] > nums[high] {\n    low = mid + 1\n} else if nums[mid] < nums[high] {\n    high = mid\n} else {\n    high--\n}"),
+                    choice("if nums[mid] >= nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}", false, "Treating a tie the same as \"mid is greater\" can incorrectly discard the side that actually contains the minimum - a tie specifically needs its own cautious handling, not folding into one of the two directional branches.", code = "if nums[mid] >= nums[high] {\n    low = mid + 1\n} else {\n    high = mid\n}"),
+                    choice("high--", false, "Always shrinking high by one, ignoring the comparison entirely, abandons the fast comparison-based narrowing for every single step, degrading every case to O(n) instead of only the specific tied cases that actually require it.", code = "high--"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var low = 0\nvar high = nums.count - 1\nwhile low < high {\n    let mid = low + (high - low) / 2\n    // ???\n}\nreturn nums[low]",
+                choices = listOf(
+                    choice("if nums[mid] > nums[high] { low = mid + 1 } else if nums[mid] < nums[high] { high = mid } else { high -= 1 }", true, "This keeps the standard fast comparison for the two informative cases (strictly greater or strictly less) and only falls back to the slow, safe high -= 1 step specifically when a tie makes the direction genuinely ambiguous - the worst case degrades to O(n) only when it truly must.", code = "if nums[mid] > nums[high] { low = mid + 1 } else if nums[mid] < nums[high] { high = mid } else { high -= 1 }"),
+                    choice("if nums[mid] >= nums[high] { low = mid + 1 } else { high = mid }", false, "Treating a tie the same as \"mid is greater\" can incorrectly discard the side that actually contains the minimum - a tie specifically needs its own cautious handling, not folding into one of the two directional branches.", code = "if nums[mid] >= nums[high] { low = mid + 1 } else { high = mid }"),
+                    choice("high -= 1", false, "Always shrinking high by one, ignoring the comparison entirely, abandons the fast comparison-based narrowing for every single step, degrading every case to O(n) instead of only the specific tied cases that actually require it.", code = "high -= 1"),
+                ),
+            ),
+        ),
     ),
     step(
         "koko-eating-bananas", BINARY_SEARCH, CODE_BLOCK,
