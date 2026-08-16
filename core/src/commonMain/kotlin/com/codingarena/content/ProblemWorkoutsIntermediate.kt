@@ -531,6 +531,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (s.substring(left, right).contains(' ')) return false",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "left = 0\nright = len(s) - 1\nwhile left < right:\n    while left < right and not s[left].isalnum():\n        left += 1\n    while left < right and not s[right].isalnum():\n        right -= 1\n    # ???\n    left += 1\n    right -= 1\nreturn True",
+                choices = listOf(
+                    choice("if s[left].lower() != s[right].lower():\n    return False", true, "Filtered down to \"raceacar\", the very first comparison is 'r' (left) against 'r' (right) - matching - but the mismatch surfaces two steps in, comparing 'a' against 'a' still matches, then 'c' against 'a' fails, correctly returning False.", code = "if s[left].lower() != s[right].lower():\n    return False"),
+                    choice("if s[left] != s[right]:\n    return False", false, "Without lowercasing, this would incorrectly treat differently-cased matching letters as mismatches, though it happens to still work on this particular all-lowercase example - it's not reliable in general.", code = "if s[left] != s[right]:\n    return False"),
+                    choice("if \" \" in s[left:right]:\n    return False", false, "Checking for a literal space in the remaining substring has nothing to do with comparing the filtered, case-normalized characters at the two pointer positions.", code = "if \" \" in s[left:right]:\n    return False"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int left = 0;\nint right = s.length() - 1;\nwhile (left < right) {\n    while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;\n    while (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;\n    // ???\n    left++;\n    right--;\n}\nreturn true;",
+                choices = listOf(
+                    choice("if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) return false;", true, "Filtered down to \"raceacar\", the very first comparison is 'r' (left) against 'r' (right) - matching - but the mismatch surfaces two steps in, comparing 'a' against 'a' still matches, then 'c' against 'a' fails, correctly returning false.", code = "if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) return false;"),
+                    choice("if (s.charAt(left) != s.charAt(right)) return false;", false, "Without lowercasing, this would incorrectly treat differently-cased matching letters as mismatches, though it happens to still work on this particular all-lowercase example - it's not reliable in general.", code = "if (s.charAt(left) != s.charAt(right)) return false;"),
+                    choice("if (s.substring(left, right).contains(\" \")) return false;", false, "Checking for a literal space in the remaining substring has nothing to do with comparing the filtered, case-normalized characters at the two pointer positions.", code = "if (s.substring(left, right).contains(\" \")) return false;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let left = 0;\nlet right = s.length - 1;\nwhile (left < right) {\n    while (left < right && !/[a-z0-9]/i.test(s[left])) left++;\n    while (left < right && !/[a-z0-9]/i.test(s[right])) right--;\n    // ???\n    left++;\n    right--;\n}\nreturn true;",
+                choices = listOf(
+                    choice("if (s[left].toLowerCase() !== s[right].toLowerCase()) return false;", true, "Filtered down to \"raceacar\", the very first comparison is 'r' (left) against 'r' (right) - matching - but the mismatch surfaces two steps in, comparing 'a' against 'a' still matches, then 'c' against 'a' fails, correctly returning false.", code = "if (s[left].toLowerCase() !== s[right].toLowerCase()) return false;"),
+                    choice("if (s[left] !== s[right]) return false;", false, "Without lowercasing, this would incorrectly treat differently-cased matching letters as mismatches, though it happens to still work on this particular all-lowercase example - it's not reliable in general.", code = "if (s[left] !== s[right]) return false;"),
+                    choice("if (s.slice(left, right).includes(\" \")) return false;", false, "Checking for a literal space in the remaining substring has nothing to do with comparing the filtered, case-normalized characters at the two pointer positions.", code = "if (s.slice(left, right).includes(\" \")) return false;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int left = 0;\nint right = s.size() - 1;\nwhile (left < right) {\n    while (left < right && !isalnum(s[left])) left++;\n    while (left < right && !isalnum(s[right])) right--;\n    // ???\n    left++;\n    right--;\n}\nreturn true;",
+                choices = listOf(
+                    choice("if (tolower(s[left]) != tolower(s[right])) return false;", true, "Filtered down to \"raceacar\", the very first comparison is 'r' (left) against 'r' (right) - matching - but the mismatch surfaces two steps in, comparing 'a' against 'a' still matches, then 'c' against 'a' fails, correctly returning false.", code = "if (tolower(s[left]) != tolower(s[right])) return false;"),
+                    choice("if (s[left] != s[right]) return false;", false, "Without lowercasing, this would incorrectly treat differently-cased matching letters as mismatches, though it happens to still work on this particular all-lowercase example - it's not reliable in general.", code = "if (s[left] != s[right]) return false;"),
+                    choice("if (s.substr(left, right - left).find(' ') != string::npos) return false;", false, "Checking for a literal space in the remaining substring has nothing to do with comparing the filtered, case-normalized characters at the two pointer positions.", code = "if (s.substr(left, right - left).find(' ') != string::npos) return false;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "left := 0\nright := len(s) - 1\nfor left < right {\n    for left < right && !isAlnum(s[left]) {\n        left++\n    }\n    for left < right && !isAlnum(s[right]) {\n        right--\n    }\n    // ???\n    left++\n    right--\n}\nreturn true",
+                choices = listOf(
+                    choice("if unicode.ToLower(rune(s[left])) != unicode.ToLower(rune(s[right])) {\n    return false\n}", true, "Filtered down to \"raceacar\", the very first comparison is 'r' (left) against 'r' (right) - matching - but the mismatch surfaces two steps in, comparing 'a' against 'a' still matches, then 'c' against 'a' fails, correctly returning false.", code = "if unicode.ToLower(rune(s[left])) != unicode.ToLower(rune(s[right])) {\n    return false\n}"),
+                    choice("if s[left] != s[right] {\n    return false\n}", false, "Without lowercasing, this would incorrectly treat differently-cased matching letters as mismatches, though it happens to still work on this particular all-lowercase example - it's not reliable in general.", code = "if s[left] != s[right] {\n    return false\n}"),
+                    choice("if strings.Contains(s[left:right], \" \") {\n    return false\n}", false, "Checking for a literal space in the remaining substring has nothing to do with comparing the filtered, case-normalized characters at the two pointer positions.", code = "if strings.Contains(s[left:right], \" \") {\n    return false\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "let chars = Array(s)\nvar left = 0\nvar right = chars.count - 1\nwhile left < right {\n    while left < right && !(chars[left].isLetter || chars[left].isNumber) { left += 1 }\n    while left < right && !(chars[right].isLetter || chars[right].isNumber) { right -= 1 }\n    // ???\n    left += 1\n    right -= 1\n}\nreturn true",
+                choices = listOf(
+                    choice("if Character(chars[left].lowercased()) != Character(chars[right].lowercased()) { return false }", true, "Filtered down to \"raceacar\", the very first comparison is 'r' (left) against 'r' (right) - matching - but the mismatch surfaces two steps in, comparing 'a' against 'a' still matches, then 'c' against 'a' fails, correctly returning false.", code = "if Character(chars[left].lowercased()) != Character(chars[right].lowercased()) { return false }"),
+                    choice("if chars[left] != chars[right] { return false }", false, "Without lowercasing, this would incorrectly treat differently-cased matching letters as mismatches, though it happens to still work on this particular all-lowercase example - it's not reliable in general.", code = "if chars[left] != chars[right] { return false }"),
+                    choice("if chars[left..<right].contains(\" \") { return false }", false, "Checking for a literal space in the remaining substring has nothing to do with comparing the filtered, case-normalized characters at the two pointer positions.", code = "if chars[left..<right].contains(\" \") { return false }"),
+                ),
+            ),
+        ),
     ),
     step(
         "3sum", TWO_POINTERS, CODE_BLOCK,
@@ -555,6 +611,62 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Manually incrementing i from inside the inner while loop conflicts with the outer for loop's own iteration over i, producing unpredictable skipping rather than the intended duplicate-avoidance behavior.",
                 code = "if (sum < 0) left++ else if (sum > 0) right-- else { result.add(listOf(nums[i], nums[left], nums[right])); left++; right--; i++ }",
+            ),
+        ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "for i in range(len(nums)):\n    if i > 0 and nums[i] == nums[i - 1]:\n        continue\n    left = i + 1\n    right = len(nums) - 1\n    while left < right:\n        total = nums[i] + nums[left] + nums[right]\n        # ???",
+                choices = listOf(
+                    choice("if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1\n    while left < right and nums[left] == nums[left - 1]:\n        left += 1", true, "Skipping the duplicate fixed index (i=2, the second -1) avoids re-deriving [-1,-1,2] from scratch, and skipping duplicate left values after a match keeps [-1,0,1] from being recorded twice within the same fixed index either.", code = "if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1\n    while left < right and nums[left] == nums[left - 1]:\n        left += 1"),
+                    choice("if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1", false, "Without the inner while-skip after a match, the fixed index at the second -1 (i=2) still gets skipped by the outer check, but a duplicate value adjacent to left or right within the same fixed index could still produce a repeated triplet.", code = "if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1"),
+                    choice("if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1\n    i += 1", false, "Manually incrementing i has no effect here - Python's for-in over range() always advances to the next value in the range regardless of what the body does to the loop variable, so this doesn't skip anything at all.", code = "if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1\n    i += 1"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "for (int i = 0; i < nums.length; i++) {\n    if (i > 0 && nums[i] == nums[i - 1]) continue;\n    int left = i + 1;\n    int right = nums.length - 1;\n    while (left < right) {\n        int sum = nums[i] + nums[left] + nums[right];\n        // ???\n    }\n}",
+                choices = listOf(
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; while (left < right && nums[left] == nums[left - 1]) left++; }", true, "Skipping the duplicate fixed index (i=2, the second -1) avoids re-deriving [-1,-1,2] from scratch, and skipping duplicate left values after a match keeps [-1,0,1] from being recorded twice within the same fixed index either.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; while (left < right && nums[left] == nums[left - 1]) left++; }"),
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; }", false, "Without the inner while-skip after a match, the fixed index at the second -1 (i=2) still gets skipped by the outer check, but a duplicate value adjacent to left or right within the same fixed index could still produce a repeated triplet.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; }"),
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; i++; }", false, "Manually incrementing i from inside the inner while loop conflicts with the outer for loop's own increment of i, producing unpredictable skipping rather than the intended duplicate-avoidance behavior.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; i++; }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "for (let i = 0; i < nums.length; i++) {\n    if (i > 0 && nums[i] === nums[i - 1]) continue;\n    let left = i + 1;\n    let right = nums.length - 1;\n    while (left < right) {\n        const sum = nums[i] + nums[left] + nums[right];\n        // ???\n    }\n}",
+                choices = listOf(
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; while (left < right && nums[left] === nums[left - 1]) left++; }", true, "Skipping the duplicate fixed index (i=2, the second -1) avoids re-deriving [-1,-1,2] from scratch, and skipping duplicate left values after a match keeps [-1,0,1] from being recorded twice within the same fixed index either.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; while (left < right && nums[left] === nums[left - 1]) left++; }"),
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; }", false, "Without the inner while-skip after a match, the fixed index at the second -1 (i=2) still gets skipped by the outer check, but a duplicate value adjacent to left or right within the same fixed index could still produce a repeated triplet.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; }"),
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; i++; }", false, "Manually incrementing i from inside the inner while loop conflicts with the outer for loop's own increment of i, producing unpredictable skipping rather than the intended duplicate-avoidance behavior.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; i++; }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "for (int i = 0; i < (int)nums.size(); i++) {\n    if (i > 0 && nums[i] == nums[i - 1]) continue;\n    int left = i + 1;\n    int right = nums.size() - 1;\n    while (left < right) {\n        int sum = nums[i] + nums[left] + nums[right];\n        // ???\n    }\n}",
+                choices = listOf(
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; while (left < right && nums[left] == nums[left - 1]) left++; }", true, "Skipping the duplicate fixed index (i=2, the second -1) avoids re-deriving [-1,-1,2] from scratch, and skipping duplicate left values after a match keeps [-1,0,1] from being recorded twice within the same fixed index either.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; while (left < right && nums[left] == nums[left - 1]) left++; }"),
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; }", false, "Without the inner while-skip after a match, the fixed index at the second -1 (i=2) still gets skipped by the outer check, but a duplicate value adjacent to left or right within the same fixed index could still produce a repeated triplet.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; }"),
+                    choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; i++; }", false, "Manually incrementing i from inside the inner while loop conflicts with the outer for loop's own increment of i, producing unpredictable skipping rather than the intended duplicate-avoidance behavior.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; i++; }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "for i := 0; i < len(nums); i++ {\n    if i > 0 && nums[i] == nums[i-1] {\n        continue\n    }\n    left := i + 1\n    right := len(nums) - 1\n    for left < right {\n        sum := nums[i] + nums[left] + nums[right]\n        // ???\n    }\n}",
+                choices = listOf(
+                    choice("if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n    for left < right && nums[left] == nums[left-1] {\n        left++\n    }\n}", true, "Skipping the duplicate fixed index (i=2, the second -1) avoids re-deriving [-1,-1,2] from scratch, and skipping duplicate left values after a match keeps [-1,0,1] from being recorded twice within the same fixed index either.", code = "if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n    for left < right && nums[left] == nums[left-1] {\n        left++\n    }\n}"),
+                    choice("if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n}", false, "Without the inner skip after a match, the fixed index at the second -1 (i=2) still gets skipped by the outer check, but a duplicate value adjacent to left or right within the same fixed index could still produce a repeated triplet.", code = "if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n}"),
+                    choice("if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n    i++\n}", false, "Manually incrementing i from inside the inner loop conflicts with the outer for loop's own increment of i, producing unpredictable skipping rather than the intended duplicate-avoidance behavior.", code = "if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n    i++\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "for i in 0..<nums.count {\n    if i > 0 && nums[i] == nums[i - 1] { continue }\n    var left = i + 1\n    var right = nums.count - 1\n    while left < right {\n        let sum = nums[i] + nums[left] + nums[right]\n        // ???\n    }\n}",
+                choices = listOf(
+                    choice("if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1; while left < right && nums[left] == nums[left - 1] { left += 1 } }", true, "Skipping the duplicate fixed index (i=2, the second -1) avoids re-deriving [-1,-1,2] from scratch, and skipping duplicate left values after a match keeps [-1,0,1] from being recorded twice within the same fixed index either.", code = "if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1; while left < right && nums[left] == nums[left - 1] { left += 1 } }"),
+                    choice("if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }", false, "Without the inner while-skip after a match, the fixed index at the second -1 (i=2) still gets skipped by the outer check, but a duplicate value adjacent to left or right within the same fixed index could still produce a repeated triplet.", code = "if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }"),
+                    choice("if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }\ni += 1", false, "Swift's for-in loop variable is immutable, so manually incrementing i like this would not even compile - it conflicts with the outer loop's own iteration rather than cleanly skipping anything.", code = "if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }\ni += 1"),
+                ),
             ),
         ),
     ),
