@@ -6,7 +6,14 @@ import com.codingarena.domain.model.PatternGroup.SLIDING_WINDOW
 import com.codingarena.domain.model.PatternGroup.STACK
 import com.codingarena.domain.model.PatternGroup.TWO_POINTERS
 import com.codingarena.domain.model.PracticeDifficulty.DEVELOPING
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.PYTHON
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
 import com.codingarena.domain.model.WorkoutChoice
+import com.codingarena.domain.model.WorkoutCodeVariant
 import com.codingarena.domain.model.WorkoutStep
 import com.codingarena.domain.model.WorkoutStepKind.APPROACH
 import com.codingarena.domain.model.WorkoutStepKind.BOUNDARY_UPDATE
@@ -187,6 +194,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 false,
                 "Only inserting a value the first time it's seen can cause a later, valid complement to be missed if an earlier duplicate's index was the one actually needed.",
                 code = "if (seen.containsKey(complement)) return intArrayOf(seen[complement]!!, i)\nif (!seen.containsKey(nums[i])) seen[nums[i]] = i",
+            ),
+        ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "seen = {}\nfor i in range(len(nums)):\n    complement = target - nums[i]\n    # ???",
+                choices = listOf(
+                    choice("if complement in seen:\n    return [seen[complement], i]\nseen[nums[i]] = i", true, "Checking for the complement before inserting the current index means an index can never be paired with itself, even when the target is exactly double the current value.", code = "if complement in seen:\n    return [seen[complement], i]\nseen[nums[i]] = i"),
+                    choice("seen[nums[i]] = i\nif complement in seen and seen[complement] != i:\n    return [seen[complement], i]", false, "Inserting before checking, then trying to filter out self-matches with an index comparison, is fragile - it happens to work here but adds an unnecessary special case that the check-before-insert order avoids entirely.", code = "seen[nums[i]] = i\nif complement in seen and seen[complement] != i:\n    return [seen[complement], i]"),
+                    choice("if complement in seen:\n    return [seen[complement], i]\nif nums[i] not in seen:\n    seen[nums[i]] = i", false, "Only inserting a value the first time it's seen can cause a later, valid complement to be missed if an earlier duplicate's index was the one actually needed.", code = "if complement in seen:\n    return [seen[complement], i]\nif nums[i] not in seen:\n    seen[nums[i]] = i"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Map<Integer, Integer> seen = new HashMap<>();\nfor (int i = 0; i < nums.length; i++) {\n    int complement = target - nums[i];\n    // ???\n}",
+                choices = listOf(
+                    choice("if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);", true, "Checking for the complement before inserting the current index means an index can never be paired with itself, even when the target is exactly double the current value.", code = "if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nseen.put(nums[i], i);"),
+                    choice("seen.put(nums[i], i);\nif (seen.containsKey(complement) && seen.get(complement) != i) return new int[]{seen.get(complement), i};", false, "Inserting before checking, then trying to filter out self-matches with an index comparison, is fragile - it happens to work here but adds an unnecessary special case that the check-before-insert order avoids entirely.", code = "seen.put(nums[i], i);\nif (seen.containsKey(complement) && seen.get(complement) != i) return new int[]{seen.get(complement), i};"),
+                    choice("if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nif (!seen.containsKey(nums[i])) seen.put(nums[i], i);", false, "Only inserting a value the first time it's seen can cause a later, valid complement to be missed if an earlier duplicate's index was the one actually needed.", code = "if (seen.containsKey(complement)) return new int[]{seen.get(complement), i};\nif (!seen.containsKey(nums[i])) seen.put(nums[i], i);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const seen = new Map();\nfor (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    // ???\n}",
+                choices = listOf(
+                    choice("if (seen.has(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);", true, "Checking for the complement before inserting the current index means an index can never be paired with itself, even when the target is exactly double the current value.", code = "if (seen.has(complement)) return [seen.get(complement), i];\nseen.set(nums[i], i);"),
+                    choice("seen.set(nums[i], i);\nif (seen.has(complement) && seen.get(complement) !== i) return [seen.get(complement), i];", false, "Inserting before checking, then trying to filter out self-matches with an index comparison, is fragile - it happens to work here but adds an unnecessary special case that the check-before-insert order avoids entirely.", code = "seen.set(nums[i], i);\nif (seen.has(complement) && seen.get(complement) !== i) return [seen.get(complement), i];"),
+                    choice("if (seen.has(complement)) return [seen.get(complement), i];\nif (!seen.has(nums[i])) seen.set(nums[i], i);", false, "Only inserting a value the first time it's seen can cause a later, valid complement to be missed if an earlier duplicate's index was the one actually needed.", code = "if (seen.has(complement)) return [seen.get(complement), i];\nif (!seen.has(nums[i])) seen.set(nums[i], i);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "unordered_map<int, int> seen;\nfor (int i = 0; i < (int)nums.size(); i++) {\n    int complement = target - nums[i];\n    // ???\n}",
+                choices = listOf(
+                    choice("if (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;", true, "Checking for the complement before inserting the current index means an index can never be paired with itself, even when the target is exactly double the current value.", code = "if (seen.count(complement)) return {seen[complement], i};\nseen[nums[i]] = i;"),
+                    choice("seen[nums[i]] = i;\nif (seen.count(complement) && seen[complement] != i) return {seen[complement], i};", false, "Inserting before checking, then trying to filter out self-matches with an index comparison, is fragile - it happens to work here but adds an unnecessary special case that the check-before-insert order avoids entirely.", code = "seen[nums[i]] = i;\nif (seen.count(complement) && seen[complement] != i) return {seen[complement], i};"),
+                    choice("if (seen.count(complement)) return {seen[complement], i};\nif (!seen.count(nums[i])) seen[nums[i]] = i;", false, "Only inserting a value the first time it's seen can cause a later, valid complement to be missed if an earlier duplicate's index was the one actually needed.", code = "if (seen.count(complement)) return {seen[complement], i};\nif (!seen.count(nums[i])) seen[nums[i]] = i;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "seen := map[int]int{}\nfor i := 0; i < len(nums); i++ {\n    complement := target - nums[i]\n    // ???\n}",
+                choices = listOf(
+                    choice("if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nseen[nums[i]] = i", true, "Checking for the complement before inserting the current index means an index can never be paired with itself, even when the target is exactly double the current value.", code = "if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nseen[nums[i]] = i"),
+                    choice("seen[nums[i]] = i\nif j, ok := seen[complement]; ok && j != i {\n    return []int{j, i}\n}", false, "Inserting before checking, then trying to filter out self-matches with an index comparison, is fragile - it happens to work here but adds an unnecessary special case that the check-before-insert order avoids entirely.", code = "seen[nums[i]] = i\nif j, ok := seen[complement]; ok && j != i {\n    return []int{j, i}\n}"),
+                    choice("if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nif _, ok := seen[nums[i]]; !ok {\n    seen[nums[i]] = i\n}", false, "Only inserting a value the first time it's seen can cause a later, valid complement to be missed if an earlier duplicate's index was the one actually needed.", code = "if j, ok := seen[complement]; ok {\n    return []int{j, i}\n}\nif _, ok := seen[nums[i]]; !ok {\n    seen[nums[i]] = i\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var seen: [Int: Int] = [:]\nfor i in 0..<nums.count {\n    let complement = target - nums[i]\n    // ???\n}",
+                choices = listOf(
+                    choice("if let j = seen[complement] { return [j, i] }\nseen[nums[i]] = i", true, "Checking for the complement before inserting the current index means an index can never be paired with itself, even when the target is exactly double the current value.", code = "if let j = seen[complement] { return [j, i] }\nseen[nums[i]] = i"),
+                    choice("seen[nums[i]] = i\nif let j = seen[complement], j != i { return [j, i] }", false, "Inserting before checking, then trying to filter out self-matches with an index comparison, is fragile - it happens to work here but adds an unnecessary special case that the check-before-insert order avoids entirely.", code = "seen[nums[i]] = i\nif let j = seen[complement], j != i { return [j, i] }"),
+                    choice("if let j = seen[complement] { return [j, i] }\nif seen[nums[i]] == nil { seen[nums[i]] = i }", false, "Only inserting a value the first time it's seen can cause a later, valid complement to be missed if an earlier duplicate's index was the one actually needed.", code = "if let j = seen[complement] { return [j, i] }\nif seen[nums[i]] == nil { seen[nums[i]] = i }"),
+                ),
             ),
         ),
     ),
