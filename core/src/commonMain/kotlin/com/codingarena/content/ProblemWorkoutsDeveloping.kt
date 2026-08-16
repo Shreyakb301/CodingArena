@@ -838,6 +838,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "minLen = minOf(minLen, right - left)",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "left = 0\nsum_ = 0\nmin_len = float(\"inf\")\nfor right in range(len(nums)):\n    sum_ += nums[right]\n    while sum_ >= target:\n        # ???\n        sum_ -= nums[left]\n        left += 1",
+                choices = listOf(
+                    choice("min_len = min(min_len, right - left + 1)", true, "Using the current loop variable right (not a stale copy) alongside the current left correctly measures the window's true current length before it shrinks further.", code = "min_len = min(min_len, right - left + 1)"),
+                    choice("min_len = min(min_len, len(nums) - left)", false, "Using the array's total size instead of the current right position measures the wrong span - it doesn't reflect where the window's right edge actually is at this point in the loop.", code = "min_len = min(min_len, len(nums) - left)"),
+                    choice("min_len = min(min_len, right - left)", false, "Omitting the + 1 undercounts the window's length by one - a window spanning indices left through right inclusive has right - left + 1 elements, not right - left.", code = "min_len = min(min_len, right - left)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "int left = 0;\nint sum = 0;\nint minLen = Integer.MAX_VALUE;\nfor (int right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    while (sum >= target) {\n        // ???\n        sum -= nums[left];\n        left++;\n    }\n}",
+                choices = listOf(
+                    choice("minLen = Math.min(minLen, right - left + 1);", true, "Using the current loop variable right (not a stale copy) alongside the current left correctly measures the window's true current length before it shrinks further.", code = "minLen = Math.min(minLen, right - left + 1);"),
+                    choice("minLen = Math.min(minLen, nums.length - left);", false, "Using the array's total size instead of the current right position measures the wrong span - it doesn't reflect where the window's right edge actually is at this point in the loop.", code = "minLen = Math.min(minLen, nums.length - left);"),
+                    choice("minLen = Math.min(minLen, right - left);", false, "Omitting the + 1 undercounts the window's length by one - a window spanning indices left through right inclusive has right - left + 1 elements, not right - left.", code = "minLen = Math.min(minLen, right - left);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "let left = 0;\nlet sum = 0;\nlet minLen = Infinity;\nfor (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    while (sum >= target) {\n        // ???\n        sum -= nums[left];\n        left++;\n    }\n}",
+                choices = listOf(
+                    choice("minLen = Math.min(minLen, right - left + 1);", true, "Using the current loop variable right (not a stale copy) alongside the current left correctly measures the window's true current length before it shrinks further.", code = "minLen = Math.min(minLen, right - left + 1);"),
+                    choice("minLen = Math.min(minLen, nums.length - left);", false, "Using the array's total size instead of the current right position measures the wrong span - it doesn't reflect where the window's right edge actually is at this point in the loop.", code = "minLen = Math.min(minLen, nums.length - left);"),
+                    choice("minLen = Math.min(minLen, right - left);", false, "Omitting the + 1 undercounts the window's length by one - a window spanning indices left through right inclusive has right - left + 1 elements, not right - left.", code = "minLen = Math.min(minLen, right - left);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "int left = 0;\nint sum = 0;\nint minLen = INT_MAX;\nfor (int right = 0; right < (int)nums.size(); right++) {\n    sum += nums[right];\n    while (sum >= target) {\n        // ???\n        sum -= nums[left];\n        left++;\n    }\n}",
+                choices = listOf(
+                    choice("minLen = min(minLen, right - left + 1);", true, "Using the current loop variable right (not a stale copy) alongside the current left correctly measures the window's true current length before it shrinks further.", code = "minLen = min(minLen, right - left + 1);"),
+                    choice("minLen = min(minLen, (int)nums.size() - left);", false, "Using the array's total size instead of the current right position measures the wrong span - it doesn't reflect where the window's right edge actually is at this point in the loop.", code = "minLen = min(minLen, (int)nums.size() - left);"),
+                    choice("minLen = min(minLen, right - left);", false, "Omitting the + 1 undercounts the window's length by one - a window spanning indices left through right inclusive has right - left + 1 elements, not right - left.", code = "minLen = min(minLen, right - left);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "left := 0\nsum := 0\nminLen := math.MaxInt32\nfor right := 0; right < len(nums); right++ {\n    sum += nums[right]\n    for sum >= target {\n        // ???\n        sum -= nums[left]\n        left++\n    }\n}",
+                choices = listOf(
+                    choice("if right-left+1 < minLen {\n    minLen = right - left + 1\n}", true, "Using the current loop variable right (not a stale copy) alongside the current left correctly measures the window's true current length before it shrinks further.", code = "if right-left+1 < minLen {\n    minLen = right - left + 1\n}"),
+                    choice("if len(nums)-left < minLen {\n    minLen = len(nums) - left\n}", false, "Using the array's total size instead of the current right position measures the wrong span - it doesn't reflect where the window's right edge actually is at this point in the loop.", code = "if len(nums)-left < minLen {\n    minLen = len(nums) - left\n}"),
+                    choice("if right-left < minLen {\n    minLen = right - left\n}", false, "Omitting the + 1 undercounts the window's length by one - a window spanning indices left through right inclusive has right - left + 1 elements, not right - left.", code = "if right-left < minLen {\n    minLen = right - left\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var left = 0\nvar sum = 0\nvar minLen = Int.max\nfor right in 0..<nums.count {\n    sum += nums[right]\n    while sum >= target {\n        // ???\n        sum -= nums[left]\n        left += 1\n    }\n}",
+                choices = listOf(
+                    choice("minLen = min(minLen, right - left + 1)", true, "Using the current loop variable right (not a stale copy) alongside the current left correctly measures the window's true current length before it shrinks further.", code = "minLen = min(minLen, right - left + 1)"),
+                    choice("minLen = min(minLen, nums.count - left)", false, "Using the array's total size instead of the current right position measures the wrong span - it doesn't reflect where the window's right edge actually is at this point in the loop.", code = "minLen = min(minLen, nums.count - left)"),
+                    choice("minLen = min(minLen, right - left)", false, "Omitting the + 1 undercounts the window's length by one - a window spanning indices left through right inclusive has right - left + 1 elements, not right - left.", code = "minLen = min(minLen, right - left)"),
+                ),
+            ),
+        ),
     ),
     step(
         "longest-substring-without-repeating-characters", SLIDING_WINDOW, CODE_BLOCK,
