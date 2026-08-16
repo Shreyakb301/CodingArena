@@ -1264,6 +1264,62 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (stack.last() == minStack.last()) { stack.removeLast(); minStack.removeLast() } else { stack.removeLast() }",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "stack = []\nmin_stack = []\ndef pop():\n    # ???",
+                choices = listOf(
+                    choice("stack.pop()\nmin_stack.pop()", true, "Popping from both stacks together on every pop() call keeps them the exact same size, which is what lets min_stack's top always correctly reflect the minimum of whatever remains on the main stack.", code = "stack.pop()\nmin_stack.pop()"),
+                    choice("stack.pop()", false, "Popping only the main stack leaves min_stack one entry too large, so its top would still reflect a minimum that includes the value that was just removed - getMin would then be wrong.", code = "stack.pop()"),
+                    choice("if stack[-1] == min_stack[-1]:\n    stack.pop()\n    min_stack.pop()\nelse:\n    stack.pop()", false, "Only popping the min-stack when the popped value happens to equal the current minimum breaks the assumption that both stacks stay the same size - since every push added to both, every pop needs to remove from both too.", code = "if stack[-1] == min_stack[-1]:\n    stack.pop()\n    min_stack.pop()\nelse:\n    stack.pop()"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Deque<Integer> stack = new ArrayDeque<>();\nDeque<Integer> minStack = new ArrayDeque<>();\nvoid pop() {\n    // ???\n}",
+                choices = listOf(
+                    choice("stack.removeLast();\nminStack.removeLast();", true, "Popping from both stacks together on every pop() call keeps them the exact same size, which is what lets minStack's top always correctly reflect the minimum of whatever remains on the main stack.", code = "stack.removeLast();\nminStack.removeLast();"),
+                    choice("stack.removeLast();", false, "Popping only the main stack leaves minStack one entry too large, so its top would still reflect a minimum that includes the value that was just removed - getMin would then be wrong.", code = "stack.removeLast();"),
+                    choice("if (stack.peekLast().equals(minStack.peekLast())) { stack.removeLast(); minStack.removeLast(); } else { stack.removeLast(); }", false, "Only popping the min-stack when the popped value happens to equal the current minimum breaks the assumption that both stacks stay the same size - since every push added to both, every pop needs to remove from both too.", code = "if (stack.peekLast().equals(minStack.peekLast())) { stack.removeLast(); minStack.removeLast(); } else { stack.removeLast(); }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const stack = [];\nconst minStack = [];\nfunction pop() {\n    // ???\n}",
+                choices = listOf(
+                    choice("stack.pop();\nminStack.pop();", true, "Popping from both stacks together on every pop() call keeps them the exact same size, which is what lets minStack's top always correctly reflect the minimum of whatever remains on the main stack.", code = "stack.pop();\nminStack.pop();"),
+                    choice("stack.pop();", false, "Popping only the main stack leaves minStack one entry too large, so its top would still reflect a minimum that includes the value that was just removed - getMin would then be wrong.", code = "stack.pop();"),
+                    choice("if (stack[stack.length - 1] === minStack[minStack.length - 1]) { stack.pop(); minStack.pop(); } else { stack.pop(); }", false, "Only popping the min-stack when the popped value happens to equal the current minimum breaks the assumption that both stacks stay the same size - since every push added to both, every pop needs to remove from both too.", code = "if (stack[stack.length - 1] === minStack[minStack.length - 1]) { stack.pop(); minStack.pop(); } else { stack.pop(); }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "vector<int> stack;\nvector<int> minStack;\nvoid pop() {\n    // ???\n}",
+                choices = listOf(
+                    choice("stack.pop_back();\nminStack.pop_back();", true, "Popping from both stacks together on every pop() call keeps them the exact same size, which is what lets minStack's top always correctly reflect the minimum of whatever remains on the main stack.", code = "stack.pop_back();\nminStack.pop_back();"),
+                    choice("stack.pop_back();", false, "Popping only the main stack leaves minStack one entry too large, so its top would still reflect a minimum that includes the value that was just removed - getMin would then be wrong.", code = "stack.pop_back();"),
+                    choice("if (stack.back() == minStack.back()) { stack.pop_back(); minStack.pop_back(); } else { stack.pop_back(); }", false, "Only popping the min-stack when the popped value happens to equal the current minimum breaks the assumption that both stacks stay the same size - since every push added to both, every pop needs to remove from both too.", code = "if (stack.back() == minStack.back()) { stack.pop_back(); minStack.pop_back(); } else { stack.pop_back(); }"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "var stack []int\nvar minStack []int\nfunc pop() {\n    // ???\n}",
+                choices = listOf(
+                    choice("stack = stack[:len(stack)-1]\nminStack = minStack[:len(minStack)-1]", true, "Popping from both stacks together on every pop() call keeps them the exact same size, which is what lets minStack's top always correctly reflect the minimum of whatever remains on the main stack.", code = "stack = stack[:len(stack)-1]\nminStack = minStack[:len(minStack)-1]"),
+                    choice("stack = stack[:len(stack)-1]", false, "Popping only the main stack leaves minStack one entry too large, so its top would still reflect a minimum that includes the value that was just removed - getMin would then be wrong.", code = "stack = stack[:len(stack)-1]"),
+                    choice("if stack[len(stack)-1] == minStack[len(minStack)-1] {\n    stack = stack[:len(stack)-1]\n    minStack = minStack[:len(minStack)-1]\n} else {\n    stack = stack[:len(stack)-1]\n}", false, "Only popping the min-stack when the popped value happens to equal the current minimum breaks the assumption that both stacks stay the same size - since every push added to both, every pop needs to remove from both too.", code = "if stack[len(stack)-1] == minStack[len(minStack)-1] {\n    stack = stack[:len(stack)-1]\n    minStack = minStack[:len(minStack)-1]\n} else {\n    stack = stack[:len(stack)-1]\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var stack: [Int] = []\nvar minStack: [Int] = []\nfunc pop() {\n    // ???\n}",
+                choices = listOf(
+                    choice("stack.removeLast()\nminStack.removeLast()", true, "Popping from both stacks together on every pop() call keeps them the exact same size, which is what lets minStack's top always correctly reflect the minimum of whatever remains on the main stack.", code = "stack.removeLast()\nminStack.removeLast()"),
+                    choice("stack.removeLast()", false, "Popping only the main stack leaves minStack one entry too large, so its top would still reflect a minimum that includes the value that was just removed - getMin would then be wrong.", code = "stack.removeLast()"),
+                    choice("if stack.last == minStack.last { stack.removeLast(); minStack.removeLast() } else { stack.removeLast() }", false, "Only popping the min-stack when the popped value happens to equal the current minimum breaks the assumption that both stacks stay the same size - since every push added to both, every pop needs to remove from both too.", code = "if stack.last == minStack.last { stack.removeLast(); minStack.removeLast() } else { stack.removeLast() }"),
+                ),
+            ),
+        ),
     ),
     step(
         "min-stack", STACK, TIME_COMPLEXITY,
