@@ -1268,6 +1268,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "stack.addLast(v - min)",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "stack = []  # stores either the raw value, or an encoded delta\nmin_val = float(\"inf\")\ndef push(v):\n    # ???",
+                choices = listOf(
+                    choice("global min_val\nif not stack:\n    stack.append(v)\n    min_val = v\nelse:\n    stack.append(v - min_val)\n    if v < min_val:\n        min_val = v", true, "Storing v - min_val (which is negative exactly when v becomes the new minimum) lets a single running minimum, updated alongside each push, recover both the original value and the minimum at every level during pop - the min-stack's whole extra list is eliminated in exchange for this bookkeeping.", code = "global min_val\nif not stack:\n    stack.append(v)\n    min_val = v\nelse:\n    stack.append(v - min_val)\n    if v < min_val:\n        min_val = v"),
+                    choice("stack.append(v)\nmin_val = min(min_val, v)", false, "This still only tracks a single overwritten running minimum with no history - it's the earlier flawed single-variable design that can't recover a prior minimum once popped, not the delta-encoding trick being asked for.", code = "stack.append(v)\nmin_val = min(min_val, v)"),
+                    choice("stack.append(v - min_val)", false, "Storing the delta without ever updating min_val when v becomes a new minimum means every subsequent delta would be computed against a stale minimum, corrupting the encoding for the rest of the stack's lifetime.", code = "stack.append(v - min_val)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "Deque<Long> stack = new ArrayDeque<>();  // stores either the raw value, or an encoded delta\nlong min = Long.MAX_VALUE;\nvoid push(long v) {\n    // ???\n}",
+                choices = listOf(
+                    choice("if (stack.isEmpty()) { stack.addLast(v); min = v; } else { stack.addLast(v - min); if (v < min) min = v; }", true, "Storing v - min (which is negative exactly when v becomes the new minimum) lets a single running min variable, updated alongside each push, recover both the original value and the minimum at every level during pop - the min-stack's whole array is eliminated in exchange for this bookkeeping.", code = "if (stack.isEmpty()) { stack.addLast(v); min = v; } else { stack.addLast(v - min); if (v < min) min = v; }"),
+                    choice("stack.addLast(v);\nmin = Math.min(min, v);", false, "This still only tracks a single overwritten running minimum with no history - it's the earlier flawed single-variable design that can't recover a prior minimum once popped, not the delta-encoding trick being asked for.", code = "stack.addLast(v);\nmin = Math.min(min, v);"),
+                    choice("stack.addLast(v - min);", false, "Storing the delta without ever updating min when v becomes a new minimum means every subsequent delta would be computed against a stale minimum, corrupting the encoding for the rest of the stack's lifetime.", code = "stack.addLast(v - min);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "const stack = [];  // stores either the raw value, or an encoded delta\nlet min = Infinity;\nfunction push(v) {\n    // ???\n}",
+                choices = listOf(
+                    choice("if (stack.length === 0) { stack.push(v); min = v; } else { stack.push(v - min); if (v < min) min = v; }", true, "Storing v - min (which is negative exactly when v becomes the new minimum) lets a single running min variable, updated alongside each push, recover both the original value and the minimum at every level during pop - the min-stack's whole array is eliminated in exchange for this bookkeeping.", code = "if (stack.length === 0) { stack.push(v); min = v; } else { stack.push(v - min); if (v < min) min = v; }"),
+                    choice("stack.push(v);\nmin = Math.min(min, v);", false, "This still only tracks a single overwritten running minimum with no history - it's the earlier flawed single-variable design that can't recover a prior minimum once popped, not the delta-encoding trick being asked for.", code = "stack.push(v);\nmin = Math.min(min, v);"),
+                    choice("stack.push(v - min);", false, "Storing the delta without ever updating min when v becomes a new minimum means every subsequent delta would be computed against a stale minimum, corrupting the encoding for the rest of the stack's lifetime.", code = "stack.push(v - min);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "vector<long long> stack;  // stores either the raw value, or an encoded delta\nlong long minVal = LLONG_MAX;\nvoid push(long long v) {\n    // ???\n}",
+                choices = listOf(
+                    choice("if (stack.empty()) { stack.push_back(v); minVal = v; } else { stack.push_back(v - minVal); if (v < minVal) minVal = v; }", true, "Storing v - minVal (which is negative exactly when v becomes the new minimum) lets a single running minimum, updated alongside each push, recover both the original value and the minimum at every level during pop - the min-stack's whole vector is eliminated in exchange for this bookkeeping.", code = "if (stack.empty()) { stack.push_back(v); minVal = v; } else { stack.push_back(v - minVal); if (v < minVal) minVal = v; }"),
+                    choice("stack.push_back(v);\nminVal = min(minVal, v);", false, "This still only tracks a single overwritten running minimum with no history - it's the earlier flawed single-variable design that can't recover a prior minimum once popped, not the delta-encoding trick being asked for.", code = "stack.push_back(v);\nminVal = min(minVal, v);"),
+                    choice("stack.push_back(v - minVal);", false, "Storing the delta without ever updating minVal when v becomes a new minimum means every subsequent delta would be computed against a stale minimum, corrupting the encoding for the rest of the stack's lifetime.", code = "stack.push_back(v - minVal);"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "var stack []int64  // stores either the raw value, or an encoded delta\nvar minVal int64 = math.MaxInt64\nfunc push(v int64) {\n    // ???\n}",
+                choices = listOf(
+                    choice("if len(stack) == 0 {\n    stack = append(stack, v)\n    minVal = v\n} else {\n    stack = append(stack, v-minVal)\n    if v < minVal {\n        minVal = v\n    }\n}", true, "Storing v - minVal (which is negative exactly when v becomes the new minimum) lets a single running minimum, updated alongside each push, recover both the original value and the minimum at every level during pop - the min-stack's whole slice is eliminated in exchange for this bookkeeping.", code = "if len(stack) == 0 {\n    stack = append(stack, v)\n    minVal = v\n} else {\n    stack = append(stack, v-minVal)\n    if v < minVal {\n        minVal = v\n    }\n}"),
+                    choice("stack = append(stack, v)\nif v < minVal {\n    minVal = v\n}", false, "This still only tracks a single overwritten running minimum with no history - it's the earlier flawed single-variable design that can't recover a prior minimum once popped, not the delta-encoding trick being asked for.", code = "stack = append(stack, v)\nif v < minVal {\n    minVal = v\n}"),
+                    choice("stack = append(stack, v-minVal)", false, "Storing the delta without ever updating minVal when v becomes a new minimum means every subsequent delta would be computed against a stale minimum, corrupting the encoding for the rest of the stack's lifetime.", code = "stack = append(stack, v-minVal)"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "var stack: [Int] = []  // stores either the raw value, or an encoded delta\nvar minVal = Int.max\nfunc push(_ v: Int) {\n    // ???\n}",
+                choices = listOf(
+                    choice("if stack.isEmpty { stack.append(v); minVal = v } else { stack.append(v - minVal); if v < minVal { minVal = v } }", true, "Storing v - minVal (which is negative exactly when v becomes the new minimum) lets a single running minimum, updated alongside each push, recover both the original value and the minimum at every level during pop - the min-stack's whole array is eliminated in exchange for this bookkeeping.", code = "if stack.isEmpty { stack.append(v); minVal = v } else { stack.append(v - minVal); if v < minVal { minVal = v } }"),
+                    choice("stack.append(v)\nminVal = min(minVal, v)", false, "This still only tracks a single overwritten running minimum with no history - it's the earlier flawed single-variable design that can't recover a prior minimum once popped, not the delta-encoding trick being asked for.", code = "stack.append(v)\nminVal = min(minVal, v)"),
+                    choice("stack.append(v - minVal)", false, "Storing the delta without ever updating minVal when v becomes a new minimum means every subsequent delta would be computed against a stale minimum, corrupting the encoding for the rest of the stack's lifetime.", code = "stack.append(v - minVal)"),
+                ),
+            ),
+        ),
     ),
     step(
         "min-stack", STACK, TIME_COMPLEXITY,
