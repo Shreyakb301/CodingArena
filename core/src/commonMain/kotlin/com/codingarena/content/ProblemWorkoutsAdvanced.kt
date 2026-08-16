@@ -501,6 +501,62 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 code = "if (s.lowercaseChar() != s.lowercaseChar()) return false",
             ),
         ),
+        languageVariants = listOf(
+            WorkoutCodeVariant(
+                PYTHON,
+                "def is_palindrome(s, case_sensitive):\n    left = 0\n    right = len(s) - 1\n    while left < right:\n        while left < right and not s[left].isalnum():\n            left += 1\n        while left < right and not s[right].isalnum():\n            right -= 1\n        # ???\n        left += 1\n        right -= 1\n    return True",
+                choices = listOf(
+                    choice("a = s[left] if case_sensitive else s[left].lower()\nb = s[right] if case_sensitive else s[right].lower()\nif a != b:\n    return False", true, "Branching only at the comparison step, based on the case_sensitive flag, reuses the entire skip-and-scan structure unchanged and adds the configurability exactly where it's needed, with no duplicated logic.", code = "a = s[left] if case_sensitive else s[left].lower()\nb = s[right] if case_sensitive else s[right].lower()\nif a != b:\n    return False"),
+                    choice("if case_sensitive:\n    if s[left] != s[right]:\n        return False\nelse:\n    return is_palindrome(s.lower(), False)", false, "Recursing into a fresh call with a fully lowercased copy of the string abandons the current left/right progress and restarts the whole scan from the beginning, which is both wasteful and structurally awkward.", code = "if case_sensitive:\n    if s[left] != s[right]:\n        return False\nelse:\n    return is_palindrome(s.lower(), False)"),
+                    choice("if s.lower() != s.lower():\n    return False", false, "Comparing the whole string s to itself rather than the individual characters at left and right is a vacuous, always-false condition - the comparison needs to happen on the two specific characters currently being examined.", code = "if s.lower() != s.lower():\n    return False"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVA,
+                "boolean isPalindrome(String s, boolean caseSensitive) {\n    int left = 0;\n    int right = s.length() - 1;\n    while (left < right) {\n        while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;\n        while (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;\n        // ???\n        left++;\n        right--;\n    }\n    return true;\n}",
+                choices = listOf(
+                    choice("char a = caseSensitive ? s.charAt(left) : Character.toLowerCase(s.charAt(left));\nchar b = caseSensitive ? s.charAt(right) : Character.toLowerCase(s.charAt(right));\nif (a != b) return false;", true, "Branching only at the comparison step, based on the caseSensitive flag, reuses the entire skip-and-scan structure unchanged and adds the configurability exactly where it's needed, with no duplicated logic.", code = "char a = caseSensitive ? s.charAt(left) : Character.toLowerCase(s.charAt(left));\nchar b = caseSensitive ? s.charAt(right) : Character.toLowerCase(s.charAt(right));\nif (a != b) return false;"),
+                    choice("if (caseSensitive) { if (s.charAt(left) != s.charAt(right)) return false; } else { return isPalindrome(s.toLowerCase(), false); }", false, "Recursing into a fresh call with a fully lowercased copy of the string abandons the current left/right progress and restarts the whole scan from the beginning, which is both wasteful and structurally awkward.", code = "if (caseSensitive) { if (s.charAt(left) != s.charAt(right)) return false; } else { return isPalindrome(s.toLowerCase(), false); }"),
+                    choice("if (s.toLowerCase() != s.toLowerCase()) return false;", false, "Comparing String references with != rather than the individual characters at left and right is both a reference-equality bug and a vacuous comparison - the comparison needs to happen on the two specific characters currently being examined.", code = "if (s.toLowerCase() != s.toLowerCase()) return false;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                JAVASCRIPT,
+                "function isPalindrome(s, caseSensitive) {\n    let left = 0;\n    let right = s.length - 1;\n    while (left < right) {\n        while (left < right && !/[a-z0-9]/i.test(s[left])) left++;\n        while (left < right && !/[a-z0-9]/i.test(s[right])) right--;\n        // ???\n        left++;\n        right--;\n    }\n    return true;\n}",
+                choices = listOf(
+                    choice("const a = caseSensitive ? s[left] : s[left].toLowerCase();\nconst b = caseSensitive ? s[right] : s[right].toLowerCase();\nif (a !== b) return false;", true, "Branching only at the comparison step, based on the caseSensitive flag, reuses the entire skip-and-scan structure unchanged and adds the configurability exactly where it's needed, with no duplicated logic.", code = "const a = caseSensitive ? s[left] : s[left].toLowerCase();\nconst b = caseSensitive ? s[right] : s[right].toLowerCase();\nif (a !== b) return false;"),
+                    choice("if (caseSensitive) { if (s[left] !== s[right]) return false; } else { return isPalindrome(s.toLowerCase(), false); }", false, "Recursing into a fresh call with a fully lowercased copy of the string abandons the current left/right progress and restarts the whole scan from the beginning, which is both wasteful and structurally awkward.", code = "if (caseSensitive) { if (s[left] !== s[right]) return false; } else { return isPalindrome(s.toLowerCase(), false); }"),
+                    choice("if (s.toLowerCase() !== s.toLowerCase()) return false;", false, "Comparing the whole string s to itself rather than the individual characters at left and right is a vacuous, always-false condition - the comparison needs to happen on the two specific characters currently being examined.", code = "if (s.toLowerCase() !== s.toLowerCase()) return false;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                CPP,
+                "bool isPalindrome(string s, bool caseSensitive) {\n    int left = 0;\n    int right = s.size() - 1;\n    while (left < right) {\n        while (left < right && !isalnum(s[left])) left++;\n        while (left < right && !isalnum(s[right])) right--;\n        // ???\n        left++;\n        right--;\n    }\n    return true;\n}",
+                choices = listOf(
+                    choice("char a = caseSensitive ? s[left] : tolower(s[left]);\nchar b = caseSensitive ? s[right] : tolower(s[right]);\nif (a != b) return false;", true, "Branching only at the comparison step, based on the caseSensitive flag, reuses the entire skip-and-scan structure unchanged and adds the configurability exactly where it's needed, with no duplicated logic.", code = "char a = caseSensitive ? s[left] : tolower(s[left]);\nchar b = caseSensitive ? s[right] : tolower(s[right]);\nif (a != b) return false;"),
+                    choice("if (caseSensitive) { if (s[left] != s[right]) return false; } else { string lower = s; transform(lower.begin(), lower.end(), lower.begin(), ::tolower); return isPalindrome(lower, false); }", false, "Recursing into a fresh call with a fully lowercased copy of the string abandons the current left/right progress and restarts the whole scan from the beginning, which is both wasteful and structurally awkward.", code = "if (caseSensitive) { if (s[left] != s[right]) return false; } else { string lower = s; transform(lower.begin(), lower.end(), lower.begin(), ::tolower); return isPalindrome(lower, false); }"),
+                    choice("if (tolower(s) != tolower(s)) return false;", false, "Calling tolower() on the whole string s rather than on the individual characters at left and right doesn't even compile - tolower expects a single character, not a std::string.", code = "if (tolower(s) != tolower(s)) return false;"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                GO,
+                "func isPalindrome(s string, caseSensitive bool) bool {\n    left := 0\n    right := len(s) - 1\n    for left < right {\n        for left < right && !isAlnum(s[left]) {\n            left++\n        }\n        for left < right && !isAlnum(s[right]) {\n            right--\n        }\n        // ???\n        left++\n        right--\n    }\n    return true\n}",
+                choices = listOf(
+                    choice("a := s[left]\nb := s[right]\nif !caseSensitive {\n    a = byte(unicode.ToLower(rune(a)))\n    b = byte(unicode.ToLower(rune(b)))\n}\nif a != b {\n    return false\n}", true, "Branching only at the comparison step, based on the caseSensitive flag, reuses the entire skip-and-scan structure unchanged and adds the configurability exactly where it's needed, with no duplicated logic.", code = "a := s[left]\nb := s[right]\nif !caseSensitive {\n    a = byte(unicode.ToLower(rune(a)))\n    b = byte(unicode.ToLower(rune(b)))\n}\nif a != b {\n    return false\n}"),
+                    choice("if caseSensitive {\n    if s[left] != s[right] {\n        return false\n    }\n} else {\n    return isPalindrome(strings.ToLower(s), false)\n}", false, "Recursing into a fresh call with a fully lowercased copy of the string abandons the current left/right progress and restarts the whole scan from the beginning, which is both wasteful and structurally awkward.", code = "if caseSensitive {\n    if s[left] != s[right] {\n        return false\n    }\n} else {\n    return isPalindrome(strings.ToLower(s), false)\n}"),
+                    choice("if strings.ToLower(s) != strings.ToLower(s) {\n    return false\n}", false, "Comparing the whole string s to itself rather than the individual characters at left and right is a vacuous, always-false condition - the comparison needs to happen on the two specific characters currently being examined.", code = "if strings.ToLower(s) != strings.ToLower(s) {\n    return false\n}"),
+                ),
+            ),
+            WorkoutCodeVariant(
+                SWIFT,
+                "func isPalindrome(_ s: [Character], _ caseSensitive: Bool) -> Bool {\n    var left = 0\n    var right = s.count - 1\n    while left < right {\n        while left < right && !(s[left].isLetter || s[left].isNumber) { left += 1 }\n        while left < right && !(s[right].isLetter || s[right].isNumber) { right -= 1 }\n        // ???\n        left += 1\n        right -= 1\n    }\n    return true\n}",
+                choices = listOf(
+                    choice("let a = caseSensitive ? s[left] : Character(s[left].lowercased())\nlet b = caseSensitive ? s[right] : Character(s[right].lowercased())\nif a != b { return false }", true, "Branching only at the comparison step, based on the caseSensitive flag, reuses the entire skip-and-scan structure unchanged and adds the configurability exactly where it's needed, with no duplicated logic.", code = "let a = caseSensitive ? s[left] : Character(s[left].lowercased())\nlet b = caseSensitive ? s[right] : Character(s[right].lowercased())\nif a != b { return false }"),
+                    choice("if caseSensitive {\n    if s[left] != s[right] { return false }\n} else {\n    return isPalindrome(s.map { Character($0.lowercased()) }, false)\n}", false, "Recursing into a fresh call with a fully lowercased copy of the array abandons the current left/right progress and restarts the whole scan from the beginning, which is both wasteful and structurally awkward.", code = "if caseSensitive {\n    if s[left] != s[right] { return false }\n} else {\n    return isPalindrome(s.map { Character($0.lowercased()) }, false)\n}"),
+                    choice("if s.map({ $0.lowercased() }) != s.map({ $0.lowercased() }) { return false }", false, "Comparing the whole array to itself rather than the individual characters at left and right is a vacuous, always-false condition - the comparison needs to happen on the two specific characters currently being examined.", code = "if s.map({ $0.lowercased() }) != s.map({ $0.lowercased() }) { return false }"),
+                ),
+            ),
+        ),
     ),
     step(
         "container-with-most-water", TWO_POINTERS, CODE_BLOCK,
