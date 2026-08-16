@@ -7,7 +7,14 @@ import com.codingarena.domain.model.PatternGroup.SLIDING_WINDOW
 import com.codingarena.domain.model.PatternGroup.STACK
 import com.codingarena.domain.model.PatternGroup.TWO_POINTERS
 import com.codingarena.domain.model.PracticeDifficulty
+import com.codingarena.domain.model.ProgrammingLanguage.CPP
+import com.codingarena.domain.model.ProgrammingLanguage.GO
+import com.codingarena.domain.model.ProgrammingLanguage.JAVA
+import com.codingarena.domain.model.ProgrammingLanguage.JAVASCRIPT
+import com.codingarena.domain.model.ProgrammingLanguage.PYTHON
+import com.codingarena.domain.model.ProgrammingLanguage.SWIFT
 import com.codingarena.domain.model.WorkoutChoice
+import com.codingarena.domain.model.WorkoutCodeVariant
 import com.codingarena.domain.model.WorkoutStep
 import com.codingarena.domain.model.WorkoutStepKind
 import com.codingarena.domain.model.WorkoutStepKind.APPROACH
@@ -45,6 +52,7 @@ internal fun step(
     difficulty: PracticeDifficulty = PracticeDifficulty.BEGINNER,
     code: String? = null,
     choices: List<WorkoutChoice>,
+    languageVariants: List<WorkoutCodeVariant> = emptyList(),
 ): WorkoutStep = WorkoutStep(
     id = "$slug-${kind.name.lowercase()}-${difficulty.name.lowercase()}",
     problemSlug = slug,
@@ -55,6 +63,7 @@ internal fun step(
     prompt = prompt,
     code = code,
     choices = choices,
+    languageVariants = languageVariants,
 )
 
 internal fun choice(text: String, correct: Boolean, feedback: String, code: String? = null) =
@@ -176,6 +185,152 @@ private val minimumSizeSubarraySum = ProblemWorkout(
                     "Recording the length after left has already advanced measures the window one position too small, undercounting the true length of the window that actually qualified.",
                     code = "while (sum >= target) {\n    sum -= nums[left]\n    left++\n    minLen = minOf(minLen, right - left + 1)\n}",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "left = 0\nsum_ = 0\nmin_len = float(\"inf\")\nfor right in range(len(nums)):\n    sum_ += nums[right]\n    # ??? \n",
+                    choices = listOf(
+                        choice(
+                            "while sum_ >= target:\n    min_len = min(min_len, right - left + 1)\n    sum_ -= nums[left]\n    left += 1",
+                            true,
+                            "The while loop keeps shrinking and recording as long as the window still qualifies, and right - left + 1 correctly counts the window's current length before it shrinks further.",
+                            code = "while sum_ >= target:\n    min_len = min(min_len, right - left + 1)\n    sum_ -= nums[left]\n    left += 1",
+                        ),
+                        choice(
+                            "if sum_ >= target:\n    min_len = min(min_len, right - left + 1)\n    sum_ -= nums[left]\n    left += 1",
+                            false,
+                            "Using if instead of while shrinks by at most one position per outer iteration, which can leave a still-qualifying window unshrunk and report a length longer than the true minimum.",
+                            code = "if sum_ >= target:\n    min_len = min(min_len, right - left + 1)\n    sum_ -= nums[left]\n    left += 1",
+                        ),
+                        choice(
+                            "while sum_ >= target:\n    sum_ -= nums[left]\n    left += 1\n    min_len = min(min_len, right - left + 1)",
+                            false,
+                            "Recording the length after left has already advanced measures the window one position too small, undercounting the true length of the window that actually qualified.",
+                            code = "while sum_ >= target:\n    sum_ -= nums[left]\n    left += 1\n    min_len = min(min_len, right - left + 1)",
+                        ),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int left = 0;\nint sum = 0;\nint minLen = Integer.MAX_VALUE;\nfor (int right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    // ??? \n}",
+                    choices = listOf(
+                        choice(
+                            "while (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                            true,
+                            "The while loop keeps shrinking and recording as long as the window still qualifies, and right - left + 1 correctly counts the window's current length before it shrinks further.",
+                            code = "while (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                        ),
+                        choice(
+                            "if (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                            false,
+                            "Using if instead of while shrinks by at most one position per outer iteration, which can leave a still-qualifying window unshrunk and report a length longer than the true minimum.",
+                            code = "if (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                        ),
+                        choice(
+                            "while (sum >= target) {\n    sum -= nums[left];\n    left++;\n    minLen = Math.min(minLen, right - left + 1);\n}",
+                            false,
+                            "Recording the length after left has already advanced measures the window one position too small, undercounting the true length of the window that actually qualified.",
+                            code = "while (sum >= target) {\n    sum -= nums[left];\n    left++;\n    minLen = Math.min(minLen, right - left + 1);\n}",
+                        ),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let left = 0;\nlet sum = 0;\nlet minLen = Infinity;\nfor (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    // ??? \n}",
+                    choices = listOf(
+                        choice(
+                            "while (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                            true,
+                            "The while loop keeps shrinking and recording as long as the window still qualifies, and right - left + 1 correctly counts the window's current length before it shrinks further.",
+                            code = "while (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                        ),
+                        choice(
+                            "if (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                            false,
+                            "Using if instead of while shrinks by at most one position per outer iteration, which can leave a still-qualifying window unshrunk and report a length longer than the true minimum.",
+                            code = "if (sum >= target) {\n    minLen = Math.min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                        ),
+                        choice(
+                            "while (sum >= target) {\n    sum -= nums[left];\n    left++;\n    minLen = Math.min(minLen, right - left + 1);\n}",
+                            false,
+                            "Recording the length after left has already advanced measures the window one position too small, undercounting the true length of the window that actually qualified.",
+                            code = "while (sum >= target) {\n    sum -= nums[left];\n    left++;\n    minLen = Math.min(minLen, right - left + 1);\n}",
+                        ),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int left = 0;\nint sum = 0;\nint minLen = INT_MAX;\nfor (int right = 0; right < (int)nums.size(); right++) {\n    sum += nums[right];\n    // ??? \n}",
+                    choices = listOf(
+                        choice(
+                            "while (sum >= target) {\n    minLen = min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                            true,
+                            "The while loop keeps shrinking and recording as long as the window still qualifies, and right - left + 1 correctly counts the window's current length before it shrinks further.",
+                            code = "while (sum >= target) {\n    minLen = min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                        ),
+                        choice(
+                            "if (sum >= target) {\n    minLen = min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                            false,
+                            "Using if instead of while shrinks by at most one position per outer iteration, which can leave a still-qualifying window unshrunk and report a length longer than the true minimum.",
+                            code = "if (sum >= target) {\n    minLen = min(minLen, right - left + 1);\n    sum -= nums[left];\n    left++;\n}",
+                        ),
+                        choice(
+                            "while (sum >= target) {\n    sum -= nums[left];\n    left++;\n    minLen = min(minLen, right - left + 1);\n}",
+                            false,
+                            "Recording the length after left has already advanced measures the window one position too small, undercounting the true length of the window that actually qualified.",
+                            code = "while (sum >= target) {\n    sum -= nums[left];\n    left++;\n    minLen = min(minLen, right - left + 1);\n}",
+                        ),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "left := 0\nsum := 0\nminLen := math.MaxInt32\nfor right := 0; right < len(nums); right++ {\n    sum += nums[right]\n    // ??? \n}",
+                    choices = listOf(
+                        choice(
+                            "for sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n    sum -= nums[left]\n    left++\n}",
+                            true,
+                            "The while loop keeps shrinking and recording as long as the window still qualifies, and right - left + 1 correctly counts the window's current length before it shrinks further.",
+                            code = "for sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n    sum -= nums[left]\n    left++\n}",
+                        ),
+                        choice(
+                            "if sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n    sum -= nums[left]\n    left++\n}",
+                            false,
+                            "Using if instead of a loop shrinks by at most one position per outer iteration, which can leave a still-qualifying window unshrunk and report a length longer than the true minimum.",
+                            code = "if sum >= target {\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n    sum -= nums[left]\n    left++\n}",
+                        ),
+                        choice(
+                            "for sum >= target {\n    sum -= nums[left]\n    left++\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n}",
+                            false,
+                            "Recording the length after left has already advanced measures the window one position too small, undercounting the true length of the window that actually qualified.",
+                            code = "for sum >= target {\n    sum -= nums[left]\n    left++\n    if right-left+1 < minLen {\n        minLen = right - left + 1\n    }\n}",
+                        ),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var left = 0\nvar sum = 0\nvar minLen = Int.max\nfor right in 0..<nums.count {\n    sum += nums[right]\n    // ??? \n}",
+                    choices = listOf(
+                        choice(
+                            "while sum >= target {\n    minLen = min(minLen, right - left + 1)\n    sum -= nums[left]\n    left += 1\n}",
+                            true,
+                            "The while loop keeps shrinking and recording as long as the window still qualifies, and right - left + 1 correctly counts the window's current length before it shrinks further.",
+                            code = "while sum >= target {\n    minLen = min(minLen, right - left + 1)\n    sum -= nums[left]\n    left += 1\n}",
+                        ),
+                        choice(
+                            "if sum >= target {\n    minLen = min(minLen, right - left + 1)\n    sum -= nums[left]\n    left += 1\n}",
+                            false,
+                            "Using if instead of while shrinks by at most one position per outer iteration, which can leave a still-qualifying window unshrunk and report a length longer than the true minimum.",
+                            code = "if sum >= target {\n    minLen = min(minLen, right - left + 1)\n    sum -= nums[left]\n    left += 1\n}",
+                        ),
+                        choice(
+                            "while sum >= target {\n    sum -= nums[left]\n    left += 1\n    minLen = min(minLen, right - left + 1)\n}",
+                            false,
+                            "Recording the length after left has already advanced measures the window one position too small, undercounting the true length of the window that actually qualified.",
+                            code = "while sum >= target {\n    sum -= nums[left]\n    left += 1\n    minLen = min(minLen, right - left + 1)\n}",
+                        ),
+                    ),
+                ),
+            ),
         ),
         step(
             "minimum-size-subarray-sum", SLIDING_WINDOW, TIME_COMPLEXITY,
@@ -376,6 +531,62 @@ private val validAnagramWorkout = ProblemWorkout(
                     "This decrements using s again instead of t, so it only ever resets s's own counts back to zero and never actually reads anything from t at all.",
                     code = "for (c in s) counts[c - 'a']--",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "if len(s) != len(t): return False\ncounts = [0] * 26\nfor c in s: counts[ord(c) - ord(\"a\")] += 1\n# ???\nreturn all(x == 0 for x in counts)",
+                    choices = listOf(
+                        choice("for c in t: counts[ord(c) - ord(\"a\")] -= 1", true, "Decrementing for every character in t undoes exactly the increments from s when the two strings use the same characters the same number of times, leaving every count at zero.", code = "for c in t: counts[ord(c) - ord(\"a\")] -= 1"),
+                        choice("for c in t: counts[ord(c) - ord(\"a\")] += 1", false, "Incrementing for both strings only ever adds up total occurrences - it can never distinguish an anagram from two strings that merely share a length and character set.", code = "for c in t: counts[ord(c) - ord(\"a\")] += 1"),
+                        choice("for c in s: counts[ord(c) - ord(\"a\")] -= 1", false, "This decrements using s again instead of t, so it only ever resets s's own counts back to zero and never actually reads anything from t at all.", code = "for c in s: counts[ord(c) - ord(\"a\")] -= 1"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "if (s.length() != t.length()) return false;\nint[] counts = new int[26];\nfor (char c : s.toCharArray()) counts[c - 'a']++;\n// ???\nfor (int x : counts) if (x != 0) return false;\nreturn true;",
+                    choices = listOf(
+                        choice("for (char c : t.toCharArray()) counts[c - 'a']--;", true, "Decrementing for every character in t undoes exactly the increments from s when the two strings use the same characters the same number of times, leaving every count at zero.", code = "for (char c : t.toCharArray()) counts[c - 'a']--;"),
+                        choice("for (char c : t.toCharArray()) counts[c - 'a']++;", false, "Incrementing for both strings only ever adds up total occurrences - it can never distinguish an anagram from two strings that merely share a length and character set.", code = "for (char c : t.toCharArray()) counts[c - 'a']++;"),
+                        choice("for (char c : s.toCharArray()) counts[c - 'a']--;", false, "This decrements using s again instead of t, so it only ever resets s's own counts back to zero and never actually reads anything from t at all.", code = "for (char c : s.toCharArray()) counts[c - 'a']--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "if (s.length !== t.length) return false;\nconst counts = new Array(26).fill(0);\nfor (const c of s) counts[c.charCodeAt(0) - 97]++;\n// ???\nreturn counts.every(x => x === 0);",
+                    choices = listOf(
+                        choice("for (const c of t) counts[c.charCodeAt(0) - 97]--;", true, "Decrementing for every character in t undoes exactly the increments from s when the two strings use the same characters the same number of times, leaving every count at zero.", code = "for (const c of t) counts[c.charCodeAt(0) - 97]--;"),
+                        choice("for (const c of t) counts[c.charCodeAt(0) - 97]++;", false, "Incrementing for both strings only ever adds up total occurrences - it can never distinguish an anagram from two strings that merely share a length and character set.", code = "for (const c of t) counts[c.charCodeAt(0) - 97]++;"),
+                        choice("for (const c of s) counts[c.charCodeAt(0) - 97]--;", false, "This decrements using s again instead of t, so it only ever resets s's own counts back to zero and never actually reads anything from t at all.", code = "for (const c of s) counts[c.charCodeAt(0) - 97]--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "if (s.size() != t.size()) return false;\nint counts[26] = {0};\nfor (char c : s) counts[c - 'a']++;\n// ???\nfor (int x : counts) if (x != 0) return false;\nreturn true;",
+                    choices = listOf(
+                        choice("for (char c : t) counts[c - 'a']--;", true, "Decrementing for every character in t undoes exactly the increments from s when the two strings use the same characters the same number of times, leaving every count at zero.", code = "for (char c : t) counts[c - 'a']--;"),
+                        choice("for (char c : t) counts[c - 'a']++;", false, "Incrementing for both strings only ever adds up total occurrences - it can never distinguish an anagram from two strings that merely share a length and character set.", code = "for (char c : t) counts[c - 'a']++;"),
+                        choice("for (char c : s) counts[c - 'a']--;", false, "This decrements using s again instead of t, so it only ever resets s's own counts back to zero and never actually reads anything from t at all.", code = "for (char c : s) counts[c - 'a']--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "if len(s) != len(t) {\n    return false\n}\nvar counts [26]int\nfor _, c := range s {\n    counts[c-'a']++\n}\n// ???\nfor _, x := range counts {\n    if x != 0 {\n        return false\n    }\n}\nreturn true",
+                    choices = listOf(
+                        choice("for _, c := range t {\n    counts[c-'a']--\n}", true, "Decrementing for every character in t undoes exactly the increments from s when the two strings use the same characters the same number of times, leaving every count at zero.", code = "for _, c := range t {\n    counts[c-'a']--\n}"),
+                        choice("for _, c := range t {\n    counts[c-'a']++\n}", false, "Incrementing for both strings only ever adds up total occurrences - it can never distinguish an anagram from two strings that merely share a length and character set.", code = "for _, c := range t {\n    counts[c-'a']++\n}"),
+                        choice("for _, c := range s {\n    counts[c-'a']--\n}", false, "This decrements using s again instead of t, so it only ever resets s's own counts back to zero and never actually reads anything from t at all.", code = "for _, c := range s {\n    counts[c-'a']--\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "if s.count != t.count { return false }\nvar counts = [Int](repeating: 0, count: 26)\nfor c in s { counts[Int(c.asciiValue! - 97)] += 1 }\n// ???\nreturn counts.allSatisfy { \$0 == 0 }",
+                    choices = listOf(
+                        choice("for c in t { counts[Int(c.asciiValue! - 97)] -= 1 }", true, "Decrementing for every character in t undoes exactly the increments from s when the two strings use the same characters the same number of times, leaving every count at zero.", code = "for c in t { counts[Int(c.asciiValue! - 97)] -= 1 }"),
+                        choice("for c in t { counts[Int(c.asciiValue! - 97)] += 1 }", false, "Incrementing for both strings only ever adds up total occurrences - it can never distinguish an anagram from two strings that merely share a length and character set.", code = "for c in t { counts[Int(c.asciiValue! - 97)] += 1 }"),
+                        choice("for c in s { counts[Int(c.asciiValue! - 97)] -= 1 }", false, "This decrements using s again instead of t, so it only ever resets s's own counts back to zero and never actually reads anything from t at all.", code = "for c in s { counts[Int(c.asciiValue! - 97)] -= 1 }"),
+                    ),
+                ),
+            ),
         ),
         step(
             "valid-anagram", ARRAYS_HASHING, TIME_COMPLEXITY,
@@ -576,6 +787,62 @@ private val threeSumWorkout = ProblemWorkout(
                     "Moving both pointers on every iteration regardless of the sum, rather than only after a match, can skip past pairs that would have summed correctly before they're ever checked.",
                     code = "if (sum == 0) { result.add(listOf(nums[i], nums[left], nums[right])) }; left++; right--",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "left = i + 1\nright = len(nums) - 1\nwhile left < right:\n    total = nums[i] + nums[left] + nums[right]\n    # ???",
+                    choices = listOf(
+                        choice("if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1", true, "This correctly grows the sum by moving left forward when it's too small, shrinks it by moving right backward when it's too large, and advances both pointers past the match once one is recorded.", code = "if total < 0:\n    left += 1\nelif total > 0:\n    right -= 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1"),
+                        choice("if total < 0:\n    right -= 1\nelif total > 0:\n    left += 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1", false, "This swaps the two directions - moving right backward when the sum is already too small pushes it even lower instead of toward zero.", code = "if total < 0:\n    right -= 1\nelif total > 0:\n    left += 1\nelse:\n    result.append([nums[i], nums[left], nums[right]])\n    left += 1\n    right -= 1"),
+                        choice("if total == 0:\n    result.append([nums[i], nums[left], nums[right]])\nleft += 1\nright -= 1", false, "Moving both pointers on every iteration regardless of the sum, rather than only after a match, can skip past pairs that would have summed correctly before they're ever checked.", code = "if total == 0:\n    result.append([nums[i], nums[left], nums[right]])\nleft += 1\nright -= 1"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "int left = i + 1;\nint right = nums.length - 1;\nwhile (left < right) {\n    int sum = nums[i] + nums[left] + nums[right];\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; }", true, "This correctly grows the sum by moving left forward when it's too small, shrinks it by moving right backward when it's too large, and advances both pointers past the match once one is recorded.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; }"),
+                        choice("if (sum < 0) right--; else if (sum > 0) left++; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; }", false, "This swaps the two directions - moving right backward when the sum is already too small pushes it even lower instead of toward zero.", code = "if (sum < 0) right--; else if (sum > 0) left++; else { result.add(List.of(nums[i], nums[left], nums[right])); left++; right--; }"),
+                        choice("if (sum == 0) { result.add(List.of(nums[i], nums[left], nums[right])); } left++; right--;", false, "Moving both pointers on every iteration regardless of the sum, rather than only after a match, can skip past pairs that would have summed correctly before they're ever checked.", code = "if (sum == 0) { result.add(List.of(nums[i], nums[left], nums[right])); } left++; right--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "let left = i + 1;\nlet right = nums.length - 1;\nwhile (left < right) {\n    const sum = nums[i] + nums[left] + nums[right];\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; }", true, "This correctly grows the sum by moving left forward when it's too small, shrinks it by moving right backward when it's too large, and advances both pointers past the match once one is recorded.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; }"),
+                        choice("if (sum < 0) right--; else if (sum > 0) left++; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; }", false, "This swaps the two directions - moving right backward when the sum is already too small pushes it even lower instead of toward zero.", code = "if (sum < 0) right--; else if (sum > 0) left++; else { result.push([nums[i], nums[left], nums[right]]); left++; right--; }"),
+                        choice("if (sum === 0) { result.push([nums[i], nums[left], nums[right]]); } left++; right--;", false, "Moving both pointers on every iteration regardless of the sum, rather than only after a match, can skip past pairs that would have summed correctly before they're ever checked.", code = "if (sum === 0) { result.push([nums[i], nums[left], nums[right]]); } left++; right--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "int left = i + 1;\nint right = nums.size() - 1;\nwhile (left < right) {\n    int sum = nums[i] + nums[left] + nums[right];\n    // ???\n}",
+                    choices = listOf(
+                        choice("if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; }", true, "This correctly grows the sum by moving left forward when it's too small, shrinks it by moving right backward when it's too large, and advances both pointers past the match once one is recorded.", code = "if (sum < 0) left++; else if (sum > 0) right--; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; }"),
+                        choice("if (sum < 0) right--; else if (sum > 0) left++; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; }", false, "This swaps the two directions - moving right backward when the sum is already too small pushes it even lower instead of toward zero.", code = "if (sum < 0) right--; else if (sum > 0) left++; else { result.push_back({nums[i], nums[left], nums[right]}); left++; right--; }"),
+                        choice("if (sum == 0) { result.push_back({nums[i], nums[left], nums[right]}); } left++; right--;", false, "Moving both pointers on every iteration regardless of the sum, rather than only after a match, can skip past pairs that would have summed correctly before they're ever checked.", code = "if (sum == 0) { result.push_back({nums[i], nums[left], nums[right]}); } left++; right--;"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "left := i + 1\nright := len(nums) - 1\nfor left < right {\n    sum := nums[i] + nums[left] + nums[right]\n    // ???\n}",
+                    choices = listOf(
+                        choice("if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n}", true, "This correctly grows the sum by moving left forward when it's too small, shrinks it by moving right backward when it's too large, and advances both pointers past the match once one is recorded.", code = "if sum < 0 {\n    left++\n} else if sum > 0 {\n    right--\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n}"),
+                        choice("if sum < 0 {\n    right--\n} else if sum > 0 {\n    left++\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n}", false, "This swaps the two directions - moving right backward when the sum is already too small pushes it even lower instead of toward zero.", code = "if sum < 0 {\n    right--\n} else if sum > 0 {\n    left++\n} else {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n    left++\n    right--\n}"),
+                        choice("if sum == 0 {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n}\nleft++\nright--", false, "Moving both pointers on every iteration regardless of the sum, rather than only after a match, can skip past pairs that would have summed correctly before they're ever checked.", code = "if sum == 0 {\n    result = append(result, []int{nums[i], nums[left], nums[right]})\n}\nleft++\nright--"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var left = i + 1\nvar right = nums.count - 1\nwhile left < right {\n    let sum = nums[i] + nums[left] + nums[right]\n    // ???\n}",
+                    choices = listOf(
+                        choice("if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }", true, "This correctly grows the sum by moving left forward when it's too small, shrinks it by moving right backward when it's too large, and advances both pointers past the match once one is recorded.", code = "if sum < 0 { left += 1 } else if sum > 0 { right -= 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }"),
+                        choice("if sum < 0 { right -= 1 } else if sum > 0 { left += 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }", false, "This swaps the two directions - moving right backward when the sum is already too small pushes it even lower instead of toward zero.", code = "if sum < 0 { right -= 1 } else if sum > 0 { left += 1 } else { result.append([nums[i], nums[left], nums[right]]); left += 1; right -= 1 }"),
+                        choice("if sum == 0 { result.append([nums[i], nums[left], nums[right]]) }\nleft += 1\nright -= 1", false, "Moving both pointers on every iteration regardless of the sum, rather than only after a match, can skip past pairs that would have summed correctly before they're ever checked.", code = "if sum == 0 { result.append([nums[i], nums[left], nums[right]]) }\nleft += 1\nright -= 1"),
+                    ),
+                ),
+            ),
         ),
         step(
             "3sum", TWO_POINTERS, TIME_COMPLEXITY,
@@ -776,6 +1043,62 @@ private val validParenthesesWorkout = ProblemWorkout(
                     "This pushes closing brackets instead of opening ones, so pairs[c] would be looked up against the wrong side of the stack and the logic never matches correctly.",
                     code = "if (c in \")]}\") stack.addLast(c) else { if (stack.isEmpty() || stack.removeLast() != pairs[c]) return false }",
                 )),
+            languageVariants = listOf(
+                WorkoutCodeVariant(
+                    PYTHON,
+                    "stack = []\npairs = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\"}\nfor c in s:\n    # ???\nreturn len(stack) == 0",
+                    choices = listOf(
+                        choice("if c in \"([{\":\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False", true, "This pushes every opening bracket, and for a closing bracket, fails immediately on an empty stack or a mismatched popped value - exactly the two failure conditions that must both be checked.", code = "if c in \"([{\":\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False"),
+                        choice("if c in \"([{\":\n    stack.append(c)\nelse:\n    stack.pop()", false, "Popping without checking the stack for emptiness first would crash on a closing bracket with nothing open, and without checking the popped value's type, mismatched pairs slip through unnoticed.", code = "if c in \"([{\":\n    stack.append(c)\nelse:\n    stack.pop()"),
+                        choice("if c in \")]}\":\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False", false, "This pushes closing brackets instead of opening ones, so pairs[c] would be looked up against the wrong side of the stack and the logic never matches correctly.", code = "if c in \")]}\":\n    stack.append(c)\nelse:\n    if not stack or stack.pop() != pairs[c]:\n        return False"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVA,
+                    "Deque<Character> stack = new ArrayDeque<>();\nMap<Character, Character> pairs = Map.of(')', '(', ']', '[', '}', '{');\nfor (char c : s.toCharArray()) {\n    // ???\n}\nreturn stack.isEmpty();",
+                    choices = listOf(
+                        choice("if (\"([{\".indexOf(c) >= 0) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }", true, "This pushes every opening bracket, and for a closing bracket, fails immediately on an empty stack or a mismatched popped value - exactly the two failure conditions that must both be checked.", code = "if (\"([{\".indexOf(c) >= 0) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }"),
+                        choice("if (\"([{\".indexOf(c) >= 0) stack.push(c); else stack.pop();", false, "Popping without checking the stack for emptiness first would crash on a closing bracket with nothing open, and without checking the popped value's type, mismatched pairs slip through unnoticed.", code = "if (\"([{\".indexOf(c) >= 0) stack.push(c); else stack.pop();"),
+                        choice("if (\")]}\".indexOf(c) >= 0) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }", false, "This pushes closing brackets instead of opening ones, so pairs[c] would be looked up against the wrong side of the stack and the logic never matches correctly.", code = "if (\")]}\".indexOf(c) >= 0) stack.push(c); else { if (stack.isEmpty() || stack.pop() != pairs.get(c)) return false; }"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    JAVASCRIPT,
+                    "const stack = [];\nconst pairs = { ')': '(', ']': '[', '}': '{' };\nfor (const c of s) {\n    // ???\n}\nreturn stack.length === 0;",
+                    choices = listOf(
+                        choice("if (\"([{\".includes(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }", true, "This pushes every opening bracket, and for a closing bracket, fails immediately on an empty stack or a mismatched popped value - exactly the two failure conditions that must both be checked.", code = "if (\"([{\".includes(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }"),
+                        choice("if (\"([{\".includes(c)) stack.push(c); else stack.pop();", false, "Popping without checking the stack for emptiness first would crash on a closing bracket with nothing open, and without checking the popped value's type, mismatched pairs slip through unnoticed.", code = "if (\"([{\".includes(c)) stack.push(c); else stack.pop();"),
+                        choice("if (\")]}\".includes(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }", false, "This pushes closing brackets instead of opening ones, so pairs[c] would be looked up against the wrong side of the stack and the logic never matches correctly.", code = "if (\")]}\".includes(c)) stack.push(c); else { if (stack.length === 0 || stack.pop() !== pairs[c]) return false; }"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    CPP,
+                    "vector<char> stack;\nunordered_map<char, char> pairs = {{')', '('}, {']', '['}, {'}', '{'}};\nfor (char c : s) {\n    // ???\n}\nreturn stack.empty();",
+                    choices = listOf(
+                        choice("if (string(\"([{\").find(c) != string::npos) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }", true, "This pushes every opening bracket, and for a closing bracket, fails immediately on an empty stack or a mismatched popped value - exactly the two failure conditions that must both be checked.", code = "if (string(\"([{\").find(c) != string::npos) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }"),
+                        choice("if (string(\"([{\").find(c) != string::npos) stack.push_back(c); else stack.pop_back();", false, "Popping without checking the stack for emptiness first would crash on a closing bracket with nothing open, and without checking the popped value's type, mismatched pairs slip through unnoticed.", code = "if (string(\"([{\").find(c) != string::npos) stack.push_back(c); else stack.pop_back();"),
+                        choice("if (string(\")]}\").find(c) != string::npos) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }", false, "This pushes closing brackets instead of opening ones, so pairs[c] would be looked up against the wrong side of the stack and the logic never matches correctly.", code = "if (string(\")]}\").find(c) != string::npos) { stack.push_back(c); } else { if (stack.empty()) return false; char top = stack.back(); stack.pop_back(); if (top != pairs[c]) return false; }"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    GO,
+                    "stack := []byte{}\npairs := map[byte]byte{')': '(', ']': '[', '}': '{'}\nfor i := 0; i < len(s); i++ {\n    c := s[i]\n    // ???\n}\nreturn len(stack) == 0",
+                    choices = listOf(
+                        choice("if strings.ContainsRune(\"([{\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}", true, "This pushes every opening bracket, and for a closing bracket, fails immediately on an empty stack or a mismatched popped value - exactly the two failure conditions that must both be checked.", code = "if strings.ContainsRune(\"([{\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}"),
+                        choice("if strings.ContainsRune(\"([{\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    stack = stack[:len(stack)-1]\n}", false, "Popping without checking the stack for emptiness first would crash on a closing bracket with nothing open, and without checking the popped value's type, mismatched pairs slip through unnoticed.", code = "if strings.ContainsRune(\"([{\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    stack = stack[:len(stack)-1]\n}"),
+                        choice("if strings.ContainsRune(\")]}\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}", false, "This pushes closing brackets instead of opening ones, so pairs[c] would be looked up against the wrong side of the stack and the logic never matches correctly.", code = "if strings.ContainsRune(\")]}\", rune(c)) {\n    stack = append(stack, c)\n} else {\n    if len(stack) == 0 || stack[len(stack)-1] != pairs[c] {\n        return false\n    }\n    stack = stack[:len(stack)-1]\n}"),
+                    ),
+                ),
+                WorkoutCodeVariant(
+                    SWIFT,
+                    "var stack: [Character] = []\nlet pairs: [Character: Character] = [\")\": \"(\", \"]\": \"[\", \"}\": \"{\"]\nfor c in s {\n    // ???\n}\nreturn stack.isEmpty",
+                    choices = listOf(
+                        choice("if \"([{\".contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }", true, "This pushes every opening bracket, and for a closing bracket, fails immediately on an empty stack or a mismatched popped value - exactly the two failure conditions that must both be checked.", code = "if \"([{\".contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }"),
+                        choice("if \"([{\".contains(c) { stack.append(c) } else { stack.removeLast() }", false, "Popping without checking the stack for emptiness first would crash on a closing bracket with nothing open, and without checking the popped value's type, mismatched pairs slip through unnoticed.", code = "if \"([{\".contains(c) { stack.append(c) } else { stack.removeLast() }"),
+                        choice("if \")]}\".contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }", false, "This pushes closing brackets instead of opening ones, so pairs[c] would be looked up against the wrong side of the stack and the logic never matches correctly.", code = "if \")]}\".contains(c) { stack.append(c) } else { if stack.isEmpty || stack.removeLast() != pairs[c] { return false } }"),
+                    ),
+                ),
+            ),
         ),
         step(
             "valid-parentheses", STACK, TIME_COMPLEXITY,

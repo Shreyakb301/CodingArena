@@ -53,6 +53,21 @@ data class WorkoutChoice(
     val code: String? = null,
 )
 
+/**
+ * An alternate-language rendering of a CODE_BLOCK [WorkoutStep]'s [WorkoutStep.code]
+ * and its choices' code.
+ *
+ * The base content here is authored in Kotlin (not Python, unlike
+ * [com.codingarena.domain.model.CodingProblem]), so this is what lets a
+ * Python/Java/etc. learner see idiomatic code in their language instead.
+ */
+@Serializable
+data class WorkoutCodeVariant(
+    val language: ProgrammingLanguage,
+    val code: String,
+    val choices: List<WorkoutChoice> = emptyList(),
+)
+
 @Serializable
 data class WorkoutStep(
     val id: String,
@@ -72,6 +87,14 @@ data class WorkoutStep(
     val prompt: String,
     val code: String? = null,
     val choices: List<WorkoutChoice>,
+    val languageVariants: List<WorkoutCodeVariant> = emptyList(),
 ) {
     val correctIndex: Int get() = choices.indexOfFirst { it.correct }
+}
+
+/** The step as it should be shown to a user who prefers [language]; falls back to the base Kotlin content. */
+fun WorkoutStep.forLanguage(language: ProgrammingLanguage): WorkoutStep {
+    if (code == null) return this
+    val variant = languageVariants.firstOrNull { it.language == language } ?: return this
+    return copy(code = variant.code, choices = variant.choices.ifEmpty { choices })
 }

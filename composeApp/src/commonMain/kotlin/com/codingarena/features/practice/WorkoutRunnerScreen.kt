@@ -67,9 +67,11 @@ import com.codingarena.domain.model.MissedConcept
 import com.codingarena.domain.model.PatternGroup
 import com.codingarena.domain.model.PracticeDifficulty
 import com.codingarena.domain.model.PracticeSessionKind
+import com.codingarena.domain.model.ProgrammingLanguage
 import com.codingarena.domain.model.WorkoutChoice
 import com.codingarena.domain.model.WorkoutStep
 import com.codingarena.domain.model.WorkoutStepKind
+import com.codingarena.domain.model.forLanguage
 import com.codingarena.domain.repository.CurriculumRepository
 import com.codingarena.domain.repository.PracticeStateRepository
 import com.codingarena.domain.repository.StreakRepository
@@ -191,8 +193,12 @@ class WorkoutRunnerViewModel(
         val curriculum = NeetCode150.curriculum
         val records = curriculumRepo.records(uid)
         val progress = blitzEngine.progress(curriculum, records, time.nowMillis())
+        val language = currentUser.profile.value?.onboarding?.preferredLanguage ?: ProgrammingLanguage.PYTHON
+        val workouts = ProblemWorkouts.workouts.map { workout ->
+            workout.copy(steps = workout.steps.map { it.forLanguage(language) })
+        }
         val updated = engine.startRound(
-            current, curriculum, progress, records, ProblemWorkouts.workouts, time.nowMillis(),
+            current, curriculum, progress, records, workouts, time.nowMillis(),
         )
         practiceStateRepo.save(updated, time.nowMillis())
         _state.value = WorkoutRunnerUiState(
