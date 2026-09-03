@@ -12,3 +12,6 @@ keystore.properties
 
 # Kotlin compiler scratch
 .kotlin/
+
+# wrangler local state
+.wrangler/
