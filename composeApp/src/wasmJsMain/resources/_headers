@@ -1,0 +1,23 @@
+# Cloudflare Pages headers.
+
+/*.wasm
+  Content-Type: application/wasm
+
+# Wasm/JS bundle filenames are content-hashed - cache them forever.
+/*.wasm
+  Cache-Control: public, max-age=31536000, immutable
+/codingarena.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# Always revalidate the shell and the pieces referenced by fixed name so a new
+# deploy is picked up immediately.
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
+/sqljs.worker.js
+  Cache-Control: no-cache
+/sql-wasm.js
+  Cache-Control: no-cache

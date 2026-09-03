@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -10,6 +11,7 @@ plugins {
 
 val androidEnabled = System.getProperty("codingarena.android").toBoolean()
 val appleEnabled = System.getProperty("codingarena.apple").toBoolean()
+val webEnabled = System.getProperty("codingarena.web").toBoolean()
 
 if (androidEnabled) apply(from = rootProject.file("gradle/android-app.gradle"))
 
@@ -37,6 +39,22 @@ kotlin {
                 // Compose Multiplatform requires a static framework on iOS.
                 isStatic = true
             }
+        }
+    }
+
+    if (webEnabled) {
+        // Kotlin/Wasm + Compose for Web. The canvas-based UI runs the exact same
+        // commonMain Compose code as iOS. Output: composeApp/build/dist/wasmJs/
+        // productionExecutable/ - static files, deployable to any host.
+        @OptIn(ExperimentalWasmDsl::class)
+        wasmJs {
+            outputModuleName.set("codingarena")
+            browser {
+                commonWebpackConfig {
+                    outputFileName = "codingarena.js"
+                }
+            }
+            binaries.executable()
         }
     }
 
@@ -75,6 +93,18 @@ kotlin {
         getByName("desktopMain").dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+        }
+
+        if (webEnabled) {
+            getByName("wasmJsMain").dependencies {
+                implementation(libs.kotlinx.browser)
+                // sql.js (SQLite/Wasm) for the database Web Worker, plus the
+                // plugin that copies its files next to the bundle. See
+                // composeApp/webpack.config.d/sqljs.js and
+                // src/wasmJsMain/resources/sqljs.worker.js.
+                implementation(npm("sql.js", "1.8.0"))
+                implementation(devNpm("copy-webpack-plugin", "9.1.0"))
+            }
         }
     }
 
