@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,7 @@ plugins {
 
 val androidEnabled = System.getProperty("codingarena.android").toBoolean()
 val appleEnabled = System.getProperty("codingarena.apple").toBoolean()
+val webEnabled = System.getProperty("codingarena.web").toBoolean()
 
 // Adds the Android target. Must run before the `kotlin { }` block below so the
 // android source sets exist by the time dependencies are wired up.
@@ -30,6 +32,13 @@ kotlin {
         iosX64()
         iosArm64()
         iosSimulatorArm64()
+    }
+
+    if (webEnabled) {
+        @OptIn(ExperimentalWasmDsl::class)
+        wasmJs {
+            browser()
+        }
     }
 
     sourceSets {
@@ -66,6 +75,16 @@ kotlin {
                 dependencies {
                     implementation(libs.sqldelight.driver.native)
                     implementation(libs.ktor.client.darwin)
+                }
+            }
+        }
+
+        if (webEnabled) {
+            matching { it.name == "wasmJsMain" }.configureEach {
+                dependencies {
+                    implementation(libs.sqldelight.driver.web)
+                    implementation(libs.ktor.client.js)
+                    implementation(libs.kotlinx.browser)
                 }
             }
         }
