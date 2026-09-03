@@ -54,6 +54,7 @@ class LocalCurriculumRepository(
             solved = if (record.solved) 1L else 0L,
             solvedAt = record.solvedAt,
         )
+        Unit
     }
 
     override suspend fun saveAll(userId: String, records: List<RecallRecord>) = withContext(io) {
@@ -88,6 +89,7 @@ class LocalCurriculumRepository(
                 endedAt = session.endedAt,
                 synced = 0L,
             )
+            Unit
         }
 
     override suspend fun recentSessions(userId: String, limit: Int): List<BlitzSessionSummary> =

@@ -129,10 +129,12 @@ class LocalProfileRepository(
             startingRating = profile.startingRating.toLong(),
             createdAt = profile.createdAt,
         )
+        Unit
     }
 
     override suspend fun clear(userId: String) = withContext(io) {
         db.arenaQueries.deleteProfile(userId)
+        Unit
     }
 
     private fun com.codingarena.db.Profile.toDomain() = UserProfile(
@@ -213,6 +215,7 @@ class LocalRatingRepository(
             recordedAt = entry.recordedAt,
             problemId = entry.problemId,
         )
+        Unit
     }
 
     override suspend fun overallHistory(userId: String): List<RatingHistoryEntry> = withContext(io) {
@@ -256,6 +259,7 @@ class LocalAttemptRepository(
             source = attempt.source.name,
             synced = if (attempt.synced) 1L else 0L,
         )
+        Unit
     }
 
     override suspend fun recent(userId: String, limit: Int): List<PracticeAttempt> = withContext(io) {
@@ -313,6 +317,7 @@ class LocalReviewRepository(
             lapses = review.lapses.toLong(),
             topic = review.topic.name,
         )
+        Unit
     }
 }
 
@@ -339,6 +344,7 @@ class LocalStreakRepository(
             activeDaysThisWeek = state.activeDaysThisWeek.joinDays(),
             totalActiveDays = state.totalActiveDays.toLong(),
         )
+        Unit
     }
 }
 
@@ -379,6 +385,7 @@ class LocalDailyPuzzleRepository(
 
     override suspend fun save(puzzle: DailyPuzzle) = withContext(io) {
         db.arenaQueries.upsertDailyPuzzle(puzzle.epochDay, puzzle.problemId, puzzle.downloadedAt)
+        Unit
     }
 
     override suspend fun result(userId: String, epochDay: Long): DailyPuzzleResult? = withContext(io) {
@@ -398,6 +405,7 @@ class LocalDailyPuzzleRepository(
             ratingChange = result.ratingChange.toLong(),
             completedAt = result.completedAt,
         )
+        Unit
     }
 
     override fun observeResult(userId: String, epochDay: Long): Flow<DailyPuzzleResult?> =
@@ -439,6 +447,7 @@ class LocalLearningPathRepository(
             createdAt = path.createdAt,
             completedAt = path.completedAt,
         )
+        Unit
     }
 
     private fun String.decode(): LearningPath? =
@@ -460,6 +469,7 @@ class LocalCodeRushRepository(
             endedAt = session.endedAt,
             synced = 0L,
         )
+        Unit
     }
 
     override suspend fun sessions(userId: String): List<CodeRushSession> = withContext(io) {
@@ -494,10 +504,12 @@ class LocalPracticeStateRepository(
             updatedAt = now,
             synced = 0L,
         )
+        Unit
     }
 
     override suspend fun clear(userId: String) = withContext(io) {
         db.arenaQueries.clearPracticeAdaptiveState(userId)
+        Unit
     }
 
     private fun String.decode(): AdaptivePracticeState? =
@@ -520,6 +532,7 @@ class LocalInterviewProgressRepository(
             updatedAt = now,
             synced = 0L,
         )
+        Unit
     }
 
     private fun String.decode(): InterviewProgress? =
@@ -540,5 +553,6 @@ class LocalSettingsRepository(
 
     override suspend fun put(key: String, value: String) = withContext(io) {
         db.arenaQueries.upsertSetting(key, value)
+        Unit
     }
 }

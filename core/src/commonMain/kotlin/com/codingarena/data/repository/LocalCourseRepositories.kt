@@ -44,6 +44,7 @@ class LocalCourseProgressRepository(
             updatedAt = progress.lastPractisedAt ?: 0L,
             synced = if (synced) 1L else 0L,
         )
+        Unit
     }
 
     override suspend fun unsynced(): List<ChapterProgress> = withContext(io) {
@@ -53,6 +54,7 @@ class LocalCourseProgressRepository(
 
     override suspend fun markSynced(userId: String, chapterId: String) = withContext(io) {
         db.arenaQueries.markChapterProgressSynced(userId, chapterId)
+        Unit
     }
 
     private fun decode(payload: String): ChapterProgress? = runCatching {
@@ -86,10 +88,11 @@ class LocalCodeDraftRepository(
             draft.updatedAt,
             if (draft.synced) 1L else 0L,
         )
+        Unit
     }
 
     override suspend fun delete(userId: String, problemId: String, language: ProgrammingLanguage) =
-        withContext(io) { db.arenaQueries.deleteCodeDraft(userId, problemId, language.name) }
+        withContext(io) { db.arenaQueries.deleteCodeDraft(userId, problemId, language.name); Unit }
 
     private fun com.codingarena.db.CodeDraft.toDomain(): CodeDraft? =
         ProgrammingLanguage.entries.firstOrNull { it.name == language }?.let { parsed ->
