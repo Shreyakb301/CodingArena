@@ -64,15 +64,15 @@ import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 /** The onboarding questions, in order. */
-enum class OnboardingStep(val title: String, val subtitle: String) {
-    WELCOME("Welcome to CodingArena", ""),
-    EXPERIENCE("How much have you practised?", "This sets your starting rating - it adjusts fast."),
-    LANGUAGE("Which language do you think in?", "Code snippets will use it where they can."),
-    GOAL("What are you preparing for?", "Sets the target your readiness score is measured against."),
-    TOPICS("Which topics do you already know?", "Anything you skip simply starts unrated."),
-    COMMITMENT("How often do you want to practise?", "Used for your weekly goal and streak."),
-    PLACEMENT("Quick placement test", "Eight short questions. Optional - you can skip it."),
-    DONE("You are set up", "Your first learning path is ready."),
+enum class OnboardingStep(val title: String) {
+    WELCOME("Welcome to CodingArena"),
+    EXPERIENCE("How much have you practised?"),
+    LANGUAGE("Which language do you think in?"),
+    GOAL("What are you preparing for?"),
+    TOPICS("Which topics do you already know?"),
+    COMMITMENT("How often do you want to practise?"),
+    PLACEMENT("Quick placement test"),
+    DONE("You are set up"),
 }
 
 data class OnboardingUiState(
@@ -247,25 +247,12 @@ fun OnboardingScreen(
             contentPadding = PaddingValues(vertical = 28.dp),
         ) {
             item {
-                Column(
-                    Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        state.step.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center,
-                    )
-                    if (state.step.subtitle.isNotEmpty()) {
-                        Spacer(Modifier.height(10.dp))
-                        Text(
-                            state.step.subtitle,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
+                Text(
+                    state.step.title,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    style = MaterialTheme.typography.headlineMedium,
+                    textAlign = TextAlign.Center,
+                )
             }
 
             when (state.step) {
