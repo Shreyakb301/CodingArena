@@ -1,34 +1,43 @@
 package com.codingarena.features.onboarding
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import com.codingarena.core.design.ArenaChip
 import com.codingarena.core.design.CodeBlock
-import com.codingarena.core.design.SectionHeader
 import com.codingarena.domain.engine.PlacementAnswer
 import com.codingarena.domain.engine.PlacementResult
 import com.codingarena.domain.engine.PlacementTestEngine
@@ -79,10 +88,6 @@ data class OnboardingUiState(
     val saving: Boolean = false,
     val finished: Boolean = false,
 ) {
-    val progress: Float
-        get() = OnboardingStep.entries.indexOf(step).toFloat() /
-            (OnboardingStep.entries.size - 1).coerceAtLeast(1)
-
     val currentPlacementQuestion: CodingProblem?
         get() = placementQuestions.getOrNull(placementIndex)
 
@@ -219,33 +224,50 @@ fun OnboardingScreen(
         if (state.step == OnboardingStep.PLACEMENT) viewModel.preparePlacement()
     }
 
-    Column(Modifier.fillMaxSize().padding(20.dp)) {
-        LinearProgressIndicator(
-            progress = { state.progress },
-            modifier = Modifier.fillMaxWidth(),
-        )
+    // Short steps sit optically centred; the long ones (topic grid, placement
+    // test) top-align and scroll.
+    val centred = state.step in CENTRED_STEPS
+    val steps = OnboardingStep.entries
 
-        Text(
-            state.step.title,
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(
-                top = 24.dp,
-                bottom = if (state.step.subtitle.isEmpty()) 16.dp else 0.dp,
-            ),
-        )
-        if (state.step.subtitle.isNotEmpty()) {
-            Text(
-                state.step.subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
-            )
-        }
+    Column(
+        Modifier.fillMaxSize()
+            .padding(horizontal = 24.dp)
+            .padding(top = 20.dp, bottom = 20.dp),
+    ) {
+        StepSegments(current = steps.indexOf(state.step), total = steps.size)
 
         LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = if (centred) {
+                Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+            } else {
+                Arrangement.spacedBy(12.dp)
+            },
+            contentPadding = PaddingValues(vertical = 28.dp),
         ) {
+            item {
+                Column(
+                    Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        state.step.title,
+                        style = MaterialTheme.typography.headlineMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    if (state.step.subtitle.isNotEmpty()) {
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            state.step.subtitle,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            }
+
             when (state.step) {
                 OnboardingStep.WELCOME -> item {
                     OutlinedTextField(
@@ -253,6 +275,7 @@ fun OnboardingScreen(
                         onValueChange = viewModel::setName,
                         label = { Text("What should we call you?") },
                         singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -260,7 +283,6 @@ fun OnboardingScreen(
                 OnboardingStep.EXPERIENCE -> items(ExperienceLevel.entries) { level ->
                     ChoiceRow(
                         label = level.displayName,
-                        caption = "Starts you around ${level.startingRating}",
                         selected = state.answers.experienceLevel == level,
                         onClick = { viewModel.setExperience(level) },
                     )
@@ -269,7 +291,6 @@ fun OnboardingScreen(
                 OnboardingStep.LANGUAGE -> items(ProgrammingLanguage.entries) { language ->
                     ChoiceRow(
                         label = language.displayName,
-                        caption = null,
                         selected = state.answers.preferredLanguage == language,
                         onClick = { viewModel.setLanguage(language) },
                     )
@@ -278,7 +299,6 @@ fun OnboardingScreen(
                 OnboardingStep.GOAL -> items(TargetJobLevel.entries) { level ->
                     ChoiceRow(
                         label = level.displayName,
-                        caption = null,
                         selected = state.answers.targetJobLevel == level,
                         onClick = { viewModel.setJobLevel(level) },
                     )
@@ -292,18 +312,20 @@ fun OnboardingScreen(
                 }
 
                 OnboardingStep.COMMITMENT -> {
-                    item { SectionHeader("Session length") }
+                    item { GroupLabel("Session length") }
                     items(SessionLength.entries) { length ->
                         ChoiceRow(
                             label = length.displayName,
-                            caption = null,
                             selected = state.answers.sessionLength == length,
                             onClick = { viewModel.setSessionLength(length) },
                         )
                     }
-                    item { SectionHeader("Days per week") }
+                    item { GroupLabel("Days per week") }
                     item {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                        ) {
                             (2..7).forEach { days ->
                                 FilterChip(
                                     selected = state.answers.weeklyGoalDays == days,
@@ -323,37 +345,43 @@ fun OnboardingScreen(
                     when {
                         state.placementSkipped -> item {
                             Text(
-                                "Skipped. We will start you from your experience level and let " +
-                                    "your first few problems settle the rating.",
+                                "Skipped. We start you from your experience level and let your " +
+                                    "first few problems settle the rating.",
                                 style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center,
                             )
                         }
 
                         placement != null -> item {
-                            Column {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     placement.estimatedRating.toString(),
                                     style = MaterialTheme.typography.displaySmall,
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
-                                Text(placement.summary, style = MaterialTheme.typography.bodyLarge)
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    placement.summary,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    textAlign = TextAlign.Center,
+                                )
                             }
                         }
 
                         question != null -> {
                             item {
-                                Column {
-                                    Text(
-                                        "Question ${state.placementIndex + 1} of " +
-                                            "${state.placementQuestions.size}",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    Text(
-                                        question.description,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        modifier = Modifier.padding(top = 6.dp),
-                                    )
-                                }
+                                Text(
+                                    "Question ${state.placementIndex + 1} of " +
+                                        "${state.placementQuestions.size}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            item {
+                                Text(
+                                    question.description,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
                             }
                             question.codeSnippet?.let { item { CodeBlock(it) } }
                             item {
@@ -366,11 +394,12 @@ fun OnboardingScreen(
                                 Card(
                                     Modifier.fillMaxWidth()
                                         .clickable { viewModel.answerPlacement(choice.id) },
+                                    shape = MaterialTheme.shapes.medium,
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.surface,
                                     ),
                                 ) {
-                                    Text(choice.text, Modifier.padding(14.dp))
+                                    Text(choice.text, Modifier.padding(16.dp))
                                 }
                             }
                             item {
@@ -389,58 +418,113 @@ fun OnboardingScreen(
                         "Your rating starts as an estimate. It becomes a measurement after a " +
                             "handful of problems - that is the point.",
                         style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
         }
 
-        Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Button(
+            onClick = {
+                if (state.step == OnboardingStep.DONE) viewModel.finish() else viewModel.next()
+            },
+            // Blocked mid-placement so the estimate is never built from a
+            // half-finished test.
+            enabled = !state.saving && !state.placementInProgress,
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
         ) {
+            Text(if (state.step == OnboardingStep.DONE) "Start practising" else "Continue")
+        }
+
+        if (state.step != OnboardingStep.WELCOME) {
             TextButton(
                 onClick = viewModel::back,
-                enabled = state.step != OnboardingStep.WELCOME,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 2.dp),
             ) { Text("Back") }
+        }
+    }
+}
 
-            Button(
-                onClick = {
-                    if (state.step == OnboardingStep.DONE) viewModel.finish() else viewModel.next()
-                },
-                // Blocked mid-placement so the estimate is never built from a
-                // half-finished test.
-                enabled = !state.saving && !state.placementInProgress,
-            ) {
-                Text(if (state.step == OnboardingStep.DONE) "Start practising" else "Continue")
-            }
+/** The steps whose content is short enough to sit centred rather than scroll. */
+private val CENTRED_STEPS = setOf(
+    OnboardingStep.WELCOME,
+    OnboardingStep.EXPERIENCE,
+    OnboardingStep.LANGUAGE,
+    OnboardingStep.GOAL,
+    OnboardingStep.DONE,
+)
+
+@Composable
+private fun StepSegments(current: Int, total: Int) {
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        repeat(total) { i ->
+            Box(
+                Modifier.weight(1f)
+                    .height(4.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (i <= current) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        },
+                    ),
+            )
         }
     }
 }
 
 @Composable
+private fun GroupLabel(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
 private fun ChoiceRow(
     label: String,
-    caption: String?,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    FilterChip(
-        selected = selected,
+    Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        label = {
-            Column(Modifier.padding(vertical = 6.dp)) {
-                Text(label, style = MaterialTheme.typography.titleMedium)
-                caption?.let {
-                    Text(
-                        it,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+        shape = MaterialTheme.shapes.medium,
+        color = if (selected) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surface
         },
-    )
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.outlineVariant
+            },
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            label,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp, horizontal = 16.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+            color = if (selected) {
+                MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+        )
+    }
 }
 
 @Composable
@@ -456,10 +540,16 @@ private fun TopicGrid(
                         selected = topic in selected,
                         onClick = { onToggle(topic) },
                         modifier = Modifier.weight(1f),
-                        label = { Text(topic.displayName) },
+                        label = {
+                            Text(
+                                topic.displayName,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                textAlign = TextAlign.Center,
+                            )
+                        },
                     )
                 }
-                if (row.size == 1) ArenaChip("", Modifier.weight(1f))
+                if (row.size == 1) Spacer(Modifier.weight(1f))
             }
         }
     }
