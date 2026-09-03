@@ -16,4 +16,5 @@ jobs:
           cache: gradle
       - run: ./gradlew :core:jvmTest :composeApp:compileKotlinDesktop :server:test
       - run: ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
+      - run: ./gradlew :composeApp:compileKotlinWasmJs
 
