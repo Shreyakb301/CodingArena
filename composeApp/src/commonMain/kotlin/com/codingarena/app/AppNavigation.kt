@@ -50,7 +50,14 @@ import com.codingarena.features.splash.SplashScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Routes.SPLASH) {
+    NavHost(
+        navController = navController,
+        startDestination = Routes.SPLASH,
+        enterTransition = navEnter,
+        exitTransition = navExit,
+        popEnterTransition = navPopEnter,
+        popExitTransition = navPopExit,
+    ) {
 
         composable(Routes.SPLASH) {
             SplashScreen(
