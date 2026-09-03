@@ -56,10 +56,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 /** The onboarding questions, in order. */
 enum class OnboardingStep(val title: String, val subtitle: String) {
-    WELCOME(
-        "Welcome to CodingArena",
-        "Short daily practice with a rating that actually reflects what you know.",
-    ),
+    WELCOME("Welcome to CodingArena", ""),
     EXPERIENCE("How much have you practised?", "This sets your starting rating - it adjusts fast."),
     LANGUAGE("Which language do you think in?", "Code snippets will use it where they can."),
     GOAL("What are you preparing for?", "Sets the target your readiness score is measured against."),
@@ -231,14 +228,19 @@ fun OnboardingScreen(
         Text(
             state.step.title,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(top = 24.dp),
+            modifier = Modifier.padding(
+                top = 24.dp,
+                bottom = if (state.step.subtitle.isEmpty()) 16.dp else 0.dp,
+            ),
         )
-        Text(
-            state.step.subtitle,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
-        )
+        if (state.step.subtitle.isNotEmpty()) {
+            Text(
+                state.step.subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp, bottom = 16.dp),
+            )
+        }
 
         LazyColumn(
             modifier = Modifier.weight(1f),
