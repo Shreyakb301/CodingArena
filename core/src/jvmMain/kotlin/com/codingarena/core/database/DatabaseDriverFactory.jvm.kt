@@ -1,5 +1,6 @@
 package com.codingarena.core.database
 
+import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.codingarena.db.ArenaDatabase
@@ -19,6 +20,9 @@ actual class DatabaseDriverFactory(private val path: String? = defaultPath()) {
     actual fun create(): SqlDriver {
         val url = if (path == null) JdbcSqliteDriver.IN_MEMORY else "jdbc:sqlite:$path"
         val driver = JdbcSqliteDriver(url, Properties())
+        // The schema is generated in async mode for the web target; JdbcSqliteDriver
+        // is synchronous, so adapt it back before create()/migrate().
+        val schema = ArenaDatabase.Schema.synchronous()
         // Unlike the Android and Native drivers, JdbcSqliteDriver does not run
         // SQLDelight migrations automatically. Older desktop installs also did
         // not persist PRAGMA user_version, so infer their version from the
@@ -27,15 +31,15 @@ actual class DatabaseDriverFactory(private val path: String? = defaultPath()) {
             DriverManager.getConnection(url, Properties()).use(::existingSchemaVersion)
         } else null
         if (currentVersion != null) {
-            if (currentVersion < ArenaDatabase.Schema.version) {
-                ArenaDatabase.Schema.migrate(driver, currentVersion, ArenaDatabase.Schema.version)
+            if (currentVersion < schema.version) {
+                schema.migrate(driver, currentVersion, schema.version)
             }
         } else {
-            ArenaDatabase.Schema.create(driver)
+            schema.create(driver)
         }
         driver.execute(
             identifier = null,
-            sql = "PRAGMA user_version = ${ArenaDatabase.Schema.version}",
+            sql = "PRAGMA user_version = ${schema.version}",
             parameters = 0,
         )
         return driver

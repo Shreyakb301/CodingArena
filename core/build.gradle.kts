@@ -77,6 +77,12 @@ sqldelight {
         create("ArenaDatabase") {
             packageName.set("com.codingarena.db")
             verifyMigrations.set(true)
+            // The browser has no synchronous SQLite driver - the web target runs
+            // the database in a Web Worker and talks to it asynchronously. This
+            // flag is global to the database, so JVM/iOS/Android also get the
+            // async-generated API (`awaitAsList()` in place of `executeAsList()`).
+            // On a synchronous driver those await calls simply return inline.
+            generateAsync.set(true)
         }
     }
 }

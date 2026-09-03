@@ -1,5 +1,8 @@
 package com.codingarena.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.codingarena.data.local.arenaJson
@@ -26,7 +29,7 @@ class LocalCurriculumRepository(
 ) : CurriculumRepository {
 
     override suspend fun records(userId: String): Map<String, RecallRecord> = withContext(io) {
-        db.arenaQueries.selectRecallRecords(userId).executeAsList()
+        db.arenaQueries.selectRecallRecords(userId).awaitAsList()
             .associate { it.slug to it.toDomain() }
     }
 
@@ -35,7 +38,7 @@ class LocalCurriculumRepository(
             .map { rows -> rows.associate { it.slug to it.toDomain() } }
 
     override suspend fun record(userId: String, slug: String): RecallRecord? = withContext(io) {
-        db.arenaQueries.selectRecallRecord(userId, slug).executeAsOneOrNull()?.toDomain()
+        db.arenaQueries.selectRecallRecord(userId, slug).awaitAsOneOrNull()?.toDomain()
     }
 
     override suspend fun save(userId: String, record: RecallRecord) = withContext(io) {
@@ -89,7 +92,7 @@ class LocalCurriculumRepository(
 
     override suspend fun recentSessions(userId: String, limit: Int): List<BlitzSessionSummary> =
         withContext(io) {
-            db.arenaQueries.selectBlitzSessions(userId, limit.toLong()).executeAsList().map {
+            db.arenaQueries.selectBlitzSessions(userId, limit.toLong()).awaitAsList().map {
                 BlitzSessionSummary(
                     id = it.id,
                     curriculumId = it.curriculumId,
@@ -102,7 +105,7 @@ class LocalCurriculumRepository(
         }
 
     override suspend fun bestScore(userId: String): Int = withContext(io) {
-        db.arenaQueries.selectBestBlitzStreak(userId).executeAsOneOrNull()?.max?.toInt() ?: 0
+        db.arenaQueries.selectBestBlitzStreak(userId).awaitAsOneOrNull()?.max?.toInt() ?: 0
     }
 
     private fun com.codingarena.db.RecallRecord.toDomain() = RecallRecord(

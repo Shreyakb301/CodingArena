@@ -1,5 +1,8 @@
 package com.codingarena.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -59,17 +62,17 @@ class LocalProblemRepository(
 ) : ProblemRepository {
 
     override suspend fun all(): List<CodingProblem> = withContext(io) {
-        db.arenaQueries.selectAllProblems().executeAsList().mapNotNull { it.payloadJson.decode() }
+        db.arenaQueries.selectAllProblems().awaitAsList().mapNotNull { it.payloadJson.decode() }
     }
 
     override suspend fun byId(id: String): CodingProblem? = withContext(io) {
-        db.arenaQueries.selectProblemById(id).executeAsOneOrNull()?.payloadJson?.decode()
+        db.arenaQueries.selectProblemById(id).awaitAsOneOrNull()?.payloadJson?.decode()
     }
 
     override suspend fun byTopic(topic: CodingTopic): List<CodingProblem> = withContext(io) {
         // The indexed column only holds the primary topic, so secondary matches
         // are filtered from the full payload after the query.
-        db.arenaQueries.selectAllProblems().executeAsList()
+        db.arenaQueries.selectAllProblems().awaitAsList()
             .mapNotNull { it.payloadJson.decode() }
             .filter { topic in it.allTopics }
     }
@@ -79,7 +82,7 @@ class LocalProblemRepository(
             .map { rows -> rows.mapNotNull { it.payloadJson.decode() } }
 
     override suspend fun seedIfEmpty(problems: List<CodingProblem>) = withContext(io) {
-        if (db.arenaQueries.countProblems().executeAsOne() == 0L) {
+        if (db.arenaQueries.countProblems().awaitAsOne() == 0L) {
             upsertAll(problems)
         }
     }
@@ -113,7 +116,7 @@ class LocalProfileRepository(
         db.arenaQueries.selectAnyProfile().asFlow().mapToOneOrNull(io).map { it?.toDomain() }
 
     override suspend fun current(): UserProfile? = withContext(io) {
-        db.arenaQueries.selectAnyProfile().executeAsOneOrNull()?.toDomain()
+        db.arenaQueries.selectAnyProfile().awaitAsOneOrNull()?.toDomain()
     }
 
     override suspend fun save(profile: UserProfile) = withContext(io) {
@@ -164,12 +167,12 @@ class LocalRatingRepository(
     }
 
     override suspend fun load(userId: String): PlayerRatings = withContext(io) {
-        val overall = db.arenaQueries.selectOverallRating(userId).executeAsOneOrNull()
+        val overall = db.arenaQueries.selectOverallRating(userId).awaitAsOneOrNull()
         PlayerRatings(
             overall = overall?.rating?.toInt() ?: PlayerRatings.DEFAULT_RATING,
-            topics = db.arenaQueries.selectTopicRatings(userId).executeAsList()
+            topics = db.arenaQueries.selectTopicRatings(userId).awaitAsList()
                 .mapNotNull { it.toDomain() }.associateBy { it.topic },
-            modes = db.arenaQueries.selectModeRatings(userId).executeAsList()
+            modes = db.arenaQueries.selectModeRatings(userId).awaitAsList()
                 .mapNotNull { it.toDomain() }.associateBy { it.mode },
             updatedAt = overall?.updatedAt ?: 0L,
         )
@@ -213,12 +216,12 @@ class LocalRatingRepository(
     }
 
     override suspend fun overallHistory(userId: String): List<RatingHistoryEntry> = withContext(io) {
-        db.arenaQueries.selectOverallHistory(userId).executeAsList().map { it.toDomain() }
+        db.arenaQueries.selectOverallHistory(userId).awaitAsList().map { it.toDomain() }
     }
 
     override suspend fun topicHistory(userId: String, topic: CodingTopic): List<RatingHistoryEntry> =
         withContext(io) {
-            db.arenaQueries.selectTopicHistory(userId, topic.name).executeAsList().map { it.toDomain() }
+            db.arenaQueries.selectTopicHistory(userId, topic.name).awaitAsList().map { it.toDomain() }
         }
 
     private fun com.codingarena.db.RatingHistory.toDomain() = RatingHistoryEntry(
@@ -256,12 +259,12 @@ class LocalAttemptRepository(
     }
 
     override suspend fun recent(userId: String, limit: Int): List<PracticeAttempt> = withContext(io) {
-        db.arenaQueries.selectRecentAttempts(userId, limit.toLong()).executeAsList().map { it.toDomain() }
+        db.arenaQueries.selectRecentAttempts(userId, limit.toLong()).awaitAsList().map { it.toDomain() }
     }
 
     override suspend fun forProblem(userId: String, problemId: String): List<PracticeAttempt> =
         withContext(io) {
-            db.arenaQueries.selectAttemptsForProblem(userId, problemId).executeAsList().map { it.toDomain() }
+            db.arenaQueries.selectAttemptsForProblem(userId, problemId).awaitAsList().map { it.toDomain() }
         }
 
     override fun observeRecent(userId: String, limit: Int): Flow<List<PracticeAttempt>> =
@@ -269,7 +272,7 @@ class LocalAttemptRepository(
             .map { rows -> rows.map { it.toDomain() } }
 
     override suspend fun unsynced(): List<PracticeAttempt> = withContext(io) {
-        db.arenaQueries.selectUnsyncedAttempts().executeAsList().map { it.toDomain() }
+        db.arenaQueries.selectUnsyncedAttempts().awaitAsList().map { it.toDomain() }
     }
 
     override suspend fun markSynced(ids: List<String>) = withContext(io) {
@@ -287,16 +290,16 @@ class LocalReviewRepository(
             .map { rows -> rows.mapNotNull { it.toDomain() } }
 
     override suspend fun all(userId: String): List<ScheduledReview> = withContext(io) {
-        db.arenaQueries.selectReviews(userId).executeAsList().mapNotNull { it.toDomain() }
+        db.arenaQueries.selectReviews(userId).awaitAsList().mapNotNull { it.toDomain() }
     }
 
     override suspend fun due(userId: String, now: Long): List<ScheduledReview> = withContext(io) {
-        db.arenaQueries.selectDueReviews(userId, now).executeAsList().mapNotNull { it.toDomain() }
+        db.arenaQueries.selectDueReviews(userId, now).awaitAsList().mapNotNull { it.toDomain() }
     }
 
     override suspend fun forProblem(userId: String, problemId: String): ScheduledReview? =
         withContext(io) {
-            db.arenaQueries.selectReviewForProblem(userId, problemId).executeAsOneOrNull()?.toDomain()
+            db.arenaQueries.selectReviewForProblem(userId, problemId).awaitAsOneOrNull()?.toDomain()
         }
 
     override suspend fun save(review: ScheduledReview) = withContext(io) {
@@ -323,7 +326,7 @@ class LocalStreakRepository(
             .map { it?.toDomain() ?: StreakState() }
 
     override suspend fun load(userId: String): StreakState = withContext(io) {
-        db.arenaQueries.selectStreak(userId).executeAsOneOrNull()?.toDomain() ?: StreakState()
+        db.arenaQueries.selectStreak(userId).awaitAsOneOrNull()?.toDomain() ?: StreakState()
     }
 
     override suspend fun save(userId: String, state: StreakState) = withContext(io) {
@@ -349,7 +352,7 @@ class LocalAchievementRepository(
             .map { rows -> rows.associate { it.achievementId to it.unlockedAt } }
 
     override suspend fun unlocked(userId: String): Map<String, Long> = withContext(io) {
-        db.arenaQueries.selectUserAchievements(userId).executeAsList()
+        db.arenaQueries.selectUserAchievements(userId).awaitAsList()
             .associate { it.achievementId to it.unlockedAt }
     }
 
@@ -369,7 +372,7 @@ class LocalDailyPuzzleRepository(
 ) : DailyPuzzleRepository {
 
     override suspend fun puzzleFor(epochDay: Long): DailyPuzzle? = withContext(io) {
-        db.arenaQueries.selectDailyPuzzle(epochDay).executeAsOneOrNull()?.let {
+        db.arenaQueries.selectDailyPuzzle(epochDay).awaitAsOneOrNull()?.let {
             DailyPuzzle(it.epochDay, it.problemId, it.downloadedAt)
         }
     }
@@ -379,7 +382,7 @@ class LocalDailyPuzzleRepository(
     }
 
     override suspend fun result(userId: String, epochDay: Long): DailyPuzzleResult? = withContext(io) {
-        db.arenaQueries.selectDailyPuzzleResult(epochDay, userId).executeAsOneOrNull()?.toDomain()
+        db.arenaQueries.selectDailyPuzzleResult(epochDay, userId).awaitAsOneOrNull()?.toDomain()
     }
 
     override suspend fun saveResult(userId: String, result: DailyPuzzleResult) = withContext(io) {
@@ -424,7 +427,7 @@ class LocalLearningPathRepository(
             .map { it?.payloadJson?.decode() }
 
     override suspend fun active(userId: String): LearningPath? = withContext(io) {
-        db.arenaQueries.selectActiveLearningPath(userId).executeAsOneOrNull()?.payloadJson?.decode()
+        db.arenaQueries.selectActiveLearningPath(userId).awaitAsOneOrNull()?.payloadJson?.decode()
     }
 
     override suspend fun save(path: LearningPath) = withContext(io) {
@@ -460,7 +463,7 @@ class LocalCodeRushRepository(
     }
 
     override suspend fun sessions(userId: String): List<CodeRushSession> = withContext(io) {
-        db.arenaQueries.selectCodeRushSessions(userId).executeAsList().mapNotNull { it.payloadJson.decode() }
+        db.arenaQueries.selectCodeRushSessions(userId).awaitAsList().mapNotNull { it.payloadJson.decode() }
     }
 
     override fun observeSessions(userId: String): Flow<List<CodeRushSession>> =
@@ -468,7 +471,7 @@ class LocalCodeRushRepository(
             .map { rows -> rows.mapNotNull { it.payloadJson.decode() } }
 
     override suspend fun bestScore(userId: String): Int = withContext(io) {
-        db.arenaQueries.selectBestCodeRushScore(userId).executeAsOneOrNull()?.max?.toInt() ?: 0
+        db.arenaQueries.selectBestCodeRushScore(userId).awaitAsOneOrNull()?.max?.toInt() ?: 0
     }
 
     private fun String.decode(): CodeRushSession? =
@@ -481,7 +484,7 @@ class LocalPracticeStateRepository(
 ) : PracticeStateRepository {
 
     override suspend fun load(userId: String): AdaptivePracticeState? = withContext(io) {
-        db.arenaQueries.selectPracticeAdaptiveState(userId).executeAsOneOrNull()?.payloadJson?.decode()
+        db.arenaQueries.selectPracticeAdaptiveState(userId).awaitAsOneOrNull()?.payloadJson?.decode()
     }
 
     override suspend fun save(state: AdaptivePracticeState, now: Long) = withContext(io) {
@@ -507,7 +510,7 @@ class LocalInterviewProgressRepository(
 ) : InterviewProgressRepository {
 
     override suspend fun load(userId: String): InterviewProgress? = withContext(io) {
-        db.arenaQueries.selectInterviewProgress(userId).executeAsOneOrNull()?.payloadJson?.decode()
+        db.arenaQueries.selectInterviewProgress(userId).awaitAsOneOrNull()?.payloadJson?.decode()
     }
 
     override suspend fun save(progress: InterviewProgress, now: Long) = withContext(io) {
@@ -532,7 +535,7 @@ class LocalSettingsRepository(
         db.arenaQueries.selectSetting(key).asFlow().mapToOneOrNull(io)
 
     override suspend fun get(key: String): String? = withContext(io) {
-        db.arenaQueries.selectSetting(key).executeAsOneOrNull()
+        db.arenaQueries.selectSetting(key).awaitAsOneOrNull()
     }
 
     override suspend fun put(key: String, value: String) = withContext(io) {

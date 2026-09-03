@@ -1,5 +1,8 @@
 package com.codingarena.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.codingarena.data.local.arenaJson
@@ -24,12 +27,12 @@ class LocalCourseProgressRepository(
         }
 
     override suspend fun all(userId: String): Map<String, ChapterProgress> = withContext(io) {
-        db.arenaQueries.selectChapterProgress(userId).executeAsList()
+        db.arenaQueries.selectChapterProgress(userId).awaitAsList()
             .mapNotNull { decode(it.payloadJson) }.associateBy { it.chapterId }
     }
 
     override suspend fun chapter(userId: String, chapterId: String): ChapterProgress? = withContext(io) {
-        db.arenaQueries.selectChapterProgressById(userId, chapterId).executeAsOneOrNull()
+        db.arenaQueries.selectChapterProgressById(userId, chapterId).awaitAsOneOrNull()
             ?.payloadJson?.let(::decode)
     }
 
@@ -44,7 +47,7 @@ class LocalCourseProgressRepository(
     }
 
     override suspend fun unsynced(): List<ChapterProgress> = withContext(io) {
-        db.arenaQueries.selectUnsyncedChapterProgress().executeAsList()
+        db.arenaQueries.selectUnsyncedChapterProgress().awaitAsList()
             .mapNotNull { decode(it.payloadJson) }
     }
 
@@ -67,11 +70,11 @@ class LocalCodeDraftRepository(
         language: ProgrammingLanguage,
     ): CodeDraft? = withContext(io) {
         db.arenaQueries.selectCodeDraft(userId, problemId, language.name)
-            .executeAsOneOrNull()?.toDomain()
+            .awaitAsOneOrNull()?.toDomain()
     }
 
     override suspend fun drafts(userId: String): List<CodeDraft> = withContext(io) {
-        db.arenaQueries.selectCodeDrafts(userId).executeAsList().mapNotNull { it.toDomain() }
+        db.arenaQueries.selectCodeDrafts(userId).awaitAsList().mapNotNull { it.toDomain() }
     }
 
     override suspend fun save(draft: CodeDraft) = withContext(io) {
