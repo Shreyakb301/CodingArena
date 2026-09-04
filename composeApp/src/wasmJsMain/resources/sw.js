@@ -1,38 +1,55 @@
-// Minimal offline shell.
+// Offline support without getting stuck on a stale build.
 //
-// The Wasm bundle is large and content-hashed by webpack, so a simple
-// "cache on first fetch, serve cache-first, clean up old entries on activate"
-// strategy makes the app open instantly and work with no network after the
-// first successful load. Bump CACHE to force clients onto a new build.
-const CACHE = "codingarena-v1";
-const CORE = ["./", "./index.html", "./manifest.webmanifest"];
+// - Content-hashed files (*.wasm, webpack chunks) never change under their
+//   name, so they are cache-first and kept forever.
+// - Everything referenced by a fixed name (the HTML shell, codingarena.js, the
+//   sql.js worker) is network-first: a fresh deploy is picked up on the next
+//   load, and the cached copy is only a fallback when offline.
+const CACHE = "codingarena-v2";
+const IMMUTABLE = /\.(wasm)$|^[a-f0-9]{16,}\./;
 
-self.addEventListener("install", (event) => {
-    self.skipWaiting();
-    event.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).catch(() => {}));
-});
+self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
-        ).then(() => self.clients.claim()),
+        caches.keys()
+            .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+            .then(() => self.clients.claim()),
     );
 });
 
 self.addEventListener("fetch", (event) => {
     const req = event.request;
-    if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
+    if (req.method !== "GET") return;
+    const url = new URL(req.url);
+    if (url.origin !== self.location.origin) return;
+
+    const name = url.pathname.split("/").pop() || "";
+    const immutable = IMMUTABLE.test(name);
+
     event.respondWith(
-        caches.match(req).then((hit) => {
-            if (hit) return hit;
-            return fetch(req).then((res) => {
-                if (res.ok && res.type === "basic") {
-                    const copy = res.clone();
-                    caches.open(CACHE).then((c) => c.put(req, copy));
-                }
-                return res;
-            });
-        }),
+        immutable ? cacheFirst(req) : networkFirst(req),
     );
 });
+
+async function cacheFirst(req) {
+    const hit = await caches.match(req);
+    if (hit) return hit;
+    const res = await fetch(req);
+    if (res.ok) (await caches.open(CACHE)).put(req, res.clone());
+    return res;
+}
+
+async function networkFirst(req) {
+    try {
+        const res = await fetch(req);
+        if (res.ok && res.type === "basic") {
+            (await caches.open(CACHE)).put(req, res.clone());
+        }
+        return res;
+    } catch (err) {
+        const hit = await caches.match(req);
+        if (hit) return hit;
+        throw err;
+    }
+}
