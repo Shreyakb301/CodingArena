@@ -93,9 +93,9 @@
 
     pull(token)
       .then(function (r) {
-        if (r && (r.reloaded || r.unauthorised)) return;
-        // Server had nothing yet, or we are ahead - seed / update it.
-        return push(token);
+        // Only seed when the server has nothing; an up-to-date pull leaves
+        // further pushes to the interval, so devices don't ping-pong reloads.
+        if (r && r.seeded === false) return push(token);
       })
       .catch(function () { /* offline - try again on the interval */ });
 

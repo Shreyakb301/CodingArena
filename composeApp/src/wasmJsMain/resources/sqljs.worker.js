@@ -67,6 +67,13 @@ function scheduleSave() {
 
 const WRITE = /^\s*(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER|PRAGMA\s+user_version\s*=)/i;
 
+// The session token is per-device (it lives in localStorage); keeping it out of
+// the synced snapshot avoids leaking it between a user's devices and stops a
+// pointless snapshot change on every boot.
+function isTokenWrite(data) {
+  return /appSetting/i.test(data.sql) && data.params && data.params[0] === "auth.token";
+}
+
 const ready = (async () => {
     const SQL = await initSqlJs({ locateFile: () => "./sql-wasm.wasm" });
     const snapshot = await loadSnapshot();
@@ -78,7 +85,7 @@ function handle(data) {
         case "exec": {
             if (!data.sql) throw new Error("exec: Missing query string");
             const results = db.exec(data.sql, data.params)[0] ?? { values: [] };
-            if (WRITE.test(data.sql)) scheduleSave();
+            if (WRITE.test(data.sql) && !isTokenWrite(data)) scheduleSave();
             return { id: data.id, results };
         }
         case "begin_transaction":

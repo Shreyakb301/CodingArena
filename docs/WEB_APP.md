@@ -48,46 +48,41 @@ device test.
 
 ---
 
-## Deploy: Cloudflare Pages (via GitHub Actions)
+## Deploy: everything on Cloudflare
 
-The Java/Gradle build runs on GitHub's runners; Cloudflare only hosts the
-static output. Config: `.github/workflows/deploy-web.yml` +
-`composeApp/src/wasmJsMain/resources/_headers` (Wasm content-type + caching).
+The static app **and** the API run on one Cloudflare Pages project.
+`wrangler.toml` holds the project name, the build-output dir, and the D1 / KV
+bindings, so a deploy is just `wrangler pages deploy`.
 
-**One-time setup:**
+| Piece | Where |
+|---|---|
+| Wasm app (static) | `composeApp/build/dist/wasmJs/productionExecutable/` |
+| API (`/v1/*`) | `functions/` - TypeScript Pages Functions |
+| Accounts | D1 database `codingarena` (`functions/schema.sql`) |
+| Progress snapshots | KV namespace `SNAPSHOTS` |
 
-1. Cloudflare dashboard -> **Workers & Pages** -> **Create** -> **Pages** ->
-   **Direct Upload** -> name it `codingarena` -> skip the upload.
-2. In the project's **Settings -> Builds & deployments**, set the production
-   branch to `master`.
-3. Create an API token: **My Profile -> API Tokens -> Create Token ->**
-   "Cloudflare Pages" template (or a custom token with *Account -> Cloudflare
-   Pages -> Edit*). Copy it.
-4. Note your **Account ID** (right-hand side of the Workers & Pages page).
-5. GitHub repo -> **Settings -> Secrets and variables -> Actions -> New
-   repository secret**, add:
-   - `CLOUDFLARE_API_TOKEN`
-   - `CLOUDFLARE_ACCOUNT_ID`
-
-**Deploy:** push to `master`, or run the *deploy web* workflow manually. The
-URL is `https://codingarena.pages.dev` (plus a custom domain if you add one).
-
-### Deploy by hand (no CI)
+**By hand:**
 
 ```bash
 ./gradlew :composeApp:wasmJsBrowserDistribution
-npx wrangler pages deploy composeApp/build/dist/wasmJs/productionExecutable \
-  --project-name=codingarena
+npx wrangler pages deploy          # reads wrangler.toml
 ```
 
-(`npx wrangler login` first, or set `CLOUDFLARE_API_TOKEN`.)
+**CI:** `.github/workflows/deploy-web.yml` builds and deploys on push to
+`master`. Needs repo secrets `CLOUDFLARE_API_TOKEN` (Pages + D1 edit) and
+`CLOUDFLARE_ACCOUNT_ID`.
 
-### Other hosts
+**Pages project secrets** (once, `wrangler pages secret put NAME`):
 
-Any static host serves the `productionExecutable/` directory as-is - GitHub
-Pages, Netlify, Vercel, S3. The `_headers` file is Cloudflare-specific
-(Netlify reads it too); elsewhere the app still runs, it just misses the
-long-cache hints.
+| Secret | Purpose |
+|---|---|
+| `JWT_SECRET` | signs session tokens |
+| `APP_URL` | `https://codingarena.pages.dev` - OAuth redirects back here |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | enable "Continue with Google"; without them the routes return 501 |
+
+Google Cloud: OAuth consent screen (External, `email`+`profile` scopes) + a
+Web OAuth client whose redirect URI is
+`https://codingarena.pages.dev/v1/auth/google/callback`.
 
 ---
 
@@ -102,16 +97,24 @@ Requires **iOS 18.2+** (Kotlin/Wasm needs the WasmGC feature Safari shipped in
 
 ---
 
-## Persistence
+## Persistence & sync
 
-The sql.js worker snapshots the SQLite file to **IndexedDB** after every write
-and reloads it on startup (`sqljs.worker.js`). Progress survives a reload, a
-browser restart and going offline.
+**Local:** the sql.js worker snapshots the SQLite file to **IndexedDB** after
+every write and reloads it on startup (`sqljs.worker.js`). Progress survives a
+reload, a browser restart, and going offline. It can be evicted under heavy
+storage pressure (`navigator.storage.persist()` reduces that risk).
 
-Limits: it is per-device and per-browser, and the browser can evict it under
-heavy storage pressure (`navigator.storage.persist()` reduces that risk).
-**Account + server sync** (partly built - see the server module) remains the
-answer for progress that follows the user across devices.
+**Cross-device:** when signed in, `sync.js` ships the whole database file to
+`/v1/progress/snapshot` (a KV value per user). On load it pulls the server
+copy if it is newer and reloads; otherwise it seeds/updates it, then pushes
+every 45 s and on tab-hide.
+
+Caveats:
+
+- Whole-file sync, so two devices that both change things offline do **not**
+  merge - the newer push wins. Sign in on your main device first.
+- Switching to a device that is behind costs one reload while it pulls.
+- The session token stays in localStorage, never in the synced database.
 
 ---
 
@@ -124,3 +127,8 @@ answer for progress that follows the user across devices.
   `web-worker-driver`).
 - `:core` and `:composeApp` gained a `wasmJs` target; `:core` has a
   `wasmJsMain` `DatabaseDriverFactory`; `:composeApp` has `wasmJsMain/main.kt`.
+- `kotlin.daemon.jvmargs` raised to 6g - the Wasm production compiler OOMs
+  below that.
+
+The Ktor `:server` still owns classrooms and code execution (Judge0) and is
+unchanged; it is not deployed. Web auth is the Cloudflare functions.
