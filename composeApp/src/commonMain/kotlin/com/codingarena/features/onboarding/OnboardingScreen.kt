@@ -224,9 +224,6 @@ fun OnboardingScreen(
         if (state.step == OnboardingStep.PLACEMENT) viewModel.preparePlacement()
     }
 
-    // Short steps sit optically centred; the long ones (topic grid, placement
-    // test) top-align and scroll.
-    val centred = state.step in CENTRED_STEPS
     val steps = OnboardingStep.entries
 
     Column(
@@ -239,11 +236,9 @@ fun OnboardingScreen(
         LazyColumn(
             modifier = Modifier.weight(1f).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = if (centred) {
-                Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
-            } else {
-                Arrangement.spacedBy(12.dp)
-            },
+            // Content sits optically centred; LazyColumn falls back to
+            // top-packing and scrolls when a step (placement test) overflows.
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
             contentPadding = PaddingValues(vertical = 28.dp),
         ) {
             item {
@@ -432,15 +427,6 @@ fun OnboardingScreen(
         }
     }
 }
-
-/** The steps whose content is short enough to sit centred rather than scroll. */
-private val CENTRED_STEPS = setOf(
-    OnboardingStep.WELCOME,
-    OnboardingStep.EXPERIENCE,
-    OnboardingStep.LANGUAGE,
-    OnboardingStep.GOAL,
-    OnboardingStep.DONE,
-)
 
 @Composable
 private fun StepSegments(current: Int, total: Int) {
