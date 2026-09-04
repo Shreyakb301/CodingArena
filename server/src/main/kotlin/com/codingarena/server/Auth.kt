@@ -19,7 +19,8 @@ data class UserAccount(
     val displayName: String,
     val email: String?,
     val role: UserRole,
-    val passwordHash: String,
+    /** Null for accounts created through an identity provider (e.g. Google). */
+    val passwordHash: String?,
 )
 
 class JwtTokens(secret: String) {
@@ -48,7 +49,8 @@ object Passwords {
         return Base64.getEncoder().encodeToString(salt) + ":" + Base64.getEncoder().encodeToString(derived)
     }
 
-    fun verify(password: String, stored: String): Boolean {
+    fun verify(password: String, stored: String?): Boolean {
+        if (stored == null) return false
         val parts = stored.split(':')
         if (parts.size != 2) return false
         val salt = runCatching { Base64.getDecoder().decode(parts[0]) }.getOrNull() ?: return false

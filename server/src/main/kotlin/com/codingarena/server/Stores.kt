@@ -15,6 +15,14 @@ import java.util.UUID
 interface ArenaStore {
     fun createUser(request: RegisterRequest): UserAccount
     fun userByEmail(email: String): UserAccount?
+
+    /**
+     * Resolves a Google-authenticated user: returns the account already linked
+     * to [googleId], otherwise links an existing account with the same email,
+     * otherwise creates a new student account. The email is trusted - the caller
+     * has verified it against Google.
+     */
+    fun linkOrCreateGoogleUser(googleId: String, email: String, displayName: String): UserAccount
     fun saveSubmission(submission: CodeSubmission)
     fun submission(id: String): CodeSubmission?
     fun createClassroom(teacherId: String, name: String, now: Long): Classroom
@@ -63,19 +71,64 @@ class PostgresArenaStore(private val config: ServerConfig) : ArenaStore {
         return account
     }
 
-    override fun userByEmail(email: String): UserAccount? = connection().use { db ->
-        db.prepareStatement("SELECT * FROM arena_user WHERE email = ?").use { statement ->
-            statement.setString(1, email.trim().lowercase())
-            statement.executeQuery().use { rows ->
-                if (!rows.next()) null else UserAccount(
-                    id = rows.getString("id"),
-                    displayName = rows.getString("display_name"),
-                    email = rows.getString("email"),
-                    role = UserRole.valueOf(rows.getString("role")),
-                    passwordHash = rows.getString("password_hash"),
-                )
+    override fun userByEmail(email: String): UserAccount? =
+        userWhere("email = ?", email.trim().lowercase())
+
+    private fun userByGoogleId(googleId: String): UserAccount? =
+        userWhere("google_id = ?", googleId)
+
+    private fun userWhere(clause: String, value: String): UserAccount? = connection().use { db ->
+        db.prepareStatement("SELECT * FROM arena_user WHERE $clause").use { statement ->
+            statement.setString(1, value)
+            statement.executeQuery().use { rows -> if (rows.next()) rows.toUserAccount() else null }
+        }
+    }
+
+    private fun java.sql.ResultSet.toUserAccount() = UserAccount(
+        id = getString("id"),
+        displayName = getString("display_name"),
+        email = getString("email"),
+        role = UserRole.valueOf(getString("role")),
+        passwordHash = getString("password_hash"),
+    )
+
+    override fun linkOrCreateGoogleUser(googleId: String, email: String, displayName: String): UserAccount {
+        userByGoogleId(googleId)?.let { return it }
+        val normalisedEmail = email.trim().lowercase()
+
+        userByEmail(normalisedEmail)?.let { existing ->
+            connection().use { db ->
+                db.prepareStatement("UPDATE arena_user SET google_id = ? WHERE id = ?").use { statement ->
+                    statement.setString(1, googleId)
+                    statement.setString(2, existing.id)
+                    statement.executeUpdate()
+                }
+            }
+            return existing
+        }
+
+        val account = UserAccount(
+            id = UUID.randomUUID().toString(),
+            displayName = displayName.trim().take(80).ifBlank { normalisedEmail.substringBefore('@') },
+            email = normalisedEmail,
+            role = UserRole.STUDENT,
+            passwordHash = null,
+        )
+        connection().use { db ->
+            db.prepareStatement(
+                "INSERT INTO arena_user(id, display_name, email, role, password_hash, google_id, created_at) " +
+                    "VALUES (?, ?, ?, ?, NULL, ?, ?)"
+            ).use { statement ->
+                statement.setString(1, account.id)
+                statement.setString(2, account.displayName)
+                statement.setString(3, account.email)
+                statement.setString(4, account.role.name)
+                statement.setString(5, googleId)
+                statement.setLong(6, System.currentTimeMillis())
+                statement.executeUpdate()
             }
         }
+        return account
     }
 
     override fun saveSubmission(submission: CodeSubmission) {
@@ -299,6 +352,11 @@ class PostgresArenaStore(private val config: ServerConfig) : ArenaStore {
                 event TEXT NOT NULL, occurred_at BIGINT NOT NULL)""",
             """CREATE INDEX IF NOT EXISTS submission_audit_idx
                 ON submission_audit(user_id, occurred_at)""",
+            // Identity-provider accounts: nullable password, unique provider id.
+            """ALTER TABLE arena_user ADD COLUMN IF NOT EXISTS google_id TEXT""",
+            """ALTER TABLE arena_user ALTER COLUMN password_hash DROP NOT NULL""",
+            """CREATE UNIQUE INDEX IF NOT EXISTS arena_user_google_idx
+                ON arena_user(google_id) WHERE google_id IS NOT NULL""",
         ).forEach { sql -> db.createStatement().use { it.execute(sql) } }
     }
 }

@@ -8,7 +8,29 @@ data class ServerConfig(
     val jwtSecret: String = env("ARENA_JWT_SECRET", "local-development-secret-change-me"),
     val judge0Url: String = env("JUDGE0_URL", "http://127.0.0.1:2358"),
     val judge0Token: String? = System.getenv("JUDGE0_TOKEN"),
+    /** Front-end origins allowed to call the API from a browser. */
+    val allowedOrigins: List<String> = env("ARENA_ALLOWED_ORIGINS", "http://localhost:8080")
+        .split(',').map(String::trim).filter(String::isNotEmpty),
+    /** Where the browser app lives; OAuth redirects the finished session back here. */
+    val appUrl: String = env("ARENA_APP_URL", "http://localhost:8080").trimEnd('/'),
+    val google: GoogleOAuthConfig? = GoogleOAuthConfig.fromEnv(),
 )
+
+/** Present only when all three Google OAuth env vars are set. */
+data class GoogleOAuthConfig(
+    val clientId: String,
+    val clientSecret: String,
+    val redirectUri: String,
+) {
+    companion object {
+        fun fromEnv(): GoogleOAuthConfig? {
+            val id = System.getenv("GOOGLE_CLIENT_ID")?.takeIf { it.isNotBlank() } ?: return null
+            val secret = System.getenv("GOOGLE_CLIENT_SECRET")?.takeIf { it.isNotBlank() } ?: return null
+            val redirect = System.getenv("GOOGLE_REDIRECT_URI")?.takeIf { it.isNotBlank() } ?: return null
+            return GoogleOAuthConfig(id, secret, redirect)
+        }
+    }
+}
 
 private fun env(name: String, fallback: String): String =
     System.getenv(name)?.takeIf { it.isNotBlank() } ?: fallback
@@ -20,4 +42,3 @@ private fun toJdbcUrl(raw: String): String {
     val hostAndPath = afterScheme.substringAfter("@", afterScheme)
     return "jdbc:postgresql://$hostAndPath"
 }
-

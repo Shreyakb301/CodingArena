@@ -16,6 +16,7 @@ import com.codingarena.domain.model.UserRole
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -130,6 +131,49 @@ class ServerApiTest {
             )
         }
     }
+
+    @Test
+    fun `google sign-in is 501 until configured`() = testApplication {
+        application {
+            module(dependencies(MemoryStore(), ServerConfig(jwtSecret = "test-secret")))
+        }
+        assertEquals(HttpStatusCode.NotImplemented, createClient {}.get("/v1/auth/google/start").status)
+    }
+
+    @Test
+    fun `google start redirects to the consent screen with the configured client`() = testApplication {
+        val config = ServerConfig(
+            jwtSecret = "test-secret",
+            google = GoogleOAuthConfig("client-123", "secret", "https://api.example.com/v1/auth/google/callback"),
+        )
+        application { module(dependencies(MemoryStore(), config)) }
+        val redirect = createClient { followRedirects = false }.get("/v1/auth/google/start")
+        assertEquals(HttpStatusCode.Found, redirect.status)
+        val location = redirect.headers["Location"] ?: ""
+        assertTrue(location.startsWith("https://accounts.google.com/o/oauth2/v2/auth?"))
+        assertTrue("client_id=client-123" in location)
+        assertTrue("scope=openid" in location)
+    }
+
+    @Test
+    fun `linkOrCreateGoogleUser links an existing email then reuses the account`() {
+        val store = MemoryStore()
+        store.createUser(RegisterRequest("Ada", "ada@example.com", "long-password", UserRole.STUDENT))
+        val linked = store.linkOrCreateGoogleUser("g-sub-1", "ada@example.com", "Ada L")
+        val again = store.linkOrCreateGoogleUser("g-sub-1", "ada@example.com", "Ada L")
+        assertEquals(linked.id, again.id)
+        assertEquals("ada@example.com", linked.email)
+    }
+
+    private fun dependencies(store: ArenaStore, config: ServerConfig) = ServerDependencies(
+        config,
+        store,
+        object : CodeRunner {
+            override suspend fun execute(language: ProgrammingLanguage, source: String, tests: List<ExecutionTest>) =
+                ExecutionResult(SubmissionStatus.PASSED, emptyList(), 0, 0)
+        },
+        CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+    )
 }
 
 private class MemoryStore : ArenaStore {
@@ -144,6 +188,9 @@ private class MemoryStore : ArenaStore {
         "u-${users.size}", request.displayName, request.email, request.role, Passwords.hash(request.password),
     ).also { users[it.email!!] = it }
     override fun userByEmail(email: String) = users[email]
+    override fun linkOrCreateGoogleUser(googleId: String, email: String, displayName: String): UserAccount =
+        users[email] ?: UserAccount("g-${users.size}", displayName, email, UserRole.STUDENT, null)
+            .also { users[email] = it }
     override fun saveSubmission(submission: CodeSubmission) { submissions[submission.id] = submission }
     override fun submission(id: String) = submissions[id]
     override fun createClassroom(teacherId: String, name: String, now: Long) =
