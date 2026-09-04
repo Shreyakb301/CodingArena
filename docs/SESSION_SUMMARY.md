@@ -10,10 +10,11 @@ Everything below is **live at https://codingarena.pages.dev** and committed to
 | | Status |
 |---|---|
 | Installable web app (Kotlin/Wasm, same UI as iOS) | ✅ live, add-to-home-screen |
-| Local persistence (progress survives reload/restart/offline) | ✅ verified |
-| Cross-device sync when signed in | ✅ verified end-to-end |
-| Email + password accounts | ✅ live (`/v1/auth/register`, `/login`) |
-| "Continue with Google" | ⏳ code deployed; needs your Google OAuth client |
+| Local persistence (survives reload/restart/offline) | ✅ verified in a headless browser |
+| Email + password accounts | ✅ verified against prod (register / login / bad password / dupe) |
+| Snapshot sync transport (`/v1/progress/snapshot`) | ✅ verified byte-exact round-trip; a real device's DB uploads and a fresh device pulls + boots on it |
+| Cross-device sync end-to-end | ◑ pieces verified individually; the full A→B content propagation I could not fully automate — **worth a real 2-device check** |
+| "Continue with Google" | ⏳ code deployed & returns 501 until you add the Google OAuth client |
 | Auto-deploy on `git push` | ⏳ needs 2 GitHub secrets |
 
 ---
