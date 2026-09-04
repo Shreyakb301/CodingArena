@@ -102,17 +102,16 @@ Requires **iOS 18.2+** (Kotlin/Wasm needs the WasmGC feature Safari shipped in
 
 ---
 
-## Persistence caveat
+## Persistence
 
-The sql.js database currently runs **in memory**: progress survives navigation
-within a session but is lost on a hard reload. Durable options, in order of
-effort:
+The sql.js worker snapshots the SQLite file to **IndexedDB** after every write
+and reloads it on startup (`sqljs.worker.js`). Progress survives a reload, a
+browser restart and going offline.
 
-1. **Account + server sync** (already built) - the real answer for
-   cross-device progress.
-2. Swap the sql.js worker for an **OPFS-backed** SQLite worker so the local DB
-   file persists. Isolated to `DatabaseDriverFactory.wasmJs.kt` + the worker
-   script.
+Limits: it is per-device and per-browser, and the browser can evict it under
+heavy storage pressure (`navigator.storage.persist()` reduces that risk).
+**Account + server sync** (partly built - see the server module) remains the
+answer for progress that follows the user across devices.
 
 ---
 
