@@ -1,14 +1,15 @@
 name: deploy web
 
-# Builds the Kotlin/Wasm browser bundle and publishes it to Cloudflare Pages.
-# Runs on every push to master, or on demand.
+# Builds the Kotlin/Wasm bundle and deploys it + the API functions to
+# Cloudflare Pages. Config lives in wrangler.toml (project name, output dir,
+# D1 binding).
 #
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   CLOUDFLARE_API_TOKEN   - a token with the "Cloudflare Pages: Edit" permission
-#   CLOUDFLARE_ACCOUNT_ID  - from the Cloudflare dashboard URL / Workers & Pages page
+#   CLOUDFLARE_API_TOKEN   - token with "Cloudflare Pages: Edit" + "D1: Edit"
+#   CLOUDFLARE_ACCOUNT_ID
 #
-# One-time: create the Pages project named "codingarena" (Workers & Pages ->
-# Create -> Pages -> Direct Upload), and set its production branch to "master".
+# Pages project secrets (set once with `wrangler pages secret put`):
+#   JWT_SECRET, APP_URL, and - for Google sign-in - GOOGLE_CLIENT_ID/SECRET.
 
 on:
   push:
@@ -36,11 +37,9 @@ jobs:
           ./gradlew :composeApp:wasmJsBrowserDistribution
           -Pcodingarena.apple=false -Pcodingarena.android=false
 
-      - name: Publish to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: >
-            pages deploy composeApp/build/dist/wasmJs/productionExecutable
-            --project-name=codingarena
+          command: pages deploy --branch=master

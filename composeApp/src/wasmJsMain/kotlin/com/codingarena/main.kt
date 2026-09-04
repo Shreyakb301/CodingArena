@@ -21,6 +21,7 @@ import androidx.compose.ui.window.ComposeViewport
 import com.codingarena.app.App
 import com.codingarena.core.database.DatabaseDriverFactory
 import com.codingarena.core.design.ArenaTheme
+import com.codingarena.data.remote.ArenaServerConfig
 import com.codingarena.data.remote.KtorClassroomGateway
 import com.codingarena.db.ArenaDatabase
 import com.codingarena.di.appModule
@@ -56,6 +57,10 @@ fun main() {
             module { single { DatabaseDriverFactory() } },
             coreModule,
             appModule,
+            // The API is served from the same origin as the app (Cloudflare
+            // Pages functions), so point the client there. Overrides the
+            // default in coreModule.
+            module { single { ArenaServerConfig(baseUrl = window.location.origin) } },
         )
     }
     ComposeViewport(document.body!!) {

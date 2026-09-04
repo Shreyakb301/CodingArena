@@ -1,0 +1,10 @@
+# Cloudflare Pages project: static Wasm app + the /v1/* API (functions/).
+name = "codingarena"
+compatibility_date = "2025-09-04"
+pages_build_output_dir = "composeApp/build/dist/wasmJs/productionExecutable"
+
+# Edge SQLite. Holds accounts and progress snapshots.
+[[d1_databases]]
+binding = "DB"
+database_name = "codingarena"
+database_id = "eb1bf47f-87a2-4c3f-bebb-0684af1dce76"
