@@ -75,7 +75,7 @@ fun main() {
                             KoinPlatform.getKoin().get<ArenaDatabase>()
                             DatabaseDriverFactory.awaitSchemaReady()
                             captureAuthRedirect()
-                            publishSessionToken()
+                            restoreSession()
                             ready = true
                         }
                         if (ready) App() else BootSplash()
@@ -93,36 +93,30 @@ private fun BootSplash() {
     }
 }
 
+private const val TOKEN_KEY = "arena.token"
+
 /**
  * The Google sign-in flow redirects back to `…/#token=<jwt>` (or
- * `…/#auth_error=<reason>`). Store the session, then strip the fragment so a
- * reload or a shared link does not carry the token around.
+ * `…/#auth_error=<reason>`). The token is kept in localStorage, which is
+ * per-device and so survives a database snapshot pull; [restoreSession] copies
+ * it into the repository the HTTP client reads.
  */
-private suspend fun captureAuthRedirect() {
+private fun captureAuthRedirect() {
     val hash = window.location.hash.removePrefix("#")
     if (hash.isEmpty()) return
-    val params = hash.split('&').mapNotNull {
-        val (k, v) = it.split('=', limit = 2).let { p -> p[0] to p.getOrElse(1) { "" } }
-        if (k.isEmpty()) null else k to v
-    }.toMap()
-
-    val token = params["token"]?.let { decodeURIComponent(it) }
-    if (!token.isNullOrBlank()) {
-        val settings = KoinPlatform.getKoin().get<SettingsRepository>()
-        settings.put(KtorClassroomGateway.AUTH_TOKEN, token)
-    }
+    val token = hash.split('&')
+        .firstOrNull { it.startsWith("token=") }
+        ?.substringAfter('=')
+        ?.let(::decodeURIComponent)
+    if (!token.isNullOrBlank()) setLocalStorage(TOKEN_KEY, token)
     // Always clear the fragment (covers the error case too).
     window.history.replaceState(null, "", window.location.pathname + window.location.search)
 }
 
-/**
- * Mirror the session token into localStorage where the small sync.js module can
- * see it - it pulls/pushes the database snapshot for cross-device progress and
- * runs outside the Wasm bundle.
- */
-private suspend fun publishSessionToken() {
-    val token = KoinPlatform.getKoin().get<SettingsRepository>().get(KtorClassroomGateway.AUTH_TOKEN)
-    setLocalStorage("arena.token", token?.takeIf { it.isNotBlank() } ?: "")
+/** localStorage holds the session on web; make it visible to the HTTP client. */
+private suspend fun restoreSession() {
+    val token = getLocalStorage(TOKEN_KEY)?.takeIf { it.isNotBlank() } ?: return
+    KoinPlatform.getKoin().get<SettingsRepository>().put(KtorClassroomGateway.AUTH_TOKEN, token)
 }
 
 @JsFun("(value) => decodeURIComponent(value)")
@@ -130,3 +124,6 @@ private external fun decodeURIComponent(value: String): String
 
 @JsFun("(key, value) => { if (value) localStorage.setItem(key, value); else localStorage.removeItem(key); }")
 private external fun setLocalStorage(key: String, value: String)
+
+@JsFun("(key) => localStorage.getItem(key)")
+private external fun getLocalStorage(key: String): String?
