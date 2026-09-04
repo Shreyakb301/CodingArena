@@ -22,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,12 +33,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.codingarena.core.design.CodeBlock
+import com.codingarena.data.remote.ArenaServerConfig
 import com.codingarena.domain.engine.PlacementAnswer
 import com.codingarena.domain.engine.PlacementResult
 import com.codingarena.domain.engine.PlacementTestEngine
@@ -61,6 +64,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 /** The onboarding questions, in order. */
@@ -252,14 +256,20 @@ fun OnboardingScreen(
 
             when (state.step) {
                 OnboardingStep.WELCOME -> item {
-                    OutlinedTextField(
-                        value = state.displayName,
-                        onValueChange = viewModel::setName,
-                        label = { Text("What should we call you?") },
-                        singleLine = true,
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    Column(
+                        Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        OutlinedTextField(
+                            value = state.displayName,
+                            onValueChange = viewModel::setName,
+                            label = { Text("What should we call you?") },
+                            singleLine = true,
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        GoogleSignInButton()
+                    }
                 }
 
                 OnboardingStep.EXPERIENCE -> items(ExperienceLevel.entries) { level ->
@@ -425,6 +435,19 @@ fun OnboardingScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 2.dp),
             ) { Text("Back") }
         }
+    }
+}
+
+@Composable
+private fun GoogleSignInButton() {
+    val config = koinInject<ArenaServerConfig>()
+    val uriHandler = LocalUriHandler.current
+    OutlinedButton(
+        onClick = { uriHandler.openUri("${config.baseUrl}/v1/auth/google/start") },
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+    ) {
+        Text("Continue with Google")
     }
 }
 
