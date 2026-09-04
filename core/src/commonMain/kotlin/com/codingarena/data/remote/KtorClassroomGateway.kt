@@ -92,6 +92,7 @@ class KtorClassroomGateway(
         settings.put(AUTH_TOKEN, "")
         settings.put(AUTH_ROLE, "")
         settings.put(AUTH_NAME, "")
+        onAuthTokenChanged("")
     }
 
     private suspend fun io.ktor.client.request.HttpRequestBuilder.authenticate() {
@@ -103,6 +104,7 @@ class KtorClassroomGateway(
         settings.put(AUTH_TOKEN, response.token)
         settings.put(AUTH_ROLE, response.role.name)
         settings.put(AUTH_NAME, response.displayName)
+        onAuthTokenChanged(response.token)
     }
 
     private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.checkedBody(): T {

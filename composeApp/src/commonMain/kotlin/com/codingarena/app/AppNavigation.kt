@@ -31,6 +31,7 @@ import com.codingarena.features.interview.MockInterviewScreen
 import com.codingarena.features.interview.TechCommProblemsScreen
 import com.codingarena.features.interview.TechCommRoundScreen
 import com.codingarena.features.learningpath.LearningPathScreen
+import com.codingarena.features.auth.LoginScreen
 import com.codingarena.features.onboarding.OnboardingScreen
 import com.codingarena.features.patternlibrary.PatternDetailScreen
 import com.codingarena.features.patternlibrary.PatternLibraryScreen
@@ -81,6 +82,14 @@ fun AppNavigation(navController: NavHostController) {
                         popUpTo(Routes.ONBOARDING) { inclusive = true }
                     }
                 },
+                onLogin = { navController.navigate(Routes.LOGIN) },
+            )
+        }
+
+        composable(Routes.LOGIN) {
+            LoginScreen(
+                onClose = { navController.popBackStack() },
+                onDone = { navController.popBackStack() },
             )
         }
 

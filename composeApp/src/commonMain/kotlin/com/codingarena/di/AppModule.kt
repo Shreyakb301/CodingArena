@@ -1,6 +1,7 @@
 package com.codingarena.di
 
 import com.codingarena.features.achievements.AchievementsViewModel
+import com.codingarena.features.auth.AuthViewModel
 import com.codingarena.features.blitz.BlitzViewModel
 import com.codingarena.features.blitz.StrategyBlitzViewModel
 import com.codingarena.features.course.CourseRoadmapViewModel
@@ -36,6 +37,7 @@ val appModule: Module = module {
     single { PracticeResultStore() }
 
     viewModel { SplashViewModel(get(), get()) }
+    viewModel { AuthViewModel(get()) }
     viewModel { OnboardingViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get()) }
     viewModel { ChallengeViewModel(get(), get(), get(), get(), get()) }

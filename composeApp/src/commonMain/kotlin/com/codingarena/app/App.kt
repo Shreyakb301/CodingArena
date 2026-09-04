@@ -105,7 +105,7 @@ private fun AppContent() {
     }
 }
 
-private val fullScreenRoutes = setOf(Routes.SPLASH, Routes.ONBOARDING)
+private val fullScreenRoutes = setOf(Routes.SPLASH, Routes.ONBOARDING, Routes.LOGIN)
 
 // Restricted to material-icons-core so the shared binary stays small.
 private val TopLevelDestination.icon

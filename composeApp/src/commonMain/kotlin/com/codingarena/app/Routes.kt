@@ -12,6 +12,7 @@ import com.codingarena.domain.model.AttemptSource
 object Routes {
     const val SPLASH = "splash"
     const val ONBOARDING = "onboarding"
+    const val LOGIN = "login"
     const val HOME = "home"
     const val PRACTICE = "practice"
     const val RATINGS = "ratings"
