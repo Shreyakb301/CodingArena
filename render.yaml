@@ -29,19 +29,6 @@ services:
           property: password
       - key: ARENA_JWT_SECRET
         generateValue: true
-      - key: ARENA_ALLOWED_ORIGINS
-        value: https://codingarena.pages.dev
-      - key: ARENA_APP_URL
-        value: https://codingarena.pages.dev
-      # "Continue with Google" - set these in the Render dashboard after
-      # creating an OAuth client. Redirect URI must be
-      # https://codingarena-api.onrender.com/v1/auth/google/callback
-      - key: GOOGLE_CLIENT_ID
-        sync: false
-      - key: GOOGLE_CLIENT_SECRET
-        sync: false
-      - key: GOOGLE_REDIRECT_URI
-        value: https://codingarena-api.onrender.com/v1/auth/google/callback
       - key: JUDGE0_URL
         value: http://127.0.0.1:2358
       - key: JUDGE0_TOKEN
