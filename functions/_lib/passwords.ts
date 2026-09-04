@@ -1,7 +1,8 @@
 // PBKDF2-SHA256 password hashing (Web Crypto). Format: base64(salt):base64(hash).
 
 const enc = new TextEncoder();
-const ITERATIONS = 120_000;
+// Cloudflare Workers caps PBKDF2 at 100k iterations.
+const ITERATIONS = 100_000;
 
 function b64(bytes: ArrayBuffer): string {
   let s = "";
