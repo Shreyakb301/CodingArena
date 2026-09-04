@@ -75,6 +75,7 @@ fun main() {
                             KoinPlatform.getKoin().get<ArenaDatabase>()
                             DatabaseDriverFactory.awaitSchemaReady()
                             captureAuthRedirect()
+                            publishSessionToken()
                             ready = true
                         }
                         if (ready) App() else BootSplash()
@@ -114,5 +115,18 @@ private suspend fun captureAuthRedirect() {
     window.history.replaceState(null, "", window.location.pathname + window.location.search)
 }
 
-private fun decodeURIComponent(value: String): String =
-    js("decodeURIComponent(value)")
+/**
+ * Mirror the session token into localStorage where the small sync.js module can
+ * see it - it pulls/pushes the database snapshot for cross-device progress and
+ * runs outside the Wasm bundle.
+ */
+private suspend fun publishSessionToken() {
+    val token = KoinPlatform.getKoin().get<SettingsRepository>().get(KtorClassroomGateway.AUTH_TOKEN)
+    setLocalStorage("arena.token", token?.takeIf { it.isNotBlank() } ?: "")
+}
+
+@JsFun("(value) => decodeURIComponent(value)")
+private external fun decodeURIComponent(value: String): String
+
+@JsFun("(key, value) => { if (value) localStorage.setItem(key, value); else localStorage.removeItem(key); }")
+private external fun setLocalStorage(key: String, value: String)

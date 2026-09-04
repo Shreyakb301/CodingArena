@@ -3,8 +3,13 @@ name = "codingarena"
 compatibility_date = "2025-09-04"
 pages_build_output_dir = "composeApp/build/dist/wasmJs/productionExecutable"
 
-# Edge SQLite. Holds accounts and progress snapshots.
+# Edge SQLite. Holds accounts.
 [[d1_databases]]
 binding = "DB"
 database_name = "codingarena"
 database_id = "eb1bf47f-87a2-4c3f-bebb-0684af1dce76"
+
+# One value per user: their exported SQLite database, for cross-device sync.
+[[kv_namespaces]]
+binding = "SNAPSHOTS"
+id = "458add9671e84bb0a640f03c2043a141"

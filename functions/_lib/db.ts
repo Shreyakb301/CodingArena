@@ -1,5 +1,6 @@
 export interface Env {
   DB: D1Database;
+  SNAPSHOTS: KVNamespace;
   JWT_SECRET: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;

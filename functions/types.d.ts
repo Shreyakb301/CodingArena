@@ -19,6 +19,21 @@ interface D1Database {
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>;
 }
 
+interface KVNamespace {
+  get(key: string, type: "arrayBuffer"): Promise<ArrayBuffer | null>;
+  get(key: string, type: "text"): Promise<string | null>;
+  getWithMetadata<M = unknown>(
+    key: string,
+    type: "arrayBuffer",
+  ): Promise<{ value: ArrayBuffer | null; metadata: M | null }>;
+  put(
+    key: string,
+    value: string | ArrayBuffer | ArrayBufferView,
+    options?: { metadata?: unknown; expirationTtl?: number },
+  ): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
 interface EventContext<Env> {
   request: Request;
   env: Env;
