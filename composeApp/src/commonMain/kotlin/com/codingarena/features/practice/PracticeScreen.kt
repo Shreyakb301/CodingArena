@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -31,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.codingarena.content.NeetCode150
 import com.codingarena.content.ProblemWorkouts
+import com.codingarena.core.design.ArenaIcons
 import com.codingarena.core.common.TimeProvider
 import com.codingarena.domain.engine.BlitzEngine
 import com.codingarena.domain.engine.BlitzMode
@@ -109,7 +111,7 @@ fun PracticeScreen(
         item { SectionLabel("CHOOSE A MODE") }
         item {
             PracticeModeRow(
-                mark = "▦",
+                icon = ArenaIcons.Topics,
                 title = "Practice by topic",
                 subtitle = "Choose a roadmap pattern",
                 onClick = onOpenTopicFocus,
@@ -117,7 +119,7 @@ fun PracticeScreen(
         }
         item {
             PracticeModeRow(
-                mark = "{ }",
+                icon = ArenaIcons.Target,
                 title = "Work on weak spots",
                 subtitle = if (state.hasCompletedLesson) "Start with what needs attention"
                     else "Complete a lesson to unlock this",
@@ -127,7 +129,7 @@ fun PracticeScreen(
         }
         item {
             PracticeModeRow(
-                mark = "◐",
+                icon = ArenaIcons.Shuffle,
                 title = "Mixed practice",
                 subtitle = "A shuffled set across learned topics",
                 onClick = onStartMixed,
@@ -135,7 +137,7 @@ fun PracticeScreen(
         }
         item {
             PracticeModeRow(
-                mark = "⚡",
+                icon = ArenaIcons.Bolt,
                 title = "Quick recall",
                 subtitle = "Short pattern-recognition drills",
                 onClick = onOpenQuickRecall,
@@ -143,7 +145,7 @@ fun PracticeScreen(
         }
         item {
             PracticeModeRow(
-                mark = "CR",
+                icon = ArenaIcons.Timer,
                 title = "Code Rush",
                 subtitle = "Timed mixed questions · 5 minutes",
                 onClick = onOpenCodeRush,
@@ -195,7 +197,7 @@ private fun RecommendedPracticeCard(
                     disabledContentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                 ),
                 shape = RoundedCornerShape(14.dp),
-            ) { Text(if (available) "Start practice  →" else "Coming soon", fontWeight = FontWeight.Medium) }
+            ) { Text(if (available) "Start practice" else "Coming soon", fontWeight = FontWeight.Medium) }
         }
     }
 }
@@ -212,7 +214,7 @@ private fun SectionLabel(text: String) {
 
 @Composable
 private fun PracticeModeRow(
-    mark: String,
+    icon: ImageVector,
     title: String,
     subtitle: String,
     onClick: () -> Unit,
@@ -235,11 +237,11 @@ private fun PracticeModeRow(
                 ),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    mark,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = contentAlpha),
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = contentAlpha),
+                    modifier = Modifier.size(20.dp),
                 )
             }
             Column(Modifier.weight(1f)) {

@@ -449,7 +449,7 @@ private fun CompletionPage(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            TextButton(onClick = onBack) { Text("← Roadmap") }
+            TextButton(onClick = onBack) { Text("‹ Roadmap") }
             currentStreak?.let { streak ->
                 if (streak > 0) ArenaChip("🔥 ${streak}d")
             }

@@ -80,7 +80,7 @@ fun TopicFocusScreen(
     LaunchedEffect(Unit) { viewModel.refresh() }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-        TextButton(onClick = onBack, modifier = Modifier.padding(top = 8.dp)) { Text("← Practice") }
+        TextButton(onClick = onBack, modifier = Modifier.padding(top = 8.dp)) { Text("‹ Practice") }
         Text(
             "Focus on a topic",
             style = MaterialTheme.typography.headlineMedium,

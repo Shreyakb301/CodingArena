@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.codingarena.content.InterviewContent
 import com.codingarena.core.common.TimeProvider
+import com.codingarena.core.design.ArenaIcons
 import com.codingarena.domain.engine.InterviewEngine
 import com.codingarena.domain.engine.RecommendedInterviewToday
 import com.codingarena.domain.model.BehavioralCategory
@@ -112,7 +115,7 @@ fun InterviewHomeScreen(
         item { SectionLabel("PRACTICE") }
         item {
             InterviewModeRow(
-                mark = "★",
+                icon = ArenaIcons.Star,
                 title = "Behavioral workouts",
                 subtitle = "Build clear STAR stories",
                 onClick = onOpenBehavioralWorkouts,
@@ -120,7 +123,7 @@ fun InterviewHomeScreen(
         }
         item {
             InterviewModeRow(
-                mark = "▤",
+                icon = ArenaIcons.Bubble,
                 title = "Technical communication",
                 subtitle = "Explain decisions and tradeoffs",
                 enabled = state.techCommAvailable,
@@ -129,7 +132,7 @@ fun InterviewHomeScreen(
         }
         item {
             InterviewModeRow(
-                mark = "◐",
+                icon = ArenaIcons.Bubbles,
                 title = "Mock interview",
                 subtitle = "Practice a complete interview",
                 onClick = onOpenMockInterview,
@@ -185,9 +188,10 @@ private fun SectionLabel(text: String) {
 
 @Composable
 internal fun InterviewModeRow(
-    mark: String,
     title: String,
     subtitle: String = "",
+    mark: String = "",
+    icon: ImageVector? = null,
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
@@ -205,12 +209,21 @@ internal fun InterviewModeRow(
                 ),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    mark,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = contentAlpha),
-                )
+                if (icon != null) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = contentAlpha),
+                        modifier = Modifier.size(22.dp),
+                    )
+                } else {
+                    Text(
+                        mark,
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = contentAlpha),
+                    )
+                }
             }
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha))

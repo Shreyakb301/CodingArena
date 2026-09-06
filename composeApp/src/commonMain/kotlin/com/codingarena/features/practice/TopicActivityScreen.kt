@@ -14,18 +14,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.codingarena.content.NeetCode150
 import com.codingarena.content.ProblemWorkouts
 import com.codingarena.content.RoadmapLessons
+import com.codingarena.core.design.ArenaIcons
 import com.codingarena.domain.model.PatternGroup
 
 /** The ways to practice one topic. */
@@ -43,7 +44,7 @@ fun TopicActivityScreen(
     val hasWorkouts = workoutsForTopic.isNotEmpty()
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-        TextButton(onClick = onBack, modifier = Modifier.padding(top = 8.dp)) { Text("← Topics") }
+        TextButton(onClick = onBack, modifier = Modifier.padding(top = 8.dp)) { Text("‹ Topics") }
         Text(
             group.displayName,
             style = MaterialTheme.typography.headlineMedium,
@@ -52,7 +53,7 @@ fun TopicActivityScreen(
         LazyColumn(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             item {
                 ActivityRow(
-                    mark = "◈",
+                    icon = ArenaIcons.Checklist,
                     title = "Complete Workout",
                     subtitle = if (hasWorkouts) "Pattern, approach, and code reasoning in one run" else "Content coming soon for this topic",
                     enabled = hasWorkouts,
@@ -61,7 +62,7 @@ fun TopicActivityScreen(
             }
             item {
                 ActivityRow(
-                    mark = "◎",
+                    icon = ArenaIcons.Bulb,
                     title = "Learn the Concept",
                     subtitle = if (hasLesson) "Guided walkthrough of the pattern" else "Pattern overview and recognition signals",
                     enabled = true,
@@ -70,7 +71,7 @@ fun TopicActivityScreen(
             }
             item {
                 ActivityRow(
-                    mark = "CR",
+                    icon = ArenaIcons.Timer,
                     title = "Timed Practice",
                     subtitle = "Code Rush, under the clock",
                     enabled = true,
@@ -83,7 +84,7 @@ fun TopicActivityScreen(
 
 @Composable
 private fun ActivityRow(
-    mark: String,
+    icon: ImageVector,
     title: String,
     subtitle: String,
     enabled: Boolean,
@@ -103,11 +104,11 @@ private fun ActivityRow(
                 ),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    mark,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = contentAlpha),
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = contentAlpha),
+                    modifier = Modifier.size(22.dp),
                 )
             }
             Column(Modifier.weight(1f)) {

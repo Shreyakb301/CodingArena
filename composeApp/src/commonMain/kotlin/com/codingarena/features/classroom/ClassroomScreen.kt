@@ -228,8 +228,8 @@ fun ClassroomScreen(onBack: () -> Unit, viewModel: ClassroomViewModel = koinView
                         ArenaListItem(
                             student.displayName,
                             "$mastered mastered · $due due" +
-                                (confusion?.let { " · ${it.actual} → ${it.mistakenFor}" } ?: ""),
-                            leading = "♟",
+                                (confusion?.let { " · mixes up ${it.actual} and ${it.mistakenFor}" } ?: ""),
+                            leading = "S",
                         )
                     }
                 }

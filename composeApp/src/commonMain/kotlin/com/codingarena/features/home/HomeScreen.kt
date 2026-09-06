@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,12 +26,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import com.codingarena.core.design.ArenaIcons
 import com.codingarena.domain.model.AttemptSource
 import com.codingarena.domain.usecase.CurrentUser
 import com.codingarena.domain.usecase.GetHomeSnapshotUseCase
@@ -128,9 +132,21 @@ private fun HomeContent(
                 Row(
                     modifier = Modifier.clickable(onClick = onOpenRatings),
                     horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text("🔥 ${snapshot.streak.currentStreak}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("◆ ${snapshot.ratings.overall}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            ArenaIcons.Diamond,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(15.dp),
+                        )
+                        Text(
+                            " ${snapshot.ratings.overall}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }
@@ -152,7 +168,7 @@ private fun HomeContent(
             Column(Modifier.padding(top = 26.dp)) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                 HomeActionRow(
-                    mark = "↗",
+                    icon = ArenaIcons.Flag,
                     title = "Continue roadmap",
                     subtitle = snapshot.learningPath?.let { path ->
                         "${path.title} · ${(path.fraction * 100).toInt()}%"
@@ -161,7 +177,7 @@ private fun HomeContent(
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                 HomeActionRow(
-                    mark = "↻",
+                    icon = ArenaIcons.Cards,
                     title = "Review",
                     subtitle = if (snapshot.dueReviewCount == 1) "1 question due" else "${snapshot.dueReviewCount} questions due",
                     onClick = onOpenPractice,
@@ -206,14 +222,14 @@ private fun DailyPracticeCard(onOpen: () -> Unit) {
                 ),
                 shape = RoundedCornerShape(14.dp),
             ) {
-                Text("Start practice  →", fontWeight = FontWeight.Medium)
+                Text("Start practice", fontWeight = FontWeight.Medium)
             }
         }
     }
 }
 
 @Composable
-private fun HomeActionRow(mark: String, title: String, subtitle: String, onClick: () -> Unit) {
+private fun HomeActionRow(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -223,7 +239,12 @@ private fun HomeActionRow(mark: String, title: String, subtitle: String, onClick
             Modifier.background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(11.dp)).padding(10.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(mark, color = MaterialTheme.colorScheme.primary, fontFamily = FontFamily.Monospace)
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp),
+            )
         }
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Medium)

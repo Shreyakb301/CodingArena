@@ -50,7 +50,7 @@ fun BehavioralCategoriesScreen(
     onSelectCategory: (BehavioralCategory) -> Unit,
 ) {
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-        TextButton(onClick = onBack, modifier = Modifier.padding(top = 8.dp)) { Text("← Interview") }
+        TextButton(onClick = onBack, modifier = Modifier.padding(top = 8.dp)) { Text("‹ Interview") }
         Text(
             "Behavioral Workouts",
             style = MaterialTheme.typography.headlineMedium,
