@@ -303,11 +303,6 @@ fun SettingsScreen(
             if (state.signedIn) {
                 Column(Modifier.padding(vertical = 4.dp)) {
                     Text("Signed in as ${state.accountDisplayName}", style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        "Your Roadmap progress is backed up to your account.",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                     Row(
                         Modifier.padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -320,11 +315,6 @@ fun SettingsScreen(
                 }
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(
-                        "Create an account to keep your Roadmap progress if you switch phones or reinstall.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                     OutlinedTextField(
                         state.authName, viewModel::setAuthName,
                         label = { Text("Display name") },
@@ -369,7 +359,6 @@ fun SettingsScreen(
         item {
             ToggleRow(
                 title = "Daily practice reminder",
-                subtitle = "A nudge when your streak is at risk",
                 checked = state.notificationsEnabled,
                 onChange = viewModel::setNotifications,
             )
@@ -379,30 +368,21 @@ fun SettingsScreen(
         item {
             ToggleRow(
                 title = "Sync on cellular",
-                subtitle = "Otherwise progress syncs on Wi-Fi only",
                 checked = state.syncOnCellular,
                 onChange = viewModel::setSyncOnCellular,
             )
         }
         item {
             Column(Modifier.padding(vertical = 8.dp)) {
-                Text(
-                    if (state.pendingUploads == 0) {
-                        "Everything on this device is saved locally."
-                    } else {
-                        "${state.pendingUploads} answer(s) waiting to upload."
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Text(
-                    state.lastSyncedAt?.let { "Last synced at $it." } ?: "Never synced.",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                if (state.pendingUploads > 0) {
+                    Text(
+                        "${state.pendingUploads} answer(s) waiting to upload.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
                 OutlinedButton(
                     onClick = viewModel::syncNow,
                     enabled = !state.syncing,
-                    modifier = Modifier.padding(top = 8.dp),
                 ) {
                     Text(if (state.syncing) "Syncing..." else "Sync now")
                 }
@@ -416,15 +396,6 @@ fun SettingsScreen(
                 }
             }
         }
-        item {
-            Text(
-                "Ratings, streaks and quiz history stay on this device and work fully offline. " +
-                    "Roadmap course progress syncs through the account above.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(vertical = 12.dp),
-            )
-        }
 
         item { Column(Modifier.padding(bottom = 24.dp)) {} }
     }
@@ -433,7 +404,6 @@ fun SettingsScreen(
 @Composable
 private fun ToggleRow(
     title: String,
-    subtitle: String,
     checked: Boolean,
     onChange: (Boolean) -> Unit,
 ) {
@@ -442,14 +412,7 @@ private fun ToggleRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                subtitle,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        Text(title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
         Switch(checked = checked, onCheckedChange = onChange)
     }
 }

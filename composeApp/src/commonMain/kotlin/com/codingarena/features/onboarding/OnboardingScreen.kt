@@ -1,5 +1,13 @@
 package com.codingarena.features.onboarding
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -234,24 +242,38 @@ fun OnboardingScreen(
     ) {
         StepSegments(current = steps.indexOf(state.step), total = steps.size)
 
-        LazyColumn(
+        AnimatedContent(
+            targetState = state.step,
             modifier = Modifier.weight(1f).fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            // Content sits optically centred; LazyColumn falls back to
-            // top-packing and scrolls when a step (placement test) overflows.
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-            contentPadding = PaddingValues(vertical = 28.dp),
-        ) {
-            item {
-                Text(
-                    state.step.title,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                    style = MaterialTheme.typography.headlineMedium,
-                    textAlign = TextAlign.Center,
-                )
-            }
+            transitionSpec = {
+                val forward = targetState.ordinal >= initialState.ordinal
+                val slide = 280
+                val enter = slideInHorizontally(tween(slide)) { w -> if (forward) w else -w } +
+                    fadeIn(tween(180))
+                val exit = slideOutHorizontally(tween(slide)) { w -> if (forward) -w / 4 else w / 4 } +
+                    fadeOut(tween(180))
+                (enter togetherWith exit).using(SizeTransform(clip = false))
+            },
+            label = "onboarding-step",
+        ) { step ->
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                // Content sits optically centred; LazyColumn falls back to
+                // top-packing and scrolls when a step (placement test) overflows.
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                contentPadding = PaddingValues(vertical = 28.dp),
+            ) {
+                item {
+                    Text(
+                        step.title,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        style = MaterialTheme.typography.headlineMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
 
-            when (state.step) {
+                when (step) {
                 OnboardingStep.WELCOME -> item {
                     Column(
                         Modifier.fillMaxWidth(),
@@ -411,6 +433,7 @@ fun OnboardingScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                     )
+                }
                 }
             }
         }
