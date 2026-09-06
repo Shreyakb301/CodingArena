@@ -1,5 +1,5 @@
-import { Env } from "./db";
-import { verifyJwt } from "./jwt";
+import type { Env } from "./db.ts";
+import { verifyJwt } from "./jwt.ts";
 
 export interface SessionUser {
   userId: string;

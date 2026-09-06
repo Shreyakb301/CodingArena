@@ -1,6 +1,6 @@
-import { sessionUser } from "../../_lib/auth";
-import { Env } from "../../_lib/db";
-import { error } from "../../_lib/http";
+import { sessionUser } from "../../_lib/auth.ts";
+import type { Env } from "../../_lib/db.ts";
+import { error } from "../../_lib/http.ts";
 
 // One exported SQLite file per user, for cross-device sync. The client decides
 // which side is newer from the X-Snapshot-Updated-At value.

@@ -1,7 +1,8 @@
-import { AuthResponse, Env, userByEmail } from "../../_lib/db";
-import { error, json } from "../../_lib/http";
-import { signJwt } from "../../_lib/jwt";
-import { verifyPassword } from "../../_lib/passwords";
+import type { AuthResponse, Env } from "../../_lib/db.ts";
+import { userByEmail } from "../../_lib/db.ts";
+import { error, json } from "../../_lib/http.ts";
+import { signJwt } from "../../_lib/jwt.ts";
+import { verifyPassword } from "../../_lib/passwords.ts";
 
 interface LoginRequest {
   email?: string;

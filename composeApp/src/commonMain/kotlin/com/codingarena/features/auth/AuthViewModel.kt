@@ -50,14 +50,15 @@ class AuthViewModel(
         val current = _state.value
         if (current.busy || !current.canSubmit) return
         _state.value = current.copy(busy = true, error = null)
+        val email = current.email.trim().lowercase()
         viewModelScope.launch {
             val result = runCatching {
                 when (current.mode) {
-                    AuthMode.LOG_IN -> gateway.login(LoginRequest(current.email.trim(), current.password))
+                    AuthMode.LOG_IN -> gateway.login(LoginRequest(email, current.password))
                     AuthMode.SIGN_UP -> gateway.register(
                         RegisterRequest(
                             displayName = current.displayName.trim(),
-                            email = current.email.trim(),
+                            email = email,
                             password = current.password,
                             role = UserRole.STUDENT,
                         ),

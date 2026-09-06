@@ -22,6 +22,10 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.Serializable
+
+@Serializable
+private data class ApiError(val message: String = "")
 
 class KtorClassroomGateway(
     private val client: HttpClient,
@@ -108,11 +112,15 @@ class KtorClassroomGateway(
     }
 
     private suspend inline fun <reified T> io.ktor.client.statement.HttpResponse.checkedBody(): T {
-        if (!status.isSuccess()) error("Server returned ${status.value}")
+        if (!status.isSuccess()) error(serverMessage() ?: "Server returned ${status.value}")
         return body()
     }
 
     private suspend fun io.ktor.client.statement.HttpResponse.authBody(): AuthResponse = checkedBody()
+
+    /** The server sends `{"message": "..."}` on every error; surface it instead of a bare status. */
+    private suspend fun io.ktor.client.statement.HttpResponse.serverMessage(): String? =
+        runCatching { body<ApiError>().message.takeIf { it.isNotBlank() } }.getOrNull()
 
     companion object {
         const val AUTH_TOKEN = "auth.token"

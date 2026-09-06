@@ -1,5 +1,5 @@
-import { Env } from "../../../_lib/db";
-import { error } from "../../../_lib/http";
+import type { Env } from "../../../_lib/db.ts";
+import { error } from "../../../_lib/http.ts";
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (!env.GOOGLE_CLIENT_ID) return error("Google sign-in is not configured", 501);

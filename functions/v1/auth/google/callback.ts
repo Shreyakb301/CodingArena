@@ -1,6 +1,7 @@
-import { Env, linkOrCreateGoogleUser } from "../../../_lib/db";
-import { getCookie, redirectToApp } from "../../../_lib/http";
-import { decodeJwt, signJwt } from "../../../_lib/jwt";
+import type { Env } from "../../../_lib/db.ts";
+import { linkOrCreateGoogleUser } from "../../../_lib/db.ts";
+import { getCookie, redirectToApp } from "../../../_lib/http.ts";
+import { decodeJwt, signJwt } from "../../../_lib/jwt.ts";
 
 // Google OAuth 2.0 authorization-code flow. The id_token is decoded (not
 // signature-verified): it is fetched directly from Google over TLS in the code

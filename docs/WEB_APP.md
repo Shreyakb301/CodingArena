@@ -118,6 +118,22 @@ Caveats:
 
 ---
 
+## Tests
+
+```bash
+node --test "functions-test/*.test.ts"     # Cloudflare functions (JWT, passwords,
+                                           # register/login/google/snapshot handlers)
+./gradlew :composeApp:desktopTest          # AuthViewModel etc.
+./gradlew :core:jvmTest                    # everything below the UI
+```
+
+`functions-test/` fakes D1 + KV in memory and runs the real handlers - no
+Cloudflare account, no wrangler. It needs Node 22.18+ / 24 (native TypeScript).
+CI runs all three.
+
+Function imports carry an explicit `.ts` extension and split `import type`
+from value imports, so Node's strip-only loader can run them unchanged.
+
 ## What changed for this target
 
 - SQLDelight generates in **async mode** (`generateAsync = true`) - the browser
