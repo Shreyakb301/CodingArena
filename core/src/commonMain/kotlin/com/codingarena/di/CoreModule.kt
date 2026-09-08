@@ -66,6 +66,7 @@ import com.codingarena.domain.classroom.ClassroomGateway
 import com.codingarena.domain.usecase.CompleteOnboardingUseCase
 import com.codingarena.domain.usecase.CurrentUser
 import com.codingarena.domain.usecase.EnsureDailyPuzzleUseCase
+import com.codingarena.domain.usecase.EstablishSignedInProfileUseCase
 import com.codingarena.domain.usecase.GetHomeSnapshotUseCase
 import com.codingarena.domain.usecase.RefreshLearningPathUseCase
 import com.codingarena.domain.usecase.StartAppUseCase
@@ -184,6 +185,7 @@ val coreModule: Module = module {
     factory { CompleteOnboardingUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { RefreshLearningPathUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory { StartAppUseCase(get(), get(), get()) }
+    factory { EstablishSignedInProfileUseCase(get(), get(), get(), get(), get()) }
 
     // ---- legacy attempt/rating sync ----
     // Course progress and classrooms use the Ktor gateway above. The older

@@ -100,13 +100,18 @@ class KtorClassroomGateway(
         onAuthTokenChanged("")
     }
 
-    override suspend fun refreshIdentity() {
-        val token = settings.get(AUTH_TOKEN)?.takeIf { it.isNotBlank() } ?: return
+    override suspend fun refreshIdentity(): Identity? {
+        val token = settings.get(AUTH_TOKEN)?.takeIf { it.isNotBlank() } ?: return null
         val response = client.get("${config.baseUrl}/v1/auth/me") { bearerAuth(token) }
-        if (!response.status.isSuccess()) return
+        if (response.status.value == 401) {
+            signOut()
+            return null
+        }
+        if (!response.status.isSuccess()) return null
         val identity: Identity = response.body()
         settings.put(AUTH_NAME, identity.displayName)
         settings.put(AUTH_ROLE, identity.role.name)
+        return identity
     }
 
     private suspend fun io.ktor.client.request.HttpRequestBuilder.authenticate() {

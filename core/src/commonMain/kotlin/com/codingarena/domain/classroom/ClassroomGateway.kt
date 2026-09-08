@@ -3,6 +3,7 @@ package com.codingarena.domain.classroom
 import com.codingarena.domain.model.Assignment
 import com.codingarena.domain.model.AuthResponse
 import com.codingarena.domain.model.ClassMembership
+import com.codingarena.domain.model.Identity
 import com.codingarena.domain.model.Classroom
 import com.codingarena.domain.model.CreateAssignmentRequest
 import com.codingarena.domain.model.LoginRequest
@@ -28,8 +29,8 @@ interface ClassroomGateway {
 
     /**
      * Fills in the stored display name and role from a token the client already
-     * holds. Used after the Google redirect, which hands back only a JWT.
-     * No-op when there is no session.
+     * holds, and returns the identity. Used after the Google redirect, which
+     * hands back only a JWT. Returns null when there is no valid session.
      */
-    suspend fun refreshIdentity() {}
+    suspend fun refreshIdentity(): Identity? = null
 }
