@@ -26,6 +26,7 @@ data class Identity(
     val userId: String,
     val role: UserRole,
     val displayName: String,
+    val email: String? = null,
 )
 
 @Serializable data class CreateClassroomRequest(val name: String)

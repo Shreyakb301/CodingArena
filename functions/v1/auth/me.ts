@@ -7,6 +7,7 @@ interface Identity {
   userId: string;
   role: string;
   displayName: string;
+  email: string | null;
 }
 
 // The signed-in user's identity for a token the client already holds. The
@@ -20,5 +21,10 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const user = await userById(env.DB, session.userId);
   if (!user) return error("Account not found", 404);
 
-  return json<Identity>({ userId: user.id, role: user.role, displayName: user.display_name });
+  return json<Identity>({
+    userId: user.id,
+    role: user.role,
+    displayName: user.display_name,
+    email: user.email,
+  });
 };

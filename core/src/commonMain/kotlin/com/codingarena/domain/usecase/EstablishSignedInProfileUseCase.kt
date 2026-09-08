@@ -31,13 +31,29 @@ class EstablishSignedInProfileUseCase(
 ) {
     suspend operator fun invoke(): UserProfile? {
         val identity = gateway.refreshIdentity() ?: return profiles.current()
-        profiles.current()?.let { return it }
+
+        val existing = profiles.current()
+        if (existing != null) {
+            // Keep the local progress, but attach it to the account so the app
+            // stops treating this as a guest and the snapshot sync takes over.
+            if (existing.isGuest || existing.email != identity.email) {
+                profiles.save(
+                    existing.copy(
+                        isGuest = false,
+                        email = identity.email ?: existing.email,
+                        displayName = existing.displayName.ifBlank { identity.displayName },
+                    ),
+                )
+            }
+            return profiles.current()
+        }
 
         val now = time.nowMillis()
         val answers = OnboardingAnswers()
         val profile = UserProfile(
             id = identity.userId,
             displayName = identity.displayName.ifBlank { "You" },
+            email = identity.email,
             isGuest = false,
             onboarding = answers,
             createdAt = now,

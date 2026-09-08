@@ -15,7 +15,7 @@ test("me returns the identity for a registered user's token", async () => {
 
   const res = await run(me, rawRequest("GET", null, bearer(token)), env);
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { userId, role: "STUDENT", displayName: "Ada" });
+  assert.deepEqual(await res.json(), { userId, role: "STUDENT", displayName: "Ada", email: "a@b.com" });
 });
 
 test("me is 401 without a token", async () => {
