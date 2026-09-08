@@ -105,11 +105,12 @@ private const val TOKEN_KEY = "arena.token"
 private fun captureAuthRedirect() {
     val hash = window.location.hash.removePrefix("#")
     if (hash.isEmpty()) return
-    val token = hash.split('&')
-        .firstOrNull { it.startsWith("token=") }
-        ?.substringAfter('=')
-        ?.let(::decodeURIComponent)
-    if (!token.isNullOrBlank()) setLocalStorage(TOKEN_KEY, token)
+    val params = hash.split('&').mapNotNull {
+        val i = it.indexOf('=')
+        if (i < 0) null else it.take(i) to decodeURIComponent(it.substring(i + 1))
+    }.toMap()
+    params["token"]?.takeIf { it.isNotBlank() }?.let { setLocalStorage(TOKEN_KEY, it) }
+    params["auth_error"]?.let { logError("Google sign-in failed: $it") }
     // Always clear the fragment (covers the error case too).
     window.history.replaceState(null, "", window.location.pathname + window.location.search)
 }
@@ -125,10 +126,14 @@ private suspend fun restoreSession() {
     val koin = KoinPlatform.getKoin()
     koin.get<SettingsRepository>().put(KtorClassroomGateway.AUTH_TOKEN, token)
     runCatching { koin.get<EstablishSignedInProfileUseCase>().invoke() }
+        .onFailure { logError("Could not establish the signed-in profile: ${it.message}") }
 }
 
 @JsFun("(value) => decodeURIComponent(value)")
 private external fun decodeURIComponent(value: String): String
+
+@JsFun("(message) => console.error(message)")
+private external fun logError(message: String)
 
 @JsFun("(key, value) => { if (value) localStorage.setItem(key, value); else localStorage.removeItem(key); }")
 private external fun setLocalStorage(key: String, value: String)
