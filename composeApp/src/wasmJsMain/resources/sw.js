@@ -5,7 +5,7 @@
 // - Everything referenced by a fixed name (the HTML shell, codingarena.js, the
 //   sql.js worker) is network-first: a fresh deploy is picked up on the next
 //   load, and the cached copy is only a fallback when offline.
-const CACHE = "codingarena-v2";
+const CACHE = "codingarena-v3";
 const IMMUTABLE = /\.(wasm)$|^[a-f0-9]{16,}\./;
 
 self.addEventListener("install", () => self.skipWaiting());
