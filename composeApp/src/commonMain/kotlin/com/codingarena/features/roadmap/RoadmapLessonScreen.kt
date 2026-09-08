@@ -168,15 +168,9 @@ private fun ProblemPage(
         item { SectionHeader("Constraints") }
         items(lesson.constraints) { constraint -> Text("• $constraint") }
         item {
-            Text(
-                "The pattern and solution are intentionally hidden. Use the examples and constraints to reason about the choices.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 6.dp),
-            )
             Button(
                 onClick = onStart,
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 28.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 28.dp),
             ) { Text(startLabel) }
         }
     }
