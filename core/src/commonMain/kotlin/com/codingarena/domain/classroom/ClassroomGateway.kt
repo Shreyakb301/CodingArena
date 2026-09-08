@@ -25,4 +25,11 @@ interface ClassroomGateway {
     suspend fun fetchProgress(): ProgressSyncPayload?
     suspend fun dashboard(classroomId: String): ClassroomDashboard
     suspend fun signOut()
+
+    /**
+     * Fills in the stored display name and role from a token the client already
+     * holds. Used after the Google redirect, which hands back only a JWT.
+     * No-op when there is no session.
+     */
+    suspend fun refreshIdentity() {}
 }

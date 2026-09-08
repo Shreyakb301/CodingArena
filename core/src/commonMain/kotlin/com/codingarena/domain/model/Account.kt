@@ -20,6 +20,14 @@ data class AuthResponse(
     val displayName: String,
 )
 
+/** The signed-in user, for a token the client already holds (the Google flow). */
+@Serializable
+data class Identity(
+    val userId: String,
+    val role: UserRole,
+    val displayName: String,
+)
+
 @Serializable data class CreateClassroomRequest(val name: String)
 @Serializable data class JoinClassroomRequest(val inviteCode: String, val displayName: String)
 @Serializable data class CreateAssignmentRequest(

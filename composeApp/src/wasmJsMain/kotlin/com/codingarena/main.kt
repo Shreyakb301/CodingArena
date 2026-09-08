@@ -26,6 +26,7 @@ import com.codingarena.data.remote.KtorClassroomGateway
 import com.codingarena.db.ArenaDatabase
 import com.codingarena.di.appModule
 import com.codingarena.di.coreModule
+import com.codingarena.domain.classroom.ClassroomGateway
 import com.codingarena.domain.repository.SettingsRepository
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -113,10 +114,16 @@ private fun captureAuthRedirect() {
     window.history.replaceState(null, "", window.location.pathname + window.location.search)
 }
 
-/** localStorage holds the session on web; make it visible to the HTTP client. */
+/**
+ * localStorage holds the session on web; make it visible to the HTTP client,
+ * then fill in the display name and role. Email/password sign-in gets those from
+ * its response body, but the Google redirect only carries a token.
+ */
 private suspend fun restoreSession() {
     val token = getLocalStorage(TOKEN_KEY)?.takeIf { it.isNotBlank() } ?: return
-    KoinPlatform.getKoin().get<SettingsRepository>().put(KtorClassroomGateway.AUTH_TOKEN, token)
+    val koin = KoinPlatform.getKoin()
+    koin.get<SettingsRepository>().put(KtorClassroomGateway.AUTH_TOKEN, token)
+    runCatching { koin.get<ClassroomGateway>().refreshIdentity() }
 }
 
 @JsFun("(value) => decodeURIComponent(value)")

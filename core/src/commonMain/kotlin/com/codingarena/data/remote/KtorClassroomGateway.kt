@@ -8,6 +8,7 @@ import com.codingarena.domain.model.Classroom
 import com.codingarena.domain.model.CreateAssignmentRequest
 import com.codingarena.domain.model.CreateClassroomRequest
 import com.codingarena.domain.model.JoinClassroomRequest
+import com.codingarena.domain.model.Identity
 import com.codingarena.domain.model.LoginRequest
 import com.codingarena.domain.model.RegisterRequest
 import com.codingarena.domain.model.ProgressSyncPayload
@@ -97,6 +98,15 @@ class KtorClassroomGateway(
         settings.put(AUTH_ROLE, "")
         settings.put(AUTH_NAME, "")
         onAuthTokenChanged("")
+    }
+
+    override suspend fun refreshIdentity() {
+        val token = settings.get(AUTH_TOKEN)?.takeIf { it.isNotBlank() } ?: return
+        val response = client.get("${config.baseUrl}/v1/auth/me") { bearerAuth(token) }
+        if (!response.status.isSuccess()) return
+        val identity: Identity = response.body()
+        settings.put(AUTH_NAME, identity.displayName)
+        settings.put(AUTH_ROLE, identity.role.name)
     }
 
     private suspend fun io.ktor.client.request.HttpRequestBuilder.authenticate() {

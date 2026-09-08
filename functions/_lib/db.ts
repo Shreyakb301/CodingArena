@@ -29,6 +29,9 @@ const uuid = (): string => crypto.randomUUID();
 export const userByEmail = (db: D1Database, email: string) =>
   db.prepare("SELECT * FROM arena_user WHERE email = ?").bind(email.trim().toLowerCase()).first<UserRow>();
 
+export const userById = (db: D1Database, id: string) =>
+  db.prepare("SELECT * FROM arena_user WHERE id = ?").bind(id).first<UserRow>();
+
 const userByGoogleId = (db: D1Database, googleId: string) =>
   db.prepare("SELECT * FROM arena_user WHERE google_id = ?").bind(googleId).first<UserRow>();
 

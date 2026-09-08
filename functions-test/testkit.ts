@@ -43,6 +43,7 @@ export class FakeD1 {
   _first({ sql, args }: Stmt): unknown {
     if (/WHERE email = \?/i.test(sql)) return this.rows.find((r) => r.email === args[0]) ?? null;
     if (/WHERE google_id = \?/i.test(sql)) return this.rows.find((r) => r.google_id === args[0]) ?? null;
+    if (/WHERE id = \?/i.test(sql)) return this.rows.find((r) => r.id === args[0]) ?? null;
     throw new Error(`FakeD1: unhandled first: ${sql}`);
   }
 }
