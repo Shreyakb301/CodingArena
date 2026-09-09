@@ -8,7 +8,9 @@ xcuserdata/
 # Release signing secrets - never commit these.
 *.jks
 *.keystore
+*.b64
 keystore.properties
+keystore/
 
 # Kotlin compiler scratch
 .kotlin/
