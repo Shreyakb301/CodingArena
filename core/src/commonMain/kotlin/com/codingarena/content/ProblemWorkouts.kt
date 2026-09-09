@@ -380,17 +380,17 @@ private val minimumSizeSubarraySum = ProblemWorkout(
             conceptKey = "minimum-size-subarray-sum-transfer",
             choices = listOf(
                 choice(
-                    "Yes - it also grows a window from the right and shrinks from the left whenever a constraint is violated, just tracking distinct characters instead of a sum.",
+                    "Yes - it grows from the right and shrinks from the left on a violated constraint, tracking distinct characters instead of a sum.",
                     true,
                     "Both problems share the same shape: a window that only ever needs to grow or shrink from its two ends based on a running condition, which is the hallmark of the sliding window pattern.",
                 ),
                 choice(
-                    "No - that problem requires backtracking over every possible substring instead of a moving window.",
+                    "No - that problem needs backtracking over every possible substring rather than a single moving window.",
                     false,
                     "That problem is actually a textbook sliding window case too - tracking which characters are currently in the window is enough to know when to shrink, no backtracking required.",
                 ),
                 choice(
-                    "No - sliding window only works when every value in the array is a positive number.",
+                    "No - the sliding window only works when every value in the array is strictly a positive number.",
                     false,
                     "The positive-values requirement is specific to using a running sum as the qualifying condition - other sliding window problems use different conditions, like distinct-character counts, that don't need positivity at all.",
                 )),
@@ -401,17 +401,17 @@ private val minimumSizeSubarraySum = ProblemWorkout(
             conceptKey = "minimum-size-subarray-sum-edge-case",
             choices = listOf(
                 choice(
-                    "An array whose total sum is smaller than target, so no subarray - not even the whole array - can ever qualify.",
+                    "An array whose total sum is below target, so no subarray, not even the whole array, can ever qualify.",
                     true,
                     "If minLen is never updated because no window ever reaches target, a solution that forgets to check for the untouched Int.MAX_VALUE sentinel would incorrectly return it instead of 0.",
                 ),
                 choice(
-                    "An array containing exactly one element equal to target.",
+                    "An array containing exactly one element that is equal to the target value.",
                     false,
                     "A single element equal to target immediately qualifies as a window of length 1, which is exactly the kind of case the shrink loop handles correctly without any special casing.",
                 ),
                 choice(
-                    "An array where every element is much larger than target.",
+                    "An array where every single element is much larger than the target value.",
                     false,
                     "Oversized elements just mean the shortest qualifying window is length 1, found on the very first expansion - this doesn't expose any bug in the shrink logic.",
                 )),
@@ -429,17 +429,17 @@ private val validAnagramWorkout = ProblemWorkout(
             conceptKey = "valid-anagram-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Frequency map: count how many times each character appears in each string and compare the counts.",
+                    "Frequency map: count each character's occurrences in both strings, then compare.",
                     true,
                     "An anagram is just a rearrangement, so what matters is not the order of characters but how many of each one appears - a frequency map captures exactly that and nothing more.",
                 ),
                 choice(
-                    "Two pointers walking both strings from opposite ends inward.",
+                    "Two pointers walking inward through both strings from their opposite ends.",
                     false,
                     "Rearranged characters don't line up at mirrored positions the way a palindrome check would need - two pointers from opposite ends has no reason to find matching characters there.",
                 ),
                 choice(
-                    "Binary search each character of one string against the other.",
+                    "Binary search for each character of one string within the sorted other string.",
                     false,
                     "Binary search needs sorted data to search over, and nothing here is sorted going in - counting occurrences directly is simpler and needs no preprocessing.",
                 )),
@@ -450,17 +450,17 @@ private val validAnagramWorkout = ProblemWorkout(
             conceptKey = "valid-anagram-approach",
             choices = listOf(
                 choice(
-                    "Build one count map by incrementing for each character in the first string and decrementing for each character in the second, then check every count is zero.",
+                    "Increment a shared count map over the first string and decrement it over the second, then check all counts are zero.",
                     true,
                     "Incrementing and decrementing the same map means any character used unevenly between the two strings leaves a nonzero count, which is exactly what marks them as not anagrams.",
                 ),
                 choice(
-                    "Sort both strings alphabetically and compare them for equality.",
+                    "Sort both strings alphabetically and then check whether the two sorted strings are exactly equal.",
                     false,
                     "This also works and is a fine alternative, but it costs O(n log n) for the sort where counting characters only costs O(n) - not the best approach when a linear one is available.",
                 ),
                 choice(
-                    "Compare the strings character by character at each matching index.",
+                    "Compare the two strings position by position, checking the character at each matching index.",
                     false,
                     "Anagrams are rearrangements, so the same characters can appear at completely different indices in each string - comparing index by index would reject valid anagrams.",
                 )),
@@ -471,17 +471,17 @@ private val validAnagramWorkout = ProblemWorkout(
             conceptKey = "valid-anagram-state-selection",
             choices = listOf(
                 choice(
-                    "A single map from character to a running count, shared across both strings.",
+                    "One character-to-count map, shared and updated across both strings.",
                     true,
                     "Sharing one map and incrementing for one string while decrementing for the other means a perfect anagram always nets back to entirely zero counts.",
                 ),
                 choice(
-                    "Two separate sorted copies of the strings.",
+                    "Two separate sorted copies of the strings, compared afterward.",
                     false,
                     "Sorting works but needs two full copies and a comparison step afterward - a single shared count map reaches the same answer with less bookkeeping.",
                 ),
                 choice(
-                    "A stack of characters from the first string.",
+                    "A stack holding the characters of the first string in order.",
                     false,
                     "A stack tracks order and last-in-first-out access, neither of which matters here - only how many of each character exist matters, not any ordering.",
                 )),
@@ -657,17 +657,17 @@ private val validAnagramWorkout = ProblemWorkout(
             conceptKey = "valid-anagram-edge-case",
             choices = listOf(
                 choice(
-                    "Strings of different lengths where the shorter one's characters are a subset of the longer one's.",
+                    "Different-length strings where the shorter one's characters are all found in the longer one.",
                     true,
                     "Without checking lengths first, a shorter string that only uses characters also present in a longer string could still net every count to zero for its own characters, wrongly passing as an anagram of a longer string.",
                 ),
                 choice(
-                    "Two empty strings.",
+                    "Two empty strings, which have no characters to count on either side.",
                     false,
                     "Two empty strings trivially net every count to zero and correctly count as anagrams of each other - this doesn't expose any bug.",
                 ),
                 choice(
-                    "Two identical strings.",
+                    "Two identical strings with exactly the same characters in the same order.",
                     false,
                     "Identical strings are the simplest possible anagram case and net every count to zero exactly as expected - nothing breaks here.",
                 )),
@@ -685,7 +685,7 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Two pointers: fix one number, then use two pointers from both ends of the remaining sorted range to find pairs that complete the sum.",
+                    "Two pointers: fix one number, then close two pointers inward over the rest of the sorted range to find completing pairs.",
                     true,
                     "Once the array is sorted, fixing one value turns the problem into 'find two numbers that sum to a target' in a sorted range - exactly what two pointers closing inward solves in linear time.",
                 ),
@@ -695,7 +695,7 @@ private val threeSumWorkout = ProblemWorkout(
                     "The three numbers in a valid triplet don't need to be consecutive in the array - a window that only ever looks at adjacent elements would miss almost every valid triplet.",
                 ),
                 choice(
-                    "Try every possible triplet with three nested loops.",
+                    "Try every possible triplet of values directly using three nested loops over the array.",
                     false,
                     "This finds every triplet correctly but costs O(n cubed), far more than the O(n squared) that fixing one value and using two pointers on the rest achieves.",
                 )),
@@ -706,12 +706,12 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-approach",
             choices = listOf(
                 choice(
-                    "Sort the array; for each index i, use two pointers starting just after i and at the end to find pairs summing to -nums[i], skipping duplicate values to avoid repeated triplets.",
+                    "Sort the array; for each i, run two pointers from just after i to the end for pairs summing to -nums[i], skipping duplicates.",
                     true,
                     "Sorting groups equal values together, which makes both 'find a pair summing to a target' solvable with two pointers and 'skip values equal to the one just tried' straightforward for avoiding duplicates.",
                 ),
                 choice(
-                    "Sort the array; for each index i, use two pointers but do not skip any duplicate values.",
+                    "Sort the array; for each index i, run two pointers over the rest but never skip any duplicate values.",
                     false,
                     "Without skipping duplicates, the same triplet found in a different position gets recorded again, producing repeated triplets when the problem asks for unique ones only.",
                 ),
@@ -727,17 +727,17 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-state-selection",
             choices = listOf(
                 choice(
-                    "A left pointer just after the fixed index and a right pointer at the array's end, moving toward each other.",
+                    "A left pointer just past the fixed index and a right pointer at the end, moving toward each other.",
                     true,
                     "In a sorted array, moving left forward increases the pair's sum and moving right backward decreases it, so these two pointers can search the entire remaining range in one linear pass.",
                 ),
                 choice(
-                    "A hash map from value to how many times it has been used so far.",
+                    "A hash map from each value to how many times it has been used so far in the sweep.",
                     false,
                     "A usage-count map is unnecessary once the array is sorted - the two-pointer sweep naturally handles finding pairs without needing to track how many times each value has appeared.",
                 ),
                 choice(
-                    "A separate sorted copy of the array for every fixed index.",
+                    "A separate freshly sorted copy of the array made for every fixed index.",
                     false,
                     "The array only needs to be sorted once at the very start - re-sorting a fresh copy for every fixed index would repeat the same work n times over for no benefit.",
                 )),
@@ -748,12 +748,12 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-boundary-update",
             choices = listOf(
                 choice(
-                    "If the sum is too small, move right backward; if too large, move left forward.",
+                    "If the sum is too small move right backward; if it is too large move left forward instead.",
                     false,
                     "This reverses the two pointers' effects - moving right backward actually decreases the sum further, moving it away from a too-small target instead of toward it.",
                 ),
                 choice(
-                    "If the sum is too small, move left forward; if too large, move right backward; if it matches, record the triplet and move both pointers inward, skipping duplicates.",
+                    "If the sum is too small move left forward; if too large move right backward; on a match record the triplet and step both inward past duplicates.",
                     true,
                     "Because the array is sorted, moving left forward strictly increases the sum and moving right backward strictly decreases it, so this rule always moves toward the target sum without ever missing a pair.",
                 ),
@@ -850,7 +850,7 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-time-complexity",
             choices = listOf(
                 choice(
-                    "O(n), because sorting takes constant time relative to the sweep.",
+                    "O(n), because sorting takes only constant time relative to the two-pointer sweep.",
                     false,
                     "Sorting alone already costs O(n log n), and the outer loop over fixed indices combined with each inner sweep brings the total to O(n squared), well above linear.",
                 ),
@@ -860,7 +860,7 @@ private val threeSumWorkout = ProblemWorkout(
                     "The two-pointer sweep replaces the innermost loop entirely - only one index is fixed with a loop, and the pair search happens in one linear pass, not a nested loop.",
                 ),
                 choice(
-                    "O(n squared), because for each of the n fixed indices, the two-pointer sweep does at most O(n) work.",
+                    "O(n squared), because each of the n fixed indices runs a two-pointer sweep doing at most O(n) work.",
                     true,
                     "Sorting costs O(n log n) up front, and then n fixed indices, each running a two-pointer sweep that's linear in the remaining range, multiply out to O(n squared) total.",
                 )),
@@ -871,17 +871,17 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-space-complexity",
             choices = listOf(
                 choice(
-                    "O(log n) to O(n), for the sort's own internal space, plus O(1) for the two pointers themselves.",
+                    "O(log n) to O(n) for the sort's internal space, plus O(1) for the pointers themselves.",
                     true,
                     "The pointers and running sum use only a handful of variables, so the dominant cost is whatever the sorting algorithm itself needs internally, which varies by implementation but is never more than linear.",
                 ),
                 choice(
-                    "O(n) for a hash set tracking every triplet seen so far.",
+                    "O(n), for a hash set that tracks every triplet seen so far during the scan.",
                     false,
                     "No hash set of triplets is needed - duplicates are avoided by skipping over equal adjacent values in the already-sorted array, not by tracking previously seen combinations.",
                 ),
                 choice(
-                    "O(n squared) for a table of every pair's sum.",
+                    "O(n squared), for a precomputed table holding every pair's sum.",
                     false,
                     "No table of pair sums is precomputed or stored - each pair's sum is computed on the fly from the current left and right pointers and immediately discarded.",
                 )),
@@ -892,7 +892,7 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-transfer",
             choices = listOf(
                 choice(
-                    "Yes - two pointers from both ends of a sorted array, moving based on whether the sum is too high or too low, applies directly without needing to fix an extra value.",
+                    "Yes - two pointers from both ends of the sorted array, moved by whether the sum runs high or low, applies with no fixed value at all.",
                     true,
                     "That's actually a simpler version of the same core idea - two pointers narrowing toward a target sum in a sorted array - just without the outer loop that fixes one of three values.",
                 ),
@@ -902,7 +902,7 @@ private val threeSumWorkout = ProblemWorkout(
                     "Two pointers can still narrow in on the closest sum by tracking the best difference seen so far as they move, the same way they narrow toward an exact target - no need to check every pair.",
                 ),
                 choice(
-                    "No - two pointers only work when searching for triplets, not pairs.",
+                    "No - two pointers only work when searching for triplets that sum exactly, not for closest pairs.",
                     false,
                     "Two pointers converging from both ends of a sorted array is fundamentally a pair-finding technique - the triplet version here just wraps it in an outer loop that fixes one extra value.",
                 )),
@@ -913,17 +913,17 @@ private val threeSumWorkout = ProblemWorkout(
             conceptKey = "3sum-edge-case",
             choices = listOf(
                 choice(
-                    "An array with repeated values, like [-1, -1, 0, 1, 1], where the same triplet can be found starting from two different but equal fixed indices.",
+                    "An array with repeated values like [-1, -1, 0, 1, 1], where one triplet can be found from two equal fixed indices.",
                     true,
                     "Without skipping to the next distinct value after processing a fixed index, the identical triplet gets rediscovered from a duplicate index and added to the result twice, violating the uniqueness requirement.",
                 ),
                 choice(
-                    "An array where every value is distinct.",
+                    "An array where every value is distinct, with no repeats anywhere.",
                     false,
                     "With no repeated values at all, there's no duplicate index to skip in the first place, so this case can't expose a missing duplicate-skip bug.",
                 ),
                 choice(
-                    "An array with fewer than three elements.",
+                    "An array with fewer than three elements, too short to form any triplet.",
                     false,
                     "Too few elements to form any triplet just means the result is empty - this is a simple size check, not something that depends on duplicate handling.",
                 )),
@@ -962,12 +962,12 @@ private val validParenthesesWorkout = ProblemWorkout(
             conceptKey = "valid-parentheses-approach",
             choices = listOf(
                 choice(
-                    "Push every opening bracket onto a stack; for each closing bracket, pop the stack and check it matches, failing immediately if the stack is empty or the types don't match; succeed only if the stack is empty at the end.",
+                    "Push each opening bracket; on each closing bracket pop and check the match, failing if the stack is empty or types differ; succeed only if the stack ends empty.",
                     true,
                     "Checking both that a pop is possible and that its type matches, plus requiring an empty stack at the end, together rule out unmatched closes, wrong nesting order, and leftover unclosed opens.",
                 ),
                 choice(
-                    "Push every opening bracket onto a stack; for each closing bracket, pop the stack without checking the type, and succeed if the string's length is even.",
+                    "Push each opening bracket; on each closing bracket pop without checking the type, and succeed if the string's length is even.",
                     false,
                     "Skipping the type check would accept mismatched pairs like '(]' as valid, and checking length alone can't detect nesting problems at all.",
                 ),
@@ -1127,17 +1127,17 @@ private val validParenthesesWorkout = ProblemWorkout(
             conceptKey = "valid-parentheses-space-complexity",
             choices = listOf(
                 choice(
-                    "O(n), because a string made entirely of opening brackets pushes every character onto the stack.",
+                    "O(n), because a string of nothing but opening brackets pushes every character onto the stack.",
                     true,
                     "In the worst case, such as \"((((((\", every character is an opening bracket with nothing to pop it, so the stack can grow to hold all n characters.",
                 ),
                 choice(
-                    "O(1), because brackets are immediately matched and removed.",
+                    "O(1), because each bracket is immediately matched and removed from the stack.",
                     false,
                     "Matching only happens when a closing bracket appears - a long run of opening brackets with no closes yet can leave many entries sitting on the stack at once.",
                 ),
                 choice(
-                    "O(log n), because the stack only grows for deeply nested brackets.",
+                    "O(log n), because the stack only grows for the deeply nested part of the brackets.",
                     false,
                     "There's no logarithmic bound here - the stack's size is determined directly by how many opening brackets appear before being closed, which can be close to n.",
                 )),
@@ -1148,12 +1148,12 @@ private val validParenthesesWorkout = ProblemWorkout(
             conceptKey = "valid-parentheses-transfer",
             choices = listOf(
                 choice(
-                    "Yes - a stack (or an equivalent counter) still identifies exactly which brackets are unmatched; those are the ones that need removing.",
+                    "Yes - a stack or equivalent counter still pinpoints exactly which brackets are unmatched, and those are the ones to remove.",
                     true,
                     "The same core mechanism - tracking unmatched opens and detecting closes with nothing to match - directly identifies which specific brackets are the problem, which is one step further than just a yes-or-no validity check.",
                 ),
                 choice(
-                    "No - deciding which brackets to remove requires trying every possible subset of removals.",
+                    "No - deciding which brackets to remove requires trying every possible subset of removals directly.",
                     false,
                     "Trying every subset would be far more work than necessary - the same single-pass stack tracking that validates a string also directly identifies which specific brackets are unmatched.",
                 ),
@@ -1169,17 +1169,17 @@ private val validParenthesesWorkout = ProblemWorkout(
             conceptKey = "valid-parentheses-edge-case",
             choices = listOf(
                 choice(
-                    "A string like \"())(\" that has equal bracket counts but closes a bracket before its matching open exists.",
+                    "A string like \"())(\" with equal bracket counts that still closes a bracket before its open exists.",
                     true,
                     "Without checking for an empty stack (or a type mismatch) at the moment a closing bracket appears, this string could crash or silently mismatch, even though the stack does end up empty overall.",
                 ),
                 choice(
-                    "An empty string.",
+                    "An empty string with no brackets in it at all.",
                     false,
                     "An empty string trivially leaves the stack empty from the start, correctly returning true without ever exercising the per-character matching logic.",
                 ),
                 choice(
-                    "A string with only one type of bracket, like \"(()())\".",
+                    "A string using only one type of bracket, like \"(()())\".",
                     false,
                     "This is validly nested and every closing bracket has a proper matching open available in the correct order - it doesn't expose a missing per-character check.",
                 )),
@@ -1197,17 +1197,17 @@ private val binarySearchWorkout = ProblemWorkout(
             conceptKey = "binary-search-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Binary search: repeatedly check the middle of the remaining range and discard the half that can't contain the target.",
+                    "Binary search: check the middle of the remaining range and discard the half that can't hold the target.",
                     true,
                     "Because the array is sorted, comparing the middle value to the target always reveals which entire half can be safely thrown away, cutting the search space roughly in half every step.",
                 ),
                 choice(
-                    "Scan the array from the start until the target is found.",
+                    "Scan the array linearly from the start until the target value is found.",
                     false,
                     "This works on any array, sorted or not, but it ignores the sorted order entirely, costing linear time where a search that uses the order can do far better.",
                 ),
                 choice(
-                    "Two pointers starting at both ends, moving toward each other.",
+                    "Two pointers starting at both ends of the array, moving toward each other.",
                     false,
                     "Two pointers closing inward is built for finding a pair that sums to something, not for locating one specific value - it doesn't use the sorted order to eliminate large chunks the way comparing to a middle value does.",
                 )),
@@ -1383,17 +1383,17 @@ private val binarySearchWorkout = ProblemWorkout(
             conceptKey = "binary-search-space-complexity",
             choices = listOf(
                 choice(
-                    "O(1), because only a fixed handful of variables - low, high, and mid - are tracked regardless of array size.",
+                    "O(1), because only the few variables low, high, and mid are tracked, regardless of array size.",
                     true,
                     "The iterative version updates the same few integer variables on every loop iteration rather than allocating new space proportional to the array or the range being searched.",
                 ),
                 choice(
-                    "O(log n), because the search range is halved on every step.",
+                    "O(log n), because the search range is cut in half on every step of the loop.",
                     false,
                     "Halving the range affects how many iterations the loop runs, not how much memory each iteration uses - the loop itself allocates nothing extra as it progresses.",
                 ),
                 choice(
-                    "O(n), because the array itself counts as extra space.",
+                    "O(n), because the input array itself has to count as extra space used.",
                     false,
                     "The input array is typically not counted as extra space since it already exists before the function runs - what matters is space the algorithm itself allocates beyond the input.",
                 )),
@@ -1404,12 +1404,12 @@ private val binarySearchWorkout = ProblemWorkout(
             conceptKey = "binary-search-transfer",
             choices = listOf(
                 choice(
-                    "Yes - binary search over the range of possible speeds, checking at each candidate whether it's fast enough, narrows to the minimum working speed the same way it narrows to a target value.",
+                    "Yes - binary search the speed range, testing each candidate for feasibility to home in on the minimum working speed, as with a target.",
                     true,
                     "As speed increases, the time needed to finish only ever decreases, never increases - that same kind of one-directional relationship is what makes binary searching over a range of possible answers valid here too.",
                 ),
                 choice(
-                    "No - that problem has no target value to compare against, so binary search doesn't apply.",
+                    "No - that problem has no target value stored to compare against, so binary search can't apply.",
                     false,
                     "There doesn't need to be a fixed target value already in an array - binary search works equally well over a *range of possible answers*, checking feasibility at each candidate.",
                 ),
@@ -1425,17 +1425,17 @@ private val binarySearchWorkout = ProblemWorkout(
             conceptKey = "binary-search-edge-case",
             choices = listOf(
                 choice(
-                    "An array large enough that low + high overflows a fixed-width integer, even though the true midpoint would fit comfortably.",
+                    "An array large enough that low + high overflows a fixed-width integer, even though the midpoint itself would fit.",
                     true,
                     "Adding low and high directly can overflow in languages with fixed-width integers when both are large, producing a wrong, out-of-range mid even though low + (high - low) / 2 would compute the same correct value safely.",
                 ),
                 choice(
-                    "An array with only one element.",
+                    "An array with only one element, where low and high stay tiny.",
                     false,
                     "With low and high both tiny for a single-element array, there's no overflow risk at all - this case doesn't exercise the bug.",
                 ),
                 choice(
-                    "An array where the target isn't present.",
+                    "An array where the target value isn't present anywhere in it.",
                     false,
                     "Whether the target is present or not doesn't affect how mid is computed - this is about the search returning -1 correctly, not about the overflow-prone arithmetic.",
                 )),
@@ -1453,17 +1453,17 @@ private val twoSumWorkout = ProblemWorkout(
             conceptKey = "two-sum-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Hash map from value to index: for each number, check whether target minus that number was already seen.",
+                    "Hash map from value to index: look up whether each number's complement was already seen.",
                     true,
                     "Looking up whether the complement was already seen is a constant-time operation with a map, turning what would be a nested search into a single pass.",
                 ),
                 choice(
-                    "Sort the array first, then use two pointers from both ends.",
+                    "Sort the array first, then scan with two pointers moving inward from both ends.",
                     false,
                     "Sorting scrambles the original indices, but the answer needs the original positions of the two numbers - a hash map avoids that problem entirely by keeping value-to-index lookups intact.",
                 ),
                 choice(
-                    "Check every pair of numbers with two nested loops.",
+                    "Check every pair of numbers directly with two nested loops over the array.",
                     false,
                     "This finds the right answer but costs O(n squared), far more than the O(n) a hash map achieves by looking up complements instead of comparing every pair.",
                 )),
@@ -1474,17 +1474,17 @@ private val twoSumWorkout = ProblemWorkout(
             conceptKey = "two-sum-approach",
             choices = listOf(
                 choice(
-                    "For each number, check whether its complement (target minus the number) is already in the map; if not, add the current number and its index to the map.",
+                    "For each number, check whether its complement is already in the map; if not, add the number and its index.",
                     true,
                     "Checking for the complement before inserting the current number ensures a single element is never paired with itself, while still finding pairs formed by any two distinct positions.",
                 ),
                 choice(
-                    "Add every number and its index to the map first, then make a second pass checking for each number's complement.",
+                    "Add every number and its index to the map first, then take a second pass looking up each complement.",
                     false,
                     "This also works correctly, but it needs two full passes over the array where checking for the complement before inserting achieves the same result in just one.",
                 ),
                 choice(
-                    "For each number, check whether the number itself (not its complement) is already in the map.",
+                    "For each number, check whether the number itself is already in the map, rather than its complement.",
                     false,
                     "Checking for the number itself instead of target minus the number would only ever find exact duplicates, not the two different values that actually sum to target in the general case.",
                 )),
@@ -1521,12 +1521,12 @@ private val twoSumWorkout = ProblemWorkout(
                     "Inserting before checking means a number can find itself as its own complement whenever target is exactly double that number, incorrectly pairing an index with itself.",
                 ),
                 choice(
-                    "Check whether target - nums[i] exists in the map first; if it does, return the pair; if not, insert nums[i] with index i into the map, then continue.",
+                    "Check whether target - nums[i] is in the map first; if it is, return the pair, otherwise insert nums[i] with index i.",
                     true,
                     "Checking before inserting guarantees the complement found, if any, was placed there by an earlier, different index, so the same element is never used twice.",
                 ),
                 choice(
-                    "Check whether nums[i] exists in the map, and if so, insert target - nums[i] instead.",
+                    "Check whether nums[i] is already in the map, and if it is, insert target - nums[i] instead of nums[i].",
                     false,
                     "This checks for the wrong value entirely - it should be looking up the complement that would pair with the current number, not the current number itself.",
                 )),
@@ -1618,17 +1618,17 @@ private val twoSumWorkout = ProblemWorkout(
             conceptKey = "two-sum-time-complexity",
             choices = listOf(
                 choice(
-                    "O(n log n), because the array must be sorted first.",
+                    "O(n log n), because the array has to be sorted into order first.",
                     false,
                     "No sorting happens in this approach - the hash map finds complements without needing the array in any particular order.",
                 ),
                 choice(
-                    "O(n squared), because every pair of numbers must be checked.",
+                    "O(n squared), because every possible pair of numbers must be checked.",
                     false,
                     "The hash map replaces the need to check every pair directly - each number only ever looks up its own complement, not every other number in the array.",
                 ),
                 choice(
-                    "O(n), because each element triggers one constant-time map lookup and one constant-time insert.",
+                    "O(n), because each element does one constant-time map lookup and one constant-time insert.",
                     true,
                     "A single pass through the array, with constant work per element thanks to the hash map, gives time proportional to n.",
                 )),
@@ -1681,17 +1681,17 @@ private val twoSumWorkout = ProblemWorkout(
             conceptKey = "two-sum-edge-case",
             choices = listOf(
                 choice(
-                    "nums = [3, 3], target = 6, where the correct answer pairs the two different indices holding the value 3.",
+                    "nums = [3, 3], target = 6, where the answer must pair the two different indices holding the value 3.",
                     true,
                     "Checking for the number itself rather than target minus the number would look up whether 3 was already seen, which only coincidentally works when the complement equals the number - the check-then-insert order matters even more clearly in cases like this.",
                 ),
                 choice(
-                    "nums = [1, 5, 3], target = 8, with all distinct values.",
+                    "nums = [1, 5, 3], target = 8, an array with all distinct values.",
                     false,
                     "With entirely distinct values, checking for the complement correctly finds 5 and 3 - this case doesn't stress the same-index or duplicate-value edge behavior.",
                 ),
                 choice(
-                    "An array with only two elements.",
+                    "An array with only two elements, the smallest valid input.",
                     false,
                     "Two elements is simply the smallest valid input and doesn't involve any duplicate or self-pairing complication on its own.",
                 )),
@@ -1709,17 +1709,17 @@ private val containsDuplicateWorkout = ProblemWorkout(
             conceptKey = "contains-duplicate-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Hash set: track every value seen so far and check membership before adding each new one.",
+                    "Hash set: check whether each value is already in the set before adding it.",
                     true,
                     "A set answers 'have I seen this value before' in constant time, which is exactly the question that needs answering for every element.",
                 ),
                 choice(
-                    "Two pointers scanning from both ends of the array inward.",
+                    "Two pointers scanning inward from both ends of the array, moving one each step.",
                     false,
                     "Duplicate values could be anywhere in the array, not necessarily positioned symmetrically from the two ends, so there's no reason to anchor pointers there.",
                 ),
                 choice(
-                    "Binary search each value against the rest of the array.",
+                    "Binary search for each value among the array's other elements to find a match.",
                     false,
                     "Binary search needs sorted data, and the array isn't sorted going in - a hash set answers the membership question without needing any preprocessing at all.",
                 )),
@@ -1730,7 +1730,7 @@ private val containsDuplicateWorkout = ProblemWorkout(
             conceptKey = "contains-duplicate-approach",
             choices = listOf(
                 choice(
-                    "For each value, check whether it's already in the set; if so, return true immediately; otherwise add it and continue.",
+                    "For each value, check whether it's in the set; if so return true, otherwise add it and go on.",
                     true,
                     "Checking before adding is what actually detects the second occurrence - the very moment a repeated value shows up, its first occurrence is already sitting in the set.",
                 ),
@@ -1740,7 +1740,7 @@ private val containsDuplicateWorkout = ProblemWorkout(
                     "This also works, since a smaller set size than the array means something repeated, but it needs to build the whole set before it can answer anything, rather than returning as soon as a duplicate is found.",
                 ),
                 choice(
-                    "Sort the array and return true if it's not already sorted.",
+                    "Sort the array, then return true when it turns out it was not already in sorted order.",
                     false,
                     "Checking sortedness has nothing to do with detecting duplicates - a strictly increasing array has no duplicates regardless of sortedness, and a sorted array can still contain repeats.",
                 )),
@@ -1772,12 +1772,12 @@ private val containsDuplicateWorkout = ProblemWorkout(
             conceptKey = "contains-duplicate-boundary-update",
             choices = listOf(
                 choice(
-                    "Add the current value to the set first, then check whether the set contains it.",
+                    "Add the current value to the set first, and then check whether the set already contained it.",
                     false,
                     "Adding first means the check afterward will always find the value present, since it was just inserted - this can never correctly detect a duplicate.",
                 ),
                 choice(
-                    "Check whether the current value is already in the set; if yes, return true; if no, add it, then move to the next value.",
+                    "Check whether the value is already in the set; if yes return true, otherwise add it and continue.",
                     true,
                     "Checking membership before adding is what makes the check meaningful - if the value is already there, this exact value must have appeared earlier.",
                 ),
@@ -1916,17 +1916,17 @@ private val containsDuplicateWorkout = ProblemWorkout(
             conceptKey = "contains-duplicate-transfer",
             choices = listOf(
                 choice(
-                    "Yes, extended slightly - a map from value to index instead of a plain set, since Two Sum needs to report which two positions matched.",
+                    "Yes, extended slightly - use a map from value to index instead of a set, since Two Sum reports which two positions matched.",
                     true,
                     "The core 'have I seen something relevant before' lookup carries over directly - it just needs to store index alongside value, and check for a computed complement instead of the value itself.",
                 ),
                 choice(
-                    "No - Two Sum requires sorting the array and using two pointers instead.",
+                    "No - Two Sum requires sorting the array first and then using two pointers instead of a set.",
                     false,
                     "Two Sum can be solved with the exact same hash-based seen-so-far idea, just checking for a complement value instead of an exact repeat - sorting isn't required.",
                 ),
                 choice(
-                    "No - a set can only answer true-or-false questions, not return specific values.",
+                    "No - a set can only answer true-or-false questions, never return the specific matching values.",
                     false,
                     "Switching from a set to a map (value to index) keeps the same constant-time lookup idea while additionally reporting *which* index matched, which is all Two Sum needs on top of Contains Duplicate.",
                 )),
@@ -1937,17 +1937,17 @@ private val containsDuplicateWorkout = ProblemWorkout(
             conceptKey = "contains-duplicate-edge-case",
             choices = listOf(
                 choice(
-                    "Any array with a duplicate - adding everything first before checking means the function would need to compare set size to array length afterward, and never returns early or points to which value repeated.",
+                    "Any array with a duplicate - adding everything before checking forces a size-versus-length check afterward and no early return.",
                     true,
                     "Building the entire set first still works for a final true/false answer via size comparison, but it does unnecessary extra work for a large duplicate-free array and can't report early - the check-before-add order is what makes each step meaningful on its own.",
                 ),
                 choice(
-                    "An empty array.",
+                    "An empty array, which has no values to check for duplicates.",
                     false,
                     "An empty array trivially has no duplicates and returns false either way - it doesn't stress the ordering of checking versus adding.",
                 ),
                 choice(
-                    "An array with all distinct values.",
+                    "An array whose values are all distinct, containing no duplicates at all.",
                     false,
                     "With no duplicates present at all, both orderings of checking and adding end up scanning the whole array and correctly returning false.",
                 )),
@@ -1965,17 +1965,17 @@ private val containerWithMostWaterWorkout = ProblemWorkout(
             conceptKey = "container-with-most-water-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Two pointers starting at both ends, moving the pointer at the shorter line inward.",
+                    "Two pointers at both ends, moving the pointer at the shorter line inward each step.",
                     true,
                     "The width is largest when the pointers start at the two ends, so the only way to potentially find a taller container is to move the pointer at the shorter, limiting line - the taller one can never help until the shorter one improves.",
                 ),
                 choice(
-                    "Sliding window that only ever grows from the left.",
+                    "A sliding window that only ever grows from the left end.",
                     false,
                     "A window that only grows can never test the widest possible pairs first and narrow down, which is exactly the strength of two pointers starting at both ends.",
                 ),
                 choice(
-                    "Check every pair of lines directly.",
+                    "Check every possible pair of lines directly with nested loops.",
                     false,
                     "This finds the correct answer but costs O(n squared), far more than the O(n) that two pointers converging from both ends achieves.",
                 )),
@@ -1986,7 +1986,7 @@ private val containerWithMostWaterWorkout = ProblemWorkout(
             conceptKey = "container-with-most-water-approach",
             choices = listOf(
                 choice(
-                    "Start pointers at both ends; compute the area at each step; move the pointer at the shorter of the two lines inward, since it's the height that limits the current area.",
+                    "Start pointers at both ends; compute the area each step; move the pointer at the shorter line inward, since that height limits the area.",
                     true,
                     "Moving the shorter line's pointer is the only move that could possibly increase the area - moving the taller one can only ever decrease both the width and the limiting height.",
                 ),
@@ -1996,7 +1996,7 @@ private val containerWithMostWaterWorkout = ProblemWorkout(
                     "Moving the taller line inward keeps the shorter, limiting height the same while shrinking the width, which can only ever produce a smaller or equal area, never a larger one.",
                 ),
                 choice(
-                    "Start pointers at both ends; always move both pointers inward together on every step.",
+                    "Start pointers at both ends; on every step move both pointers inward together regardless of heights.",
                     false,
                     "Moving both pointers together shrinks the width every time regardless of which height was actually limiting the area, skipping over potentially better combinations.",
                 )),
@@ -2007,17 +2007,17 @@ private val containerWithMostWaterWorkout = ProblemWorkout(
             conceptKey = "container-with-most-water-state-selection",
             choices = listOf(
                 choice(
-                    "A left pointer, a right pointer, and the maximum area found so far.",
+                    "A left pointer, a right pointer, and the largest area found so far.",
                     true,
                     "Everything needed to compute the current area - the two heights and the width between them - comes directly from these two pointers, and the running maximum is the answer being built.",
                 ),
                 choice(
-                    "A sorted copy of the heights array.",
+                    "A sorted copy of the heights array to scan through.",
                     false,
                     "Sorting the heights would scramble their original positions, but the width between two lines depends entirely on their original indices in the array.",
                 ),
                 choice(
-                    "A running sum of every height seen so far.",
+                    "A running sum of every height seen so far in the array.",
                     false,
                     "The area only ever depends on the shorter of exactly two specific heights and the distance between them, not on a cumulative sum of every height passed so far.",
                 )),
@@ -2172,12 +2172,12 @@ private val containerWithMostWaterWorkout = ProblemWorkout(
             conceptKey = "container-with-most-water-transfer",
             choices = listOf(
                 choice(
-                    "Partially - two pointers help there too, but the state tracked differs: it needs the running maximum height seen from each side, not just the two current heights.",
+                    "Partially - two pointers apply, but it also needs the running maximum height from each side, not just the two current heights.",
                     true,
                     "Trapping Rain Water asks how much water is trapped *between* every pair of bars, not just the single best pair, so it needs to track the tallest wall seen so far from each side as the pointers move, an extra piece of state this problem doesn't need.",
                 ),
                 choice(
-                    "Yes - the exact same code works unchanged for both problems.",
+                    "Yes - the exact same two-pointer code works unchanged for both of these problems.",
                     false,
                     "The two problems share the two-pointers-from-both-ends idea, but Trapping Rain Water needs additional state (the running max height from each side) that this problem's code doesn't track at all.",
                 ),
@@ -2193,17 +2193,17 @@ private val containerWithMostWaterWorkout = ProblemWorkout(
             conceptKey = "container-with-most-water-edge-case",
             choices = listOf(
                 choice(
-                    "Heights strictly decreasing from left to right, like [9, 7, 5, 3, 1], where the tallest line is at the very start.",
+                    "Heights strictly decreasing left to right, like [9, 7, 5, 3, 1], with the tallest line at the very start.",
                     true,
                     "Always moving left regardless of height would abandon the tallest line immediately instead of keeping it and moving right inward, missing the actual best combination that starts from the tallest bar.",
                 ),
                 choice(
-                    "Heights that are all equal.",
+                    "Heights that are all equal, with no tallest line at all.",
                     false,
                     "With every height identical, moving either pointer produces the same limiting height each time, so this case doesn't distinguish a correct rule from an always-move-left one.",
                 ),
                 choice(
-                    "An array with only two heights.",
+                    "An array with only two heights, forming a single container.",
                     false,
                     "With only two lines, there's exactly one possible container and no choice of which pointer to move - this doesn't exercise the movement rule at all.",
                 )),
@@ -2242,7 +2242,7 @@ private val validPalindromeWorkout = ProblemWorkout(
             conceptKey = "valid-palindrome-approach",
             choices = listOf(
                 choice(
-                    "Move two pointers inward from both ends, skipping any non-alphanumeric character on either side before comparing, and fail on the first case-insensitive mismatch.",
+                    "Move two pointers inward from both ends, skipping non-alphanumeric characters on each side, and fail on the first case-insensitive mismatch.",
                     true,
                     "Skipping non-alphanumeric characters directly at each pointer, rather than building a separate cleaned string first, checks symmetry in a single pass with no extra storage.",
                 ),
@@ -2289,7 +2289,7 @@ private val validPalindromeWorkout = ProblemWorkout(
                     "Skipping only the left pointer, and only once, leaves the right pointer's own non-alphanumeric characters uncompared-against correctly, and a single skip misses runs of multiple such characters.",
                 ),
                 choice(
-                    "While left points at a non-alphanumeric character, move it forward; while right points at one, move it backward; then compare the two characters case-insensitively and move both inward.",
+                    "While left is on a non-alphanumeric character move it forward; likewise move right backward; then compare case-insensitively and step both inward.",
                     true,
                     "Skipping with a while loop (not just an if) on both sides handles runs of multiple punctuation or space characters in a row before ever comparing anything.",
                 ),
@@ -2428,7 +2428,7 @@ private val validPalindromeWorkout = ProblemWorkout(
             conceptKey = "valid-palindrome-transfer",
             choices = listOf(
                 choice(
-                    "Yes, with one addition - on the first mismatch, try skipping either the left or the right character and check if what remains is a palindrome.",
+                    "Yes, with one addition - on the first mismatch, try skipping either the left or the right character and check the rest.",
                     true,
                     "The same inward-closing pointers still do the comparing; the only new piece is a fallback branch that tries both possible single deletions the moment a mismatch is found.",
                 ),
@@ -2438,7 +2438,7 @@ private val validPalindromeWorkout = ProblemWorkout(
                     "Trying every possible deletion would be far more work than necessary - only the exact mismatch position needs a fallback check, not every position in the string.",
                 ),
                 choice(
-                    "No - two pointers can only verify exact palindromes, never approximate ones.",
+                    "No - two pointers can only verify exact palindromes, never ones that allow a deletion.",
                     false,
                     "Two pointers can absolutely handle the 'allow one skip' variant - it just needs a small branch at the first mismatch to try skipping one side or the other.",
                 )),
@@ -2449,12 +2449,12 @@ private val validPalindromeWorkout = ProblemWorkout(
             conceptKey = "valid-palindrome-edge-case",
             choices = listOf(
                 choice(
-                    "A string made entirely of punctuation and spaces, like \"...,,,...\", with no alphanumeric characters at all.",
+                    "A string of only punctuation and spaces, like \"...,,,...\", with no alphanumeric characters at all.",
                     true,
                     "Without the left < right guard, the skip loop for left would run straight past right and off the end of the string looking for a letter or digit that never appears.",
                 ),
                 choice(
-                    "A single-character alphanumeric string.",
+                    "A string containing just a single alphanumeric character.",
                     false,
                     "A single character trivially satisfies left >= right immediately and returns true without ever needing to skip anything.",
                 ),
@@ -2477,17 +2477,17 @@ private val bestTimeToBuyAndSellStockWorkout = ProblemWorkout(
             conceptKey = "best-time-to-buy-and-sell-stock-pattern-recognition",
             choices = listOf(
                 choice(
-                    "A window with an implicit left edge: track the minimum price seen so far as the buy day, and the best profit against it, in one pass.",
+                    "A window with an implicit left edge: track the running minimum price as the buy day and the best profit against it, in one pass.",
                     true,
                     "The buy day only ever needs to be the lowest price seen *before* the current day - tracking that running minimum as an implicit window edge finds the answer in a single linear scan.",
                 ),
                 choice(
-                    "Two pointers starting at both ends of the price array, moving inward.",
+                    "Two pointers starting at both ends of the price array and moving inward toward each other.",
                     false,
                     "The best buy and sell days aren't necessarily positioned symmetrically from the two ends of the array - there's no reason to anchor a pointer at the very last day.",
                 ),
                 choice(
-                    "Check every pair of buy and sell days directly.",
+                    "Check every possible pair of a buy day and a later sell day directly with nested loops.",
                     false,
                     "This finds the correct answer but costs O(n squared), while tracking a running minimum price achieves the same result in O(n).",
                 )),
@@ -2684,7 +2684,7 @@ private val bestTimeToBuyAndSellStockWorkout = ProblemWorkout(
             conceptKey = "best-time-to-buy-and-sell-stock-transfer",
             choices = listOf(
                 choice(
-                    "Yes - tracking a running best (there, the best sum ending at the current position) instead of restarting from scratch at every position is the same underlying idea.",
+                    "Yes - carrying a running best (there, the best sum ending at the current position) instead of restarting at each position is the same idea.",
                     true,
                     "Both problems share the same shape: rather than recomputing from every possible starting point, carry forward one running value (minimum price, or best running sum) and update a single best-so-far answer alongside it.",
                 ),
@@ -2694,7 +2694,7 @@ private val bestTimeToBuyAndSellStockWorkout = ProblemWorkout(
                     "Maximum Subarray also has an O(n) running-best solution (Kadane's algorithm) - it doesn't need to check every subarray individually, following the same one-pass, running-value idea.",
                 ),
                 choice(
-                    "No - this technique only applies to buy-and-sell problems specifically.",
+                    "No - this running-value technique only applies to buy-and-sell price problems specifically.",
                     false,
                     "The 'track one running value, update a best-so-far answer in a single pass' idea generalizes well beyond stock prices to many problems that ask for a best value ending at each position.",
                 )),
@@ -2705,17 +2705,17 @@ private val bestTimeToBuyAndSellStockWorkout = ProblemWorkout(
             conceptKey = "best-time-to-buy-and-sell-stock-edge-case",
             choices = listOf(
                 choice(
-                    "Prices strictly decreasing every day, like [7, 6, 4, 3, 1], where no profitable sale is ever possible.",
+                    "Prices strictly decreasing every day, like [7, 6, 4, 3, 1], so no profitable sale is possible.",
                     true,
                     "With prices only ever falling, every possible sale price minus the minimum-so-far is zero or negative - initializing maxProfit to 0 and only ever raising it (never lowering it) is what correctly returns 0 instead of a negative number.",
                 ),
                 choice(
-                    "Prices strictly increasing every day.",
+                    "Prices that strictly increase on every single day of the array.",
                     false,
                     "Strictly increasing prices produce a straightforward best profit of the last price minus the first - this doesn't expose any risk of a negative result.",
                 ),
                 choice(
-                    "An array with only one price.",
+                    "An array with only one price, so no sale is possible.",
                     false,
                     "With a single day, no sale is possible at all, but this doesn't specifically test the negative-profit guard - it tests that a loop over one element still behaves correctly.",
                 )),
@@ -2733,17 +2733,17 @@ private val longestSubstringWorkout = ProblemWorkout(
             conceptKey = "longest-substring-without-repeating-characters-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Sliding window: grow a window from the right, and shrink it from the left whenever a repeat appears inside it.",
+                    "Sliding window: grow the window at the right, shrink it from the left whenever a repeat appears inside.",
                     true,
                     "The window only ever needs to shrink when its own character set is violated by a new duplicate, which is exactly the grow-and-shrink-on-violation shape a sliding window handles.",
                 ),
                 choice(
-                    "Two pointers starting at both ends of the string, moving inward.",
+                    "Two pointers starting at opposite ends of the string, moving toward each other.",
                     false,
                     "The longest repeat-free substring isn't necessarily anchored at the two ends of the string - it could be entirely in the middle, so there's no reason to start pointers there.",
                 ),
                 choice(
-                    "Check every possible substring for repeated characters.",
+                    "Check every possible substring individually for repeated characters.",
                     false,
                     "This finds the correct answer but costs far more than necessary, recomputing overlapping substrings from scratch instead of adjusting one window incrementally.",
                 )),
@@ -2775,12 +2775,12 @@ private val longestSubstringWorkout = ProblemWorkout(
             conceptKey = "longest-substring-without-repeating-characters-state-selection",
             choices = listOf(
                 choice(
-                    "A left pointer and a hash set (or map from character to its most recent index) of characters currently in the window.",
+                    "A left pointer and a set (or map from character to latest index) of characters currently in the window.",
                     true,
                     "The left pointer marks the window's start, and knowing which characters are currently inside is exactly what's needed to detect a duplicate the moment it appears.",
                 ),
                 choice(
-                    "A sorted copy of the string.",
+                    "A sorted copy of the string, rebuilt in order.",
                     false,
                     "Sorting would destroy the original character order, but the answer depends on a contiguous run of characters in their original sequence.",
                 ),
@@ -2919,17 +2919,17 @@ private val longestSubstringWorkout = ProblemWorkout(
             conceptKey = "longest-substring-without-repeating-characters-space-complexity",
             choices = listOf(
                 choice(
-                    "O(min(n, k)), where k is the size of the character set, because the window can hold at most one of each possible character.",
+                    "O(min(n, k)), with k the character-set size, since the window holds at most one of each possible character.",
                     true,
                     "Since the window never contains a repeat, its size is capped by however many distinct characters are possible, not by the string's total length.",
                 ),
                 choice(
-                    "O(1), because the window set never grows beyond a single character.",
+                    "O(1), because the window set never grows beyond a single character at a time.",
                     false,
                     "The window can hold many distinct characters at once, up to the size of the character set - it's not limited to just one.",
                 ),
                 choice(
-                    "O(n squared), because every substring considered is stored.",
+                    "O(n squared), because every substring that is considered gets stored.",
                     false,
                     "Only the current window's characters are stored at any one time - previous windows are discarded as the window slides, not accumulated.",
                 )),
@@ -2940,7 +2940,7 @@ private val longestSubstringWorkout = ProblemWorkout(
             conceptKey = "longest-substring-without-repeating-characters-transfer",
             choices = listOf(
                 choice(
-                    "Yes - swap the violation condition from 'a character repeats' to 'more than two distinct characters are in the window', shrinking whenever that new condition is broken.",
+                    "Yes - swap the violation condition from 'a character repeats' to 'more than two distinct characters in the window', shrinking when it breaks.",
                     true,
                     "The window mechanics stay identical - grow from the right, shrink from the left while a condition is violated - only the specific condition being checked changes.",
                 ),
@@ -2961,17 +2961,17 @@ private val longestSubstringWorkout = ProblemWorkout(
             conceptKey = "longest-substring-without-repeating-characters-edge-case",
             choices = listOf(
                 choice(
-                    "A string like \"abba\", where the second 'a' duplicates a character that isn't the current leftmost one, needing more than one removal to resolve.",
+                    "A string like \"abba\", where the second 'a' duplicates a character that isn't leftmost, needing more than one removal.",
                     true,
                     "When the right pointer reaches the second 'a', the window is \"bb a\"-ish and a single removal from the left (removing the first 'b') doesn't actually remove the duplicate 'a' - a while loop keeps removing until the duplicate itself is gone.",
                 ),
                 choice(
-                    "A string with all identical characters, like \"aaaa\".",
+                    "A string of all identical characters, like \"aaaa\", repeating throughout.",
                     false,
                     "Every step here duplicates the immediately preceding character, so a single shrink each time happens to be enough - this case wouldn't expose the missing while-loop bug.",
                 ),
                 choice(
-                    "A string with all unique characters.",
+                    "A string where every character is unique, with no repeats at all.",
                     false,
                     "With no duplicates at all, the shrink logic never runs in the first place, so this case can't reveal a bug in how shrinking handles a duplicate.",
                 )),
@@ -3196,7 +3196,7 @@ private val minStackWorkout = ProblemWorkout(
             conceptKey = "min-stack-transfer",
             choices = listOf(
                 choice(
-                    "Yes - the same idea works symmetrically, pushing the running maximum instead of the running minimum onto the second stack.",
+                    "Yes - the same idea works symmetrically, pushing the running maximum instead of the minimum onto the second stack.",
                     true,
                     "Nothing about the trick is specific to minimums - tracking the running maximum at each level the same way gives O(1) getMax with the identical push/pop synchronization.",
                 ),
@@ -3206,7 +3206,7 @@ private val minStackWorkout = ProblemWorkout(
                     "A heap could track a maximum too, but it's unnecessary here - the same parallel-stack idea used for the minimum applies directly and symmetrically to the maximum.",
                 ),
                 choice(
-                    "No - a stack can only ever track one of minimum or maximum, never either.",
+                    "No - a stack can only ever track one of the minimum or the maximum, never either one.",
                     false,
                     "There's nothing that limits this trick to one direction - a min-stack and a max-stack could even both be maintained alongside the main stack at the same time if both were needed.",
                 )),
@@ -3217,17 +3217,17 @@ private val minStackWorkout = ProblemWorkout(
             conceptKey = "min-stack-edge-case",
             choices = listOf(
                 choice(
-                    "push(5), push(3), pop(), getMin() - after popping the 3, a version that never recorded 5 on the min-stack (since 5 wasn't a new minimum before 3 was pushed) would return the wrong minimum.",
+                    "push(5), push(3), pop(), getMin() - skipping 5 on the min-stack (not a new min then) makes getMin wrong after the pop.",
                     true,
                     "If the min-stack only stores new minimums, it would hold just [5, 3]... but actually never even store 5 if 3 comes right after and is smaller only relative to itself - the mismatched sizes between the two stacks make popping unreliable about which minimum applies after each pop.",
                 ),
                 choice(
-                    "push(5), getMin().",
+                    "push(5), getMin() on its own, with just a single value.",
                     false,
                     "A single push followed by getMin is the simplest possible case and works correctly regardless of whether the min-stack pushes conditionally or every time.",
                 ),
                 choice(
-                    "push(5), push(10), push(15).",
+                    "push(5), push(10), push(15), with each value larger than the last.",
                     false,
                     "With values only ever increasing, the minimum never changes after the first push, so this sequence doesn't expose a desynchronization bug between the two stacks.",
                 )),
@@ -3410,7 +3410,7 @@ private val dailyTemperaturesWorkout = ProblemWorkout(
             conceptKey = "daily-temperatures-time-complexity",
             choices = listOf(
                 choice(
-                    "O(n log n), because the stack must stay sorted by temperature.",
+                    "O(n log n), because the stack has to stay sorted by temperature at all times.",
                     false,
                     "The stack isn't kept in any particular sorted order - it's popped based on direct comparisons to today's temperature, using plain constant-time stack operations.",
                 ),
@@ -3420,7 +3420,7 @@ private val dailyTemperaturesWorkout = ProblemWorkout(
                     "Even though one day can pop several earlier days, each day is only ever pushed once and popped from the stack at most once overall - the total number of stack operations stays bounded by n.",
                 ),
                 choice(
-                    "O(n), because each day is pushed onto the stack exactly once and popped at most once, across the whole run.",
+                    "O(n), because each day is pushed onto the stack once and popped at most once over the whole run.",
                     true,
                     "Even though a single day can trigger several pops at once, the combined total of every push and pop across the entire algorithm never exceeds roughly 2n.",
                 )),
@@ -3452,7 +3452,7 @@ private val dailyTemperaturesWorkout = ProblemWorkout(
             conceptKey = "daily-temperatures-transfer",
             choices = listOf(
                 choice(
-                    "Yes, with a small twist - scanning the array twice (or the indices mod the array length twice) lets the stack also account for a next-greater element that wraps around to the front.",
+                    "Yes, with a small twist - scanning the indices twice (mod the array length) lets the stack catch a next-greater element that wraps to the front.",
                     true,
                     "The core mechanism - a stack of unresolved positions, popped when a greater value appears - carries over directly; only the scan range needs to extend to simulate wrapping around the array once.",
                 ),
@@ -3462,7 +3462,7 @@ private val dailyTemperaturesWorkout = ProblemWorkout(
                     "A circular array can still be scanned in a fixed order (twice through, using index mod length) - the stack mechanism itself doesn't require the array to have a fixed logical start.",
                 ),
                 choice(
-                    "No - 'next greater element' is a completely different problem from 'days until warmer'.",
+                    "No - 'next greater element' is a completely different problem from 'days until a warmer day'.",
                     false,
                     "These are actually the same problem in different clothing - both ask 'how far until something bigger appears next,' which is exactly what a monotonic stack of unresolved positions answers.",
                 )),
@@ -3473,17 +3473,17 @@ private val dailyTemperaturesWorkout = ProblemWorkout(
             conceptKey = "daily-temperatures-edge-case",
             choices = listOf(
                 choice(
-                    "Strictly decreasing temperatures, like [80, 70, 60], where the last day never finds a warmer day and the problem expects its answer to stay 0.",
+                    "Strictly decreasing temperatures, like [80, 70, 60], where the last day finds no warmer day and its answer should stay 0.",
                     true,
                     "Any day that's never popped off the stack keeps whatever its answer array slot was initialized to - the problem specifically expects that untouched value to be 0, not -1 or any other placeholder.",
                 ),
                 choice(
-                    "Strictly increasing temperatures, like [60, 70, 80].",
+                    "Strictly increasing temperatures, like [60, 70, 80], warming every day.",
                     false,
                     "Every day except the last one is resolved almost immediately by the very next day, so the untouched-initial-value case barely comes up here.",
                 ),
                 choice(
-                    "A single-day array.",
+                    "A single-day array with no later days at all.",
                     false,
                     "A single day trivially has no future day to compare against, but this is really just a size-one version of the general 'no warmer day exists' case, not specific to the initialization bug.",
                 )),
@@ -3564,12 +3564,12 @@ private val kokoEatingBananasWorkout = ProblemWorkout(
             conceptKey = "koko-eating-bananas-boundary-update",
             choices = listOf(
                 choice(
-                    "If the candidate speed finishes within h hours, discard it and search for something faster by moving low up past it.",
+                    "If the candidate speed finishes within h hours, discard it and search faster by moving low up past it.",
                     false,
                     "Discarding a speed that already works and searching faster moves away from the minimum, converging on a needlessly fast speed instead of the smallest one that still works.",
                 ),
                 choice(
-                    "If the candidate speed finishes within h hours, it's feasible - keep it as a candidate and search for something slower by moving high down to it; otherwise move low up past it.",
+                    "If the candidate finishes within h hours, keep it and search slower by moving high down to it; otherwise move low up past it.",
                     true,
                     "Keeping a feasible speed in the range while searching for an even slower one, rather than discarding it, is what lets the search converge on the true minimum feasible speed.",
                 ),
@@ -3671,12 +3671,12 @@ private val kokoEatingBananasWorkout = ProblemWorkout(
                     "Only the speed range is binary searched - computing the hours needed for a given speed still requires a plain linear pass over all n piles, not a search through them.",
                 ),
                 choice(
-                    "O(n * m), because every possible speed from 1 to m is checked against every pile.",
+                    "O(n * m), because every possible speed from 1 to m is checked against every one of the n piles.",
                     false,
                     "Binary searching over the range of speeds means only about log m candidate speeds are ever checked, not all m of them individually.",
                 ),
                 choice(
-                    "O(n log m), because binary search over speeds takes O(log m) iterations, and each checks feasibility across all n piles.",
+                    "O(n log m), because binary search over speeds takes O(log m) iterations and each checks all n piles.",
                     true,
                     "The speed range from 1 to m shrinks logarithmically through binary search, and computing the hours needed for a candidate speed requires looking at every one of the n piles once.",
                 )),
@@ -3687,7 +3687,7 @@ private val kokoEatingBananasWorkout = ProblemWorkout(
             conceptKey = "koko-eating-bananas-space-complexity",
             choices = listOf(
                 choice(
-                    "O(1), because only a fixed handful of variables - the speed bounds and a running hour total - are tracked at any point.",
+                    "O(1), because only the speed bounds and a running hour total are tracked at any point.",
                     true,
                     "Checking feasibility for a candidate speed only needs a running total updated pile by pile, and the binary search over speeds only needs its own low and high bounds.",
                 ),
@@ -3697,7 +3697,7 @@ private val kokoEatingBananasWorkout = ProblemWorkout(
                     "Each pile's hours are added directly into a running total as the loop goes, so nothing proportional to the number of piles needs to be stored at once.",
                 ),
                 choice(
-                    "O(log m), matching the number of binary search iterations performed.",
+                    "O(log m), matching the number of binary search iterations the loop performs.",
                     false,
                     "The number of iterations the binary search performs affects how long it runs, not how much memory is used at any single point.",
                 )),
@@ -3708,7 +3708,7 @@ private val kokoEatingBananasWorkout = ProblemWorkout(
             conceptKey = "koko-eating-bananas-transfer",
             choices = listOf(
                 choice(
-                    "Yes - binary search over possible capacities, checking at each candidate how many days it would take, the same way speed is checked against hours here.",
+                    "Yes - binary search over possible capacities, checking the days each would need, just as speed is checked against hours here.",
                     true,
                     "Both problems share the same shape: a monotonic relationship between a candidate value and whether it's 'good enough,' which is exactly what makes binary searching over the range of possible answers valid.",
                 ),
@@ -3718,7 +3718,7 @@ private val kokoEatingBananasWorkout = ProblemWorkout(
                     "The specific quantity being searched doesn't matter - what matters is that increasing capacity only ever makes the days-needed go down or stay the same, the same one-directional relationship speed has with hours here.",
                 ),
                 choice(
-                    "No - binary search on the answer only works for eating-speed-style problems specifically.",
+                    "No - binary search on the answer only works for eating-speed-style problems, not shipping.",
                     false,
                     "Binary search on the answer is a general technique for any problem asking for the minimum (or maximum) value satisfying a feasibility check that only flips one way as the value increases.",
                 )),
@@ -3757,17 +3757,17 @@ private val findMinimumInRotatedSortedArrayWorkout = ProblemWorkout(
             conceptKey = "find-minimum-in-rotated-sorted-array-pattern-recognition",
             choices = listOf(
                 choice(
-                    "Binary search, comparing the middle element to the rightmost element to decide which half contains the rotation point.",
+                    "Binary search, comparing the middle to the rightmost element to tell which half holds the rotation point.",
                     true,
                     "Comparing the middle to the right edge reveals which side is the untouched, still-sorted portion and which side contains the rotation point where the minimum hides, letting half the array be discarded each step.",
                 ),
                 choice(
-                    "Scan the array once, tracking the smallest value seen so far.",
+                    "Scan the whole array once, tracking the smallest value seen so far.",
                     false,
                     "This correctly finds the minimum, but scanning every element takes linear time and ignores the fact that most of the array is still sorted in two pieces.",
                 ),
                 choice(
-                    "Two pointers starting at both ends, moving inward.",
+                    "Two pointers starting at both ends of the array, moving steadily inward.",
                     false,
                     "The minimum isn't necessarily positioned symmetrically from the two ends - it sits specifically at the rotation point, which two pointers closing inward has no way to target directly.",
                 )),
@@ -3778,7 +3778,7 @@ private val findMinimumInRotatedSortedArrayWorkout = ProblemWorkout(
             conceptKey = "find-minimum-in-rotated-sorted-array-approach",
             choices = listOf(
                 choice(
-                    "Binary search by comparing the middle element to the rightmost element; if the middle is larger, the minimum lies to its right, and if smaller, the minimum lies at or to its left.",
+                    "Binary search comparing the middle to the rightmost element: if the middle is larger the minimum is to its right, else at or left of it.",
                     true,
                     "This comparison always identifies which half currently holds the rotation point, so half the array can always be safely discarded on every step.",
                 ),
@@ -3820,17 +3820,17 @@ private val findMinimumInRotatedSortedArrayWorkout = ProblemWorkout(
             conceptKey = "find-minimum-in-rotated-sorted-array-boundary-update",
             choices = listOf(
                 choice(
-                    "If nums[mid] > nums[high], set high = mid - 1; otherwise set low = mid + 1.",
+                    "If nums[mid] > nums[high], set high = mid - 1; otherwise set low = mid + 1 to move on.",
                     false,
                     "Moving high to mid - 1 when the minimum could be at or before mid can eliminate mid even when it might actually be the answer, since the minimum was never confirmed to be strictly before mid.",
                 ),
                 choice(
-                    "If nums[mid] > nums[high], the rotation point (and minimum) is strictly to the right, so set low = mid + 1; otherwise the minimum is at mid or to its left, so set high = mid.",
+                    "If nums[mid] > nums[high], the minimum is strictly right, set low = mid + 1; else it's at mid or left, set high = mid.",
                     true,
                     "Keeping mid in range on the second branch matters because mid itself could already be the minimum - excluding it entirely would risk skipping right past the correct answer.",
                 ),
                 choice(
-                    "If nums[mid] > nums[low], the rotation point is to the right, so set low = mid + 1.",
+                    "If nums[mid] > nums[low], the rotation point is to the right, so set low = mid + 1 there.",
                     false,
                     "Comparing against the left edge instead of the right edge doesn't reliably indicate which half currently holds the rotation point.",
                 )),
@@ -3985,17 +3985,17 @@ private val findMinimumInRotatedSortedArrayWorkout = ProblemWorkout(
             conceptKey = "find-minimum-in-rotated-sorted-array-edge-case",
             choices = listOf(
                 choice(
-                    "An array rotated by its full length, leaving it in its original, unrotated sorted order, like [1,2,3,4] rotated by 4.",
+                    "An array rotated by its full length, back to its original sorted order, like [1,2,3,4] rotated by 4.",
                     true,
                     "A version that assumes a 'break point' always exists somewhere in the middle could mishandle the case where nums[mid] never exceeds nums[high] anywhere, since the array is actually still fully sorted from the start.",
                 ),
                 choice(
-                    "An array rotated somewhere in the middle, like [4,5,6,1,2,3].",
+                    "An array rotated somewhere near the middle, like [4,5,6,1,2,3].",
                     false,
                     "This is the typical rotated case the algorithm is built to handle directly - it doesn't expose a bug specific to the assume-always-rotated version.",
                 ),
                 choice(
-                    "An array with only one element.",
+                    "An array with only one element and nothing to rotate.",
                     false,
                     "A single element trivially has no meaningful rotation and the loop condition low < high never even runs - this doesn't stress the rotation-detection logic.",
                 )),

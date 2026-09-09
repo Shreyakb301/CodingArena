@@ -65,17 +65,17 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-lookup-vs-sort-tradeoff", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "Sorting costs O(n log n), strictly more than the O(n) a single pass with a hash set achieves for this specific question.",
+                "Sorting costs O(n log n), more than the O(n) a single hash-set pass achieves for this question.",
                 true,
                 "Since the question only asks whether a duplicate exists, not where or in what order, a hash set answers it in one linear pass - sorting does extra work that isn't needed here.",
             ),
             choice(
-                "Sorting cannot detect duplicates at all, only a hash set can.",
+                "Sorting cannot detect duplicates at all - only a hash set is able to.",
                 false,
                 "Sorting absolutely can detect duplicates by placing equal values adjacent to each other - it's a valid approach, just not the fastest one for this particular question.",
             ),
             choice(
-                "A hash set uses less memory than sorting the array in place.",
+                "A hash set uses noticeably less memory than sorting the array in place.",
                 false,
                 "In-place sorting can use O(1) extra space, while a hash set costs O(n) - memory isn't the advantage here, time complexity is.",
             ),
@@ -87,7 +87,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-sort-vs-count-approach", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "Yes - it's correct, just O(n log n) instead of O(n), since two strings are anagrams exactly when their sorted forms are identical.",
+                "Yes - it's correct, just O(n log n) instead of O(n), since anagrams have identical sorted forms.",
                 true,
                 "Sorting both strings and comparing them for equality is a completely valid anagram check - it's simply not the fastest one, trading some speed for a very simple implementation.",
             ),
@@ -97,7 +97,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 "Sort stability affects the relative order of equal elements, not which elements end up adjacent - two anagrams will always produce identical sorted output regardless of stability.",
             ),
             choice(
-                "No - sorting only works if both strings are already the same length.",
+                "No - sorting only works if both strings are already exactly the same length.",
                 false,
                 "Checking lengths first is good practice, but sorting-and-comparing would still correctly reject differently-sized strings anyway, since their sorted forms couldn't match.",
             ),
@@ -109,17 +109,17 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-brute-force-tradeoff", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "Only when n is small enough that O(n squared) genuinely doesn't matter - it degrades badly as the array grows, unlike the hash map approach.",
+                "Only when n is small enough that O(n squared) doesn't matter - it degrades badly as the array grows.",
                 true,
                 "Brute force isn't wrong, it's just fragile - it works fine on a small, fixed-size input but the hash map approach stays fast regardless of how large the array grows.",
             ),
                 choice(
-                "Never - nested loops are always incorrect for this problem.",
+                "Never - nested loops are always an incorrect approach for this problem.",
                 false,
                 "Nested loops correctly find the answer, they're just slower - correctness and efficiency are separate questions, and this approach is correct, just not scalable.",
             ),
             choice(
-                "Only when the array contains negative numbers.",
+                "Only when the array happens to contain negative numbers.",
                 false,
                 "Whether values are negative has no bearing on nested loops' correctness or performance - the concern is purely about how the work scales with array size.",
             ),
@@ -132,7 +132,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         code = "val seen = mutableListOf<Int>()\nfor (num in nums) {\n    if (num in seen) return true\n    seen.add(num)\n}\nreturn false",
         choices = listOf(
             choice(
-                "It's still correct, but `num in seen` on a list scans it linearly, turning the whole algorithm into O(n squared) instead of O(n).",
+                "It's still correct, but `num in seen` scans the list linearly, making the whole thing O(n squared).",
                 true,
                 "A list's membership check has to look through every element one at a time, while a set's is close to constant time - the algorithm's shape stays the same, but the cost of each check changes dramatically.",
             ),
@@ -155,7 +155,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         code = "val counts = IntArray(26)\nfor (c in s) counts[c - 'a']++\nfor (c in t) counts[c - 'a']--\nreturn counts.all { it == 0 }",
         choices = listOf(
             choice(
-                "s = \"ab\", t = \"aabb\" - t has extra characters that cancel out other counts, producing an all-zero array despite unequal lengths.",
+                "s = \"ab\", t = \"aabb\" - t's extra characters cancel out other counts, giving an all-zero array despite unequal lengths.",
                 true,
                 "Without a length check, t could add and subtract extra matching pairs of characters that happen to net back to zero, wrongly passing as an anagram of a shorter s.",
             ),
@@ -165,7 +165,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 "This is exactly the case the count map is designed to handle correctly - order doesn't matter for anagrams, and the counts would net to zero as expected.",
             ),
             choice(
-                "s = \"\", t = \"\" - both empty strings.",
+                "s = \"\", t = \"\" - both are empty strings with no characters.",
                 false,
                 "Two empty strings trivially net every count to zero and are correctly anagrams of each other - this doesn't expose the missing length check.",
             ),
@@ -260,17 +260,17 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         code = "return nums.toSet().size == nums.size",
         choices = listOf(
             choice(
-                "Correct, but it always builds the full set first - the early-exit version can stop the instant a duplicate is found instead of processing the rest of the array.",
+                "Correct, but it builds the full set first - the early-exit version can stop the instant a duplicate is found.",
                 true,
                 "Both reach the same true-or-false answer, but comparing sizes requires building the entire set before comparing, while the check-then-add loop can return the moment a duplicate appears.",
             ),
             choice(
-                "Incorrect - toSet() does not remove duplicate values.",
+                "Incorrect - toSet() does not actually remove the duplicate values.",
                 false,
                 "toSet() specifically removes duplicates by definition - that's exactly why comparing its size to the original length works as a duplicate check.",
             ),
             choice(
-                "Incorrect - this only works if the array is already sorted.",
+                "Incorrect - this only works if the array is already sorted first.",
                 false,
                 "Set construction doesn't depend on order at all - values are deduplicated regardless of how the input array is arranged.",
             ),
@@ -296,7 +296,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-sort-vs-count-complexity", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "No - sorting costs O(n log n) while the count map costs O(n); looking at every character isn't the same as the total work done overall.",
+                "No - sorting costs O(n log n) while the count map costs O(n); touching every character isn't the same as total work.",
                 true,
                 "The count-map approach visits each character a constant number of times, while sorting does extra comparison work proportional to log n per element - both touch every character, but not with the same total cost.",
             ),
@@ -318,7 +318,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-space-tradeoff-claim", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "The claim conflates the input array (which exists either way) with the extra O(n) map the hash approach specifically allocates - sort-then-two-pointers can often reuse the array in place.",
+                "The claim conflates the input array (there either way) with the extra O(n) map the hash approach allocates - an in-place sort avoids that.",
                 true,
                 "Both approaches need the input array itself, but the hash-map approach specifically adds its own O(n) structure on top - an in-place sort avoids that additional allocation.",
             ),
@@ -342,7 +342,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-in-place-vs-copy", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "When avoiding the extra O(n) space for the copies matters - two pointers check the same symmetry in place, using no extra string storage.",
+                "When avoiding the extra O(n) space for the copies matters - two pointers check the same symmetry in place.",
                 true,
                 "Both approaches correctly detect a palindrome, but building reversed and cleaned copies costs extra space that two pointers moving through the original string never needs.",
             ),
@@ -352,7 +352,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
                 "A cleaned copy can just as easily filter out non-alphanumeric characters while building it - both approaches can handle that requirement.",
             ),
             choice(
-                "Building a reversed copy is always incorrect for palindrome checks.",
+                "Building a reversed copy of the string is always incorrect for palindrome checks.",
                 false,
                 "Reversing and comparing is a completely valid way to check a palindrome - it's just less space-efficient than checking in place with two pointers.",
             ),
@@ -364,7 +364,7 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-in-place-vs-copy", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "It avoids sorting but makes avoiding duplicate triplets significantly harder to get right than the sorted two-pointer approach, where equal values sit next to each other.",
+                "It avoids sorting but makes skipping duplicate triplets much harder than the sorted two-pointer approach, where equal values sit adjacent.",
                 true,
                 "Both approaches can find the same triplets, but without the sorted order, detecting and skipping duplicate combinations requires much more careful bookkeeping.",
             ),
@@ -797,17 +797,17 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         code = "var left = 0\nvar maxLen = 0\nval window = HashSet<Char>()\nfor (right in s.indices) {\n    if (s[right] in window) {\n        window.remove(s[left])\n        left++\n    }\n    window.add(s[right])\n    maxLen = maxOf(maxLen, right - left + 1)\n}",
         choices = listOf(
             choice(
-                "\"abba\" - the second 'a' duplicates a character that isn't the current leftmost one, so a single shrink doesn't actually remove the duplicate.",
+                "\"abba\" - the second 'a' duplicates a character that isn't the leftmost one, so a single shrink doesn't remove the duplicate.",
                 true,
                 "When right reaches the second 'a', removing only the leftmost character ('a' itself, ironically at that exact moment) may not be enough in general - a while loop is needed to keep shrinking until the specific duplicate is actually gone.",
             ),
             choice(
-                "\"aaaa\" - every character is identical.",
+                "\"aaaa\" - a string where every character is identical to the rest.",
                 false,
                 "With every character being an immediate repeat of the one before it, a single shrink per step happens to be enough here - this case doesn't distinguish the buggy version from a correct one.",
             ),
             choice(
-                "\"abcdef\" - all unique characters.",
+                "\"abcdef\" - a string with all unique characters and no repeats.",
                 false,
                 "With no duplicates at all, the shrink logic never runs in the first place, so this input can't reveal a bug in how shrinking handles a duplicate.",
             ),
@@ -1073,17 +1073,17 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-single-var-vs-parallel-stack", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "A single variable has no way to recover what the minimum used to be once the value that set it is popped off - the parallel stack remembers the minimum at every level specifically to solve that.",
+                "A single variable can't recover what the minimum was once the value that set it is popped - the parallel stack keeps the minimum at every level.",
                 true,
                 "Once the current minimum is popped, a single variable is simply gone with no memory of the prior minimum, while the min-stack's own top always reflects exactly what the minimum was one level down.",
             ),
             choice(
-                "A single variable can't be updated in O(1) time on push.",
+                "A single variable can't be updated in constant time on each push.",
                 false,
                 "Updating a single running minimum on push is trivially O(1) - comparing and possibly replacing one value is fast; the real problem shows up specifically when popping.",
             ),
             choice(
-                "A single variable uses more memory than a parallel stack.",
+                "A single variable ends up using more memory than a whole parallel stack.",
                 false,
                 "A single variable is about as little memory as possible - it's actually the parallel stack that uses more memory (O(n) vs O(1)), in exchange for correctness on pop.",
             ),
@@ -1141,17 +1141,17 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         code = "val answer = IntArray(temperatures.size)\nval stack = ArrayDeque<Int>()\nfor (i in temperatures.indices) {\n    if (stack.isNotEmpty() && temperatures[i] > temperatures[stack.last()]) {\n        val prevDay = stack.removeLast()\n        answer[prevDay] = i - prevDay\n    }\n    stack.addLast(i)\n}",
         choices = listOf(
             choice(
-                "[70, 65, 60, 75] - the day with 75 should resolve all three earlier waiting days at once, but a single if only resolves the most recent one.",
+                "[70, 65, 60, 75] - the day with 75 should resolve all three earlier waiting days, but a single if resolves only the most recent.",
                 true,
                 "When the warm day 75 arrives, every one of the three earlier, cooler waiting days should be resolved in the same step - popping only once leaves the other two stuck on the stack, unresolved by that day.",
             ),
             choice(
-                "[70, 75], a simple two-day case.",
+                "[70, 75], a simple two-day case with one warmer day.",
                 false,
                 "With only one waiting day to resolve, a single pop happens to be exactly enough here - this case doesn't distinguish the buggy version from a correct one.",
             ),
             choice(
-                "[80, 70, 60], strictly decreasing temperatures.",
+                "[80, 70, 60], a strictly decreasing temperature sequence.",
                 false,
                 "With temperatures only ever decreasing, no day ever triggers a pop at all, so this input can't expose a bug in how many days get popped per resolution.",
             ),
@@ -1439,17 +1439,17 @@ internal val developingWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-wrong-comparison-edge", difficulty = DEVELOPING,
         choices = listOf(
             choice(
-                "When the rotation point is in the right half, the left portion still looks internally consistent with the left edge, so comparing to it doesn't reliably reveal which side actually holds the rotation point.",
+                "When the rotation point is in the right half, the left portion still looks consistent with the left edge, so comparing to it can't tell which side holds the rotation point.",
                 true,
                 "The right edge specifically tells you whether the middle element belongs to the larger, unrotated-looking run or not - the left edge doesn't carry that same discriminating information in every case.",
             ),
             choice(
-                "It fails only when the array has exactly one element.",
+                "It fails only when the array happens to have exactly one element in it.",
                 false,
                 "A single-element array doesn't even trigger a meaningful comparison in the first place - the reliability problem shows up specifically in larger, genuinely rotated arrays.",
             ),
             choice(
-                "It never fails - comparing to either edge works identically.",
+                "It never fails - comparing the middle to either edge works out identically.",
                 false,
                 "The two comparisons are not interchangeable - comparing against the right edge specifically identifies which side holds the rotation point in a way the left edge comparison doesn't reliably do.",
             ),

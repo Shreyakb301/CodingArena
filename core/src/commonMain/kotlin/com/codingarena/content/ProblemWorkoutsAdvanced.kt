@@ -36,7 +36,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-when-sortedness-changes-the-answer", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Two pointers from both ends now becomes the stronger choice - it reaches the same O(n) time as the hash map but with O(1) space instead of O(n), an advantage only available once sortedness can be assumed.",
+                "Two pointers from both ends becomes the stronger choice - same O(n) time as the hash map but O(1) space, available only once sortedness is assumed.",
                 true,
                 "The hash-map approach doesn't stop working, but sortedness unlocks a strictly better tradeoff - the same time complexity with no extra space, which is exactly the kind of context-dependent choice that separates 'a correct approach' from 'the best approach given what's known.'",
             ),
@@ -46,7 +46,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "Sortedness specifically enables a pointer-based approach that matches the hash map's time complexity while using no extra space - ignoring that context misses a real, available improvement.",
             ),
             choice(
-                "Sortedness makes binary search over each element the best choice instead.",
+                "Sortedness makes binary searching for each element's complement the best choice instead.",
                 false,
                 "Binary searching for each element's complement would cost O(n log n) total, which is worse than either the hash map or the two-pointer approach - sortedness enables something better than that.",
             ),
@@ -58,7 +58,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-when-sortedness-changes-the-answer", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Not necessarily - a fixed-size boolean array indexed directly by value can replace the hash set, avoiding hashing overhead entirely while still achieving O(n) time and bounded O(range) space.",
+                "Not necessarily - a fixed-size boolean array indexed by value replaces the hash set, dropping hashing overhead while keeping O(n) time and O(range) space.",
                 true,
                 "When the value range is small and known in advance, direct indexing sidesteps hashing altogether - it's a genuine, context-dependent improvement over a general-purpose hash set, not just a stylistic preference.",
             ),
@@ -68,7 +68,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "Knowing the values fall in a small, fixed range specifically enables an even simpler and often faster direct-indexing approach - dismissing that context ignores a real available improvement.",
             ),
             choice(
-                "Yes, but only if the array is also guaranteed to be sorted.",
+                "Yes, but only if the array is also guaranteed to be sorted beforehand.",
                 false,
                 "Sortedness isn't the relevant property here - it's the small, known value range that enables direct indexing, independent of whether the array itself is sorted.",
             ),
@@ -80,7 +80,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-fixed-vs-general-alphabet-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "No - a fixed 26-slot array assumes a specific alphabet; a HashMap<Char, Int> generalizes to any character set at the cost of some hashing overhead, trading a small constant-factor speed loss for correctness across all Unicode input.",
+                "No - a fixed 26-slot array assumes one alphabet; a HashMap<Char, Int> handles any character set for a small hashing cost, trading a little speed for Unicode correctness.",
                 true,
                 "The fixed-size array's speed comes directly from assuming a known, small alphabet - once that assumption breaks, a hash map becomes not just an alternative but a genuine correctness requirement, not merely a style choice.",
             ),
@@ -90,7 +90,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "A fixed-size array's size is set at creation and indexed by a specific computed offset (like c - 'a') - it isn't something that adapts to arbitrary characters without changing the indexing scheme entirely, which is effectively switching to a different data structure.",
             ),
             choice(
-                "No - anagram checking becomes fundamentally impossible once Unicode is involved.",
+                "No - anagram checking becomes fundamentally impossible once any Unicode is involved.",
                 false,
                 "Anagram checking remains entirely solvable for Unicode strings - it just requires a more general counting structure (like a hash map) instead of one built around a small, fixed alphabet.",
             ),
@@ -102,7 +102,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-single-vs-all-pairs-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The original approach returns on the first match found, but finding *all* pairs (including from repeated values) requires tracking every index per value and avoiding both duplicate pairs and reusing the same index twice - a meaningfully different bookkeeping problem.",
+                "The original returns on the first match, but finding all pairs (with repeats) needs every index per value tracked, plus avoiding duplicate pairs and index reuse - different bookkeeping.",
                 true,
                 "Returning early was a simplification specific to needing just one answer - once every valid pair matters, the algorithm has to change shape to track all occurrences per value and carefully avoid double-counting, which the original design doesn't address at all.",
             ),
@@ -112,7 +112,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "The original approach returns immediately upon the first match, specifically because it was designed to answer 'does at least one pair exist' - it does not continue searching for or collecting every other valid pair.",
             ),
             choice(
-                "The complication only exists if the array isn't sorted first.",
+                "The complication only exists if the array isn't sorted into order first.",
                 false,
                 "Sortedness isn't what creates the complication - the core issue is that finding *all* pairs (as opposed to just one) requires fundamentally different bookkeeping regardless of whether the array happens to be sorted.",
             ),
@@ -124,7 +124,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-unbounded-stream-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "An exact hash set of every value seen becomes infeasible at true scale; a probabilistic structure like a Bloom filter trades a small, bounded false-positive rate for dramatically reduced memory, which the original exact approach cannot offer as an option.",
+                "An exact hash set of every value seen becomes infeasible at true scale; a Bloom filter trades a small bounded false-positive rate for far less memory, which the exact approach can't offer.",
                 true,
                 "Once the input can't fit in memory, exactness itself becomes the tradeoff to reconsider - accepting a small, known chance of error in exchange for bounded memory is a fundamentally different kind of solution than the exact hash-set approach.",
             ),
@@ -134,7 +134,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "A hash set's memory usage grows with the number of distinct values seen, without bound - on a truly unbounded stream, this eventually exceeds available memory, which the original approach has no way to handle.",
             ),
             choice(
-                "The problem becomes unsolvable once the stream is unbounded.",
+                "The problem becomes completely unsolvable once the stream is unbounded.",
                 false,
                 "The problem remains solvable, just not with an exact, unbounded-memory structure - approximate structures like Bloom filters exist precisely to handle this class of situation with bounded resources.",
             ),
@@ -146,7 +146,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-throughput-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The algorithm's O(n) time complexity is already optimal for comparing two strings of length n - the limitation isn't the algorithm's shape, it's the sheer constant amount of work per call multiplied by an extremely high call frequency, which no single-string algorithmic change alone can fix.",
+                "The O(n) time is already optimal for comparing two length-n strings - the limit is the fixed work per call times an enormous call frequency, which no single-string algorithm change fixes.",
                 true,
                 "When an already-optimal-complexity algorithm is 'too slow' at scale, the ceiling being hit is usually about total throughput (calls per second times work per call), not about finding a faster complexity class - that reframes the problem toward caching, precomputation, or reducing call frequency instead.",
             ),
@@ -156,7 +156,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "Determining whether two strings of length n are anagrams provably requires looking at every character at least once in the worst case - O(n) is the best possible complexity class here, not a shortcoming to engineer around.",
             ),
             choice(
-                "The limitation is entirely due to using a HashMap instead of an IntArray for the counts.",
+                "The limitation is entirely down to using a HashMap instead of an IntArray for the counts.",
                 false,
                 "Switching to a fixed array would reduce constant-factor overhead somewhat, but at the scale described, that alone is unlikely to be the dominant bottleneck - the deeper limitation is the sheer volume of comparisons being requested.",
             ),
@@ -303,7 +303,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-alphabet-bound-vs-input-length", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "No - the 26-slot count array is O(1) space, but the *time* still scales with the string's length n, since every character has to be visited to update the counts; the fixed alphabet bounds space, not the number of characters processed.",
+                "No - the 26-slot count array is O(1) space, but the time still scales with n: every character must be visited to update counts. The fixed alphabet bounds space, not characters processed.",
                 true,
                 "It's an easy conflation to make, but the alphabet size limits how large the auxiliary structure can grow, not how many characters need to be read - reading each of n characters is unavoidable regardless of how few distinct symbols they can be.",
             ),
@@ -313,7 +313,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "The number of distinct counts being tracked doesn't bound how many times those counts get incremented - a length-n string still requires n individual increment operations, one per character.",
             ),
             choice(
-                "Yes, but only for strings shorter than 26 characters.",
+                "Yes, but only for strings that are shorter than 26 characters.",
                 false,
                 "String length relative to the alphabet size doesn't change the fundamental relationship - the algorithm's time complexity is O(n) regardless of whether n is smaller or much larger than 26.",
             ),
@@ -325,7 +325,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-space-vs-index-preservation-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Not quite - sorting in place saves the O(n) map space, but it also destroys the original indices the problem requires as output, so it only becomes viable if extra bookkeeping (like a parallel original-index array) is added back in, which reintroduces some of the very space being saved.",
+                "Not quite - sorting in place saves the O(n) map space but destroys the original indices the problem outputs, so it needs extra bookkeeping (a parallel index array) that reclaims some of that space.",
                 true,
                 "Whether sort-then-two-pointers is actually better depends on what has to be preserved - dropping the hash map's space is real, but recovering the original indices afterward isn't free, so 'strictly better' overstates a genuine tradeoff as an unconditional win.",
             ),
@@ -349,7 +349,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-surrogate-pair-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Indexing by individual Char (as `s[left]`/`s[right]` does) can split a surrogate pair in half, comparing only one half of a character - correctly handling this requires iterating by code point, not by raw Char index, which changes how the two pointers need to move.",
+                "Indexing by individual Char can split a surrogate pair in half, comparing only one half of a character - handling this needs iteration by code point, not raw Char index, changing how the pointers move.",
                 true,
                 "The two-pointer *idea* still applies, but the assumption that one index equals one visible character breaks down for characters outside the Basic Multilingual Plane - the implementation needs code-point-aware indexing, not just the same Char-based loop.",
             ),
@@ -359,7 +359,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "Kotlin's Char is a UTF-16 code unit, not a full Unicode code point - some characters require two Chars (a surrogate pair), which plain index-based access can split incorrectly.",
             ),
             choice(
-                "The problem becomes unsolvable with two pointers once surrogate pairs are involved.",
+                "The problem becomes completely unsolvable with two pointers once surrogate pairs are involved.",
                 false,
                 "It remains solvable with two pointers - the fix is to advance by code point rather than by raw Char index, not to abandon the two-pointer idea altogether.",
             ),
@@ -371,12 +371,12 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-surrogate-pair-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Yes, it extends by adding one more fixed outer loop (now two nested fixed indices before the two-pointer sweep), which raises the time complexity from O(n squared) to O(n cubed) - the pattern generalizes, but each additional fixed value costs another full loop.",
+                "Yes - it extends by adding one more fixed outer loop (two nested fixed indices before the sweep), raising the time from O(n squared) to O(n cubed); each added fixed value costs another loop.",
                 true,
                 "The core two-pointer idea (fix everything except the last two values, then converge inward) still works for any fixed target count, it just costs one more nested loop per additional fixed value, which is a real, compounding complexity tradeoff worth naming explicitly.",
             ),
             choice(
-                "No - two pointers only ever works for exactly three target values.",
+                "No - the two-pointer technique only ever works for exactly three target values.",
                 false,
                 "The technique isn't inherently limited to three values - it generalizes to k values by fixing k-2 of them and running two pointers on the remainder, at the cost of additional nested loops.",
             ),
@@ -393,7 +393,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-greedy-correctness-proof-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It still provably works: at every step, moving the shorter side is the only move that could possibly increase the limiting height, and this greedy exchange argument holds regardless of the specific height pattern, monotonic or not - the proof doesn't depend on any particular shape of the input.",
+                "It still provably works: at every step, moving the shorter side is the only move that can raise the limiting height, and that exchange argument holds for any height pattern, monotonic or not.",
                 true,
                 "The correctness of the shorter-side-moves rule comes from a general argument (moving the taller side can never help) that applies to any array of heights - a monotonic pattern doesn't weaken or strengthen that argument, it's just one specific case it still covers.",
             ),
@@ -415,7 +415,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-random-access-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The two-pointer sweep itself is fine (it only ever moves forward/backward one step at a time, which a linked list supports), but sorting a linked list efficiently requires a different algorithm (like merge sort adapted for linked lists) since array-style in-place sorting relies on random access this structure doesn't offer.",
+                "The two-pointer sweep is fine (it only steps one at a time, which a linked list supports), but sorting a linked list needs a different algorithm, since array sorting relies on random access.",
                 true,
                 "The two-pointer *movement* pattern (step-by-step, never jumping) is actually linked-list-friendly - the real limitation shows up specifically in the sorting step, which needs to be rethought for a structure without O(1) indexing.",
             ),
@@ -437,7 +437,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-state-insufficient-for-generalization", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "No - allowing up to k removals turns this into a problem needing to track how many removals have been used along each candidate path, which naturally leads toward dynamic programming or recursion with memoization rather than a simple two-pointer scan.",
+                "No - allowing up to k removals means tracking how many removals each candidate path has used, which points toward dynamic programming or memoized recursion rather than a plain two-pointer scan.",
                 true,
                 "The single-mismatch (\"Palindrome II\") case stays manageable with a small branch at the first mismatch, but generalizing to k removals means the number of possible decision paths grows combinatorially, which plain left/right pointer state can't represent - a genuine algorithmic limitation, not just an implementation detail.",
             ),
@@ -447,7 +447,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "A simple counter doesn't capture *which* removals were made, and different removal choices along the way can lead to very different downstream comparisons - the problem's branching structure outgrows a simple two-pointer-plus-counter design.",
             ),
             choice(
-                "No - allowing any removals at all makes the problem theoretically unsolvable.",
+                "No - allowing any removals at all makes the problem theoretically unsolvable altogether.",
                 false,
                 "The generalized problem is very much solvable, just not with the same simple two-pointer technique - it calls for a different algorithmic tool (like dynamic programming) suited to its larger decision space.",
             ),
@@ -460,7 +460,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         code = "var left = 0\nvar right = height.size - 1\nvar maxArea = 0\nwhile (left < right) {\n    val area = minOf(height[left], height[right]) * (right - left)\n    maxArea = maxOf(maxArea, area)\n    if (height[left] < height[right]) left++ else right--\n}\nreturn maxArea",
         choices = listOf(
             choice(
-                "For both cases, left < right is false from the very start (0 < -1 for empty, 0 < 0 for one element), so the loop body never runs and maxArea correctly returns its initial value of 0 - no special-casing is actually needed.",
+                "For both, left < right is false from the start (0 < -1, 0 < 0), so the loop never runs and maxArea returns 0 - no special-casing needed.",
                 true,
                 "The loop's own condition already handles these degenerate inputs gracefully, returning the sensible answer of 0 (no container possible) without ever touching height[left] or height[right] in a way that would be out of bounds.",
             ),
@@ -470,7 +470,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "right = height.size - 1 = -1 for an empty array, but the while loop's condition (left < right, i.e. 0 < -1) is checked *before* the body runs and is false, so height[right] is never actually accessed.",
             ),
             choice(
-                "Both cases require an explicit early return to avoid incorrect behavior.",
+                "Both cases require an explicit early return added to avoid incorrect behavior.",
                 false,
                 "The loop's natural condition already prevents its body from executing on either degenerate input - no explicit early-return special case is needed for correctness here.",
             ),
@@ -646,7 +646,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-proof-complexity-vs-runtime-complexity", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "This conflates two unrelated things - the difficulty of *proving* an algorithm correct (a one-time, offline reasoning effort) has no bearing on the *runtime* complexity of executing it, which is purely about how the algorithm's own operations scale with input size.",
+                "This conflates two things - proving an algorithm correct is a one-time offline effort with no bearing on its runtime complexity, which is only about how its operations scale with input size.",
                 true,
                 "How hard an algorithm is to convince yourself is correct is a property of the algorithm's design and the reasoning needed to trust it - it's a completely separate axis from how its execution time scales with n, which is what time complexity actually measures.",
             ),
@@ -656,7 +656,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "There's no mechanical relationship between how subtle an algorithm's correctness argument is and how fast it runs - a greedy algorithm with a clever proof can easily be faster than a naive one with an obvious proof.",
             ),
             choice(
-                "The teammate is right, but only for algorithms proven correct by exchange arguments specifically.",
+                "The teammate is right, but only for algorithms proven correct by an exchange argument specifically.",
                 false,
                 "The type of correctness argument used (exchange argument, induction, or otherwise) doesn't factor into the algorithm's runtime complexity - these remain entirely separate concerns regardless of proof technique.",
             ),
@@ -668,7 +668,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-immutability-cost-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Sorting a copy instead of the original array adds O(n) extra space specifically to preserve the caller's ordering guarantee - a real, deliberate tradeoff between the algorithm's own space usage and not producing a side effect on shared, external state.",
+                "Sorting a copy instead of the original adds O(n) extra space just to keep the caller's ordering - a deliberate tradeoff between the algorithm's space and not mutating shared external state.",
                 true,
                 "Whether mutating the caller's array is acceptable is a design decision with a genuine cost either way - avoiding the side effect isn't free, it specifically costs the extra O(n) space needed to hold a sorted copy instead of sorting in place.",
             ),
@@ -692,7 +692,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "sliding-window-negative-values-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It breaks down - the window's correctness relies on the running sum growing monotonically as the window expands and shrinking monotonically as it contracts, which negative values violate, since adding an element could now *decrease* the sum instead of increasing it.",
+                "It breaks down - the window relies on the running sum growing as it expands and shrinking as it contracts, which negatives violate, since adding an element could now decrease the sum.",
                 true,
                 "The entire shrink-while-qualifying logic depends on knowing that removing an element always decreases the sum and adding one always increases it - with negative numbers, that guarantee disappears, and a different technique (like prefix sums with more careful handling) is needed instead.",
             ),
@@ -714,7 +714,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "sliding-window-negative-values-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It generalizes by swapping the plain set for a count map (character to frequency) and changing the violation condition from \"character already present\" to \"more than two distinct characters currently in the window\" - the grow-and-shrink mechanics stay the same.",
+                "It generalizes: swap the set for a character-count map and change the violation from \"character present\" to \"more than two distinct characters in the window\"; grow/shrink mechanics stay.",
                 true,
                 "The core sliding-window shape (grow from the right, shrink from the left on violation) is reusable for a whole family of related problems - what changes is specifically what counts as a violation and what state is needed to detect it.",
             ),
@@ -736,7 +736,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "sliding-window-single-vs-multi-transaction-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It reveals a real limitation - one running minimum and one running profit only capture a single buy-sell cycle; two transactions require tracking multiple interacting states (e.g. profit after one transaction, then a new minimum cost basis incorporating that profit for a second transaction), which is a genuinely different, more stateful algorithm.",
+                "It reveals a real limitation - one running minimum and one profit capture only a single buy-sell cycle; two transactions need several interacting states, a genuinely more stateful algorithm.",
                 true,
                 "The one-transaction version's simplicity comes specifically from only needing to remember one thing at a time - allowing a second, non-overlapping transaction means the state has to capture 'best result so far, from which a second cycle could still begin,' which a single running minimum can't represent.",
             ),
@@ -746,7 +746,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "Running the algorithm twice independently could double-count overlapping days or fail to find the true optimal split point between two non-overlapping transactions - the two transactions need to be reasoned about jointly, not as two separate, independent problems.",
             ),
             choice(
-                "It extends trivially - just track two running minimums instead of one.",
+                "It extends trivially - just track two separate running minimums instead of one.",
                 false,
                 "Two independent running minimums don't capture the necessary relationship between the first transaction's profit and the second transaction's effective starting cost - the state needed is more interconnected than that.",
             ),
@@ -758,7 +758,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "sliding-window-streaming-multi-query-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The window mechanics themselves are naturally streaming-friendly (they never look backward beyond the current window), but re-running the whole scan from scratch for every new target value defeats the point of streaming - a genuinely different design would need to answer multiple targets without full re-scans.",
+                "The window mechanics are streaming-friendly, but re-running the whole scan for each new target defeats the point - answering many targets without full re-scans needs a different design.",
                 true,
                 "A sliding window processes each element once and never revisits earlier ones, which is compatible with a true stream - the real tension is that each *new target* currently forces a brand-new pass, which isn't a limitation of the window shape itself but of running it repeatedly from scratch.",
             ),
@@ -768,7 +768,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
                 "The window's core behavior, only ever looking at a contiguous, forward-moving range, is actually well-suited to a single streaming pass - the real complication is handling multiple different target queries efficiently, not the streaming itself.",
             ),
             choice(
-                "This limitation only matters if target is allowed to be negative.",
+                "This limitation only matters if target is allowed to be a negative number.",
                 false,
                 "The sign of target isn't the relevant constraint here - the actual complication is about re-scanning a massive stream for each new query, which is a scale-and-repetition problem, not a sign problem.",
             ),
@@ -780,7 +780,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "sliding-window-fee-adjusted-state-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The algorithm needs to track two running quantities simultaneously - the best profit if currently holding a share, and the best profit if currently not holding one - since the fee changes the calculus of when re-buying is worthwhile, which a single running minimum can no longer capture alone.",
+                "It needs two running quantities at once - the best profit while holding a share and while not - since the fee changes when re-buying is worthwhile, beyond what one running minimum captures.",
                 true,
                 "Once fees and unlimited transactions are both in play, the decision of whether to sell-then-rebuy or hold through a dip depends on more than just 'is this the lowest price so far' - it needs its own held/not-held state machine, a genuinely richer piece of state than one running minimum.",
             ),
@@ -803,7 +803,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         code = "val counts = HashMap<Char, Int>()\n// on shrink: counts[s[left]] = counts[s[left]]!! - 1\n// distinct count check uses: counts.size",
         choices = listOf(
             choice(
-                "Yes - leaving a zero-count entry in the map means counts.size overcounts the number of *currently present* distinct characters, since a character that's been fully removed still occupies a slot with value 0.",
+                "Yes - a lingering zero-count entry makes counts.size overcount the currently present distinct characters, since a fully removed character still occupies a slot.",
                 true,
                 "The distinct-character check relies on counts.size accurately reflecting what's truly still in the window - a lingering zero-count entry inflates that number, making the window seem to violate the constraint (or stay valid) incorrectly.",
             ),
@@ -989,7 +989,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "sliding-window-state-count-vs-time-complexity", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Not necessarily - as long as the extra state variables are each updated in O(1) per element and the array is still scanned once, the algorithm remains O(n) overall; more state changes what's tracked per step, not how many steps or passes are needed.",
+                "Not necessarily - as long as each extra state variable updates in O(1) per element and the array is scanned once, the algorithm stays O(n); more state changes what's tracked per step, not how many steps.",
                 true,
                 "Tracking two or three running values instead of one doesn't inherently add more passes over the input - if each variable still updates in constant time per element, the total time complexity can stay exactly the same class, just with a larger constant factor.",
             ),
@@ -1011,7 +1011,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "sliding-window-charset-bound-practical-significance", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It depends entirely on the actual input - for a genuinely huge, diverse charset and a string at least as long, the bound does collapse toward O(n) in practice, but for the much more common case of a small working alphabet (like ASCII text), the tighter min(n, charset) bound is a real, meaningful guarantee, not a technicality.",
+                "It depends on the input - for a huge diverse charset and a string at least as long, the bound does collapse toward O(n), but for a small working alphabet (like ASCII text) the min(n, charset) bound is a real guarantee, not a technicality.",
                 true,
                 "The tighter bound isn't just theoretical pedantry - whether it 'matters in practice' depends on the actual character set of realistic inputs, which for most text processing is far smaller than n, making the distinction genuinely load-bearing rather than academic.",
             ),
@@ -1035,7 +1035,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-non-strict-nesting-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Not without modification - the stack approach specifically assumes strict, well-nested structure (last-opened, first-closed); a format that allows legitimate overlap needs a fundamentally different validity rule, since a single stack can't represent two independently-tracked, interleaved regions.",
+                "Not without modification - the stack approach assumes strict, well-nested structure (last-opened, first-closed); a format allowing legitimate overlap needs a different validity rule, since one stack can't track two interleaved regions.",
                 true,
                 "The whole reason a stack works for standard bracket matching is the guarantee that nesting is strict - once that guarantee is relaxed, the very data structure that made the problem tractable no longer models the allowed structure correctly.",
             ),
@@ -1057,7 +1057,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-non-strict-nesting-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "A single stack tracking only the immediately next warmer day doesn't directly generalize - finding the k-th such day for every position needs either k separate passes (each finding the \"next warmer\" relative to the previous result) or a different structure entirely that can answer multi-step queries efficiently.",
+                "A single stack tracking only the next warmer day doesn't generalize - finding the k-th such day per position needs either k separate passes or a different structure that answers multi-step queries efficiently.",
                 true,
                 "The monotonic stack's elegance comes from resolving exactly one relationship (the very next warmer day) per element - extending that to a k-th relationship loses the simple one-pass structure and needs a genuinely different approach to stay efficient.",
             ),
@@ -1079,7 +1079,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-dual-extremum-tracking-tradeoff", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It extends cleanly by adding a second parallel max-stack alongside the existing min-stack, tracking the running maximum the same way - correct and straightforward, but it triples the total memory used (main stack plus two auxiliary stacks) compared to tracking just the minimum alone.",
+                "It extends cleanly by adding a second parallel max-stack alongside the min-stack, tracking the running maximum the same way - correct, but it roughly triples the memory (main stack plus two auxiliary stacks).",
                 true,
                 "The min-stack trick generalizes symmetrically to a max-stack with no new algorithmic ideas needed - the real cost worth naming explicitly is the extra O(n) space for the second auxiliary stack, not any added conceptual complexity.",
             ),
@@ -1101,7 +1101,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-recursion-depth-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "A recursive implementation that processes one character per recursive call would build up a call stack proportional to the nesting depth, risking a stack overflow on adversarial input, while the iterative version's explicit ArrayDeque-based stack lives on the heap and isn't bound by the language runtime's call-stack size limit.",
+                "A recursive version processing one character per call builds a call stack proportional to the nesting depth, risking overflow on adversarial input, while the iterative ArrayDeque lives on the heap.",
                 true,
                 "This is exactly the kind of limitation that separates 'works on typical input' from 'is robust to adversarial input' - a call-stack-based recursive design has a hard limit that an explicit, heap-allocated stack structure doesn't share.",
             ),
@@ -1123,7 +1123,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-arbitrary-removal-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It reveals a genuine limitation - a stack's whole contract is last-in-first-out access, so removing from the middle isn't a stack operation at all; supporting arbitrary removal while keeping O(1) min queries needs a fundamentally different structure, like a balanced tree or a doubly-linked list paired with a multiset of values.",
+                "It reveals a genuine limitation - a stack's contract is last-in-first-out, so middle removal isn't a stack operation; arbitrary removal with O(1) min needs a different structure, like a balanced tree.",
                 true,
                 "The min-stack trick specifically relies on push and pop happening in a strict LIFO order to keep the two stacks synchronized - arbitrary removal breaks that synchronization assumption entirely, which isn't a bug to patch but a sign the underlying data structure choice itself needs to change.",
             ),
@@ -1145,12 +1145,12 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-ambiguous-tie-rule-interpretation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "This rule is underspecified as stated - before touching the code, it needs a precise, unambiguous definition (e.g. does \"immediately followed\" mean the very next day, or any later day in an unbroken equal-temperature run?) since different reasonable interpretations would require different comparison operators and possibly different state entirely.",
+                "The rule is underspecified - it needs a precise definition first (is \"immediately followed\" the next day, or any later day in an equal run?), since different readings need different comparisons and state.",
                 true,
                 "Recognizing when a requirement is genuinely ambiguous, rather than just assuming one interpretation and coding it, is itself part of engineering judgment - this rule as written doesn't map cleanly onto a single unambiguous comparison change.",
             ),
             choice(
-                "The fix is straightforward: just change `>` to `>=` everywhere in the comparison.",
+                "The fix is straightforward: just change every `>` to `>=` in the comparison.",
                 false,
                 "Blindly switching to >= doesn't capture the added \"but only if not immediately followed by an even warmer day\" qualifier at all - the rule has more nuance than a single operator change can express.",
             ),
@@ -1331,7 +1331,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-dual-extremum-time-complexity", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The claim conflates a larger constant factor with a change in complexity class - pushing to two auxiliary stacks instead of one still means each operation does a fixed, input-size-independent amount of work, so push and pop both remain O(1), just with a bigger constant.",
+                "The claim confuses a bigger constant factor with a complexity-class change - two auxiliary stacks still means fixed work per operation, so push and pop stay O(1) with a larger constant.",
                 true,
                 "Adding more O(1) work per call (a second stack push alongside the first) doesn't change the complexity class, since neither stack's per-operation cost grows with n - it's still a fixed amount of work per call, exactly the definition of O(1).",
             ),
@@ -1353,12 +1353,12 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-traversal-direction-space-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "No - a symmetric worst case still exists in reverse (a strictly *increasing* sequence, rather than decreasing, would now leave every day unresolved on the stack), so the worst-case space bound remains O(n) regardless of which direction the scan runs.",
+                "No - a symmetric worst case exists in reverse (a strictly increasing sequence would leave every day unresolved), so the worst-case space stays O(n) whichever direction the scan runs.",
                 true,
                 "Reversing the direction just relabels which specific input pattern becomes the worst case - it doesn't eliminate the existence of *some* pattern that leaves every element unresolved on the stack, so the O(n) worst-case bound is unavoidable either way.",
             ),
             choice(
-                "Yes - processing in reverse always reduces the worst-case space to O(log n).",
+                "Yes - processing in reverse always reduces the worst-case space to O(log n) instead.",
                 false,
                 "There's no mechanism by which simply reversing traversal direction would produce a logarithmic bound - the stack can still grow to hold every element in some adversarial input, regardless of scan direction.",
             ),
@@ -1377,12 +1377,12 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-io-latency-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The number of comparisons is still O(log n), which is genuinely few, but if each comparison now costs real, possibly significant latency (a network round trip) rather than a cheap memory access, the *wall-clock* time can still be substantial - the algorithmic complexity and the real-world cost model have diverged.",
+                "The comparison count is still O(log n), but if each comparison now costs real latency (a network round trip) rather than a memory access, wall-clock time can still be large - complexity and the real cost model diverge.",
                 true,
                 "O(log n) describes how many *operations* are needed, not how expensive each operation is - when the cost per operation changes dramatically (from a memory access to a network round trip), the same complexity class can translate to very different real-world performance.",
             ),
             choice(
-                "Yes - O(log n) guarantees fast performance in absolute terms regardless of what each comparison costs.",
+                "Yes - O(log n) guarantees fast performance in absolute terms no matter what each comparison costs.",
                 false,
                 "Complexity analysis describes scaling behavior, not absolute wall-clock time - if each individual operation becomes far more expensive, the total real-world time changes even though the number of operations (and thus the complexity class) stays the same.",
             ),
@@ -1399,7 +1399,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-io-latency-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "No - when nums[mid] equals nums[high], the comparison can no longer tell which side the rotation point is on, since both configurations (rotation point to the left or to the right of mid) are consistent with that tie; the only safe fallback is to shrink high by one and continue, which degrades the worst-case time to O(n).",
+                "No - when nums[mid] equals nums[high], the comparison can't tell which side holds the rotation point; the only safe fallback is to shrink high by one and continue, which degrades the worst case to O(n).",
                 true,
                 "The comparison's power comes from strict inequality reliably revealing structure - a tie removes that signal entirely, forcing a conservative, one-step-at-a-time fallback that sacrifices the logarithmic guarantee in the worst case (e.g. an array of all-equal values with one rotation).",
             ),
@@ -1421,7 +1421,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-monotonicity-precondition-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "No, not directly - binary search on the answer fundamentally relies on feasibility flipping in only one direction as the candidate value increases; if that monotonic relationship breaks, the standard narrowing logic can incorrectly discard a feasible region, and a different search strategy would be needed.",
+                "No, not directly - binary search on the answer relies on feasibility flipping only one way as the candidate grows; if that monotonicity breaks, the narrowing logic can discard a feasible region and a different strategy is needed.",
                 true,
                 "Binary search on the answer isn't a generic tool for 'find the minimum value satisfying some condition' - it specifically requires that condition to be monotonic in the candidate value, and recognizing when that precondition breaks is exactly the kind of judgment that separates using a tool correctly from misapplying it.",
             ),
@@ -1443,7 +1443,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-direction-ambiguity-analysis", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It's actually equivalent - a right rotation by k on an array of length n produces the same result as a left rotation by (n - k), so \"rotated in either direction by some unknown amount\" describes exactly the same space of possible arrays as \"rotated by some unknown amount\" in one fixed direction.",
+                "It's actually equivalent - a right rotation by k equals a left rotation by (n - k), so \"rotated either direction by an unknown amount\" describes the same set of arrays as \"rotated by an unknown amount\" one way.",
                 true,
                 "This is a case where a seemingly harder-sounding generalization turns out not to add any real new cases - recognizing that the two framings describe an identical set of possible inputs is itself a valuable piece of reasoning before writing any new code.",
             ),
@@ -1465,7 +1465,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-index-based-state-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "It assumes O(1) access to \"the element at position mid\" via direct indexing - a tree-backed sorted collection doesn't offer that same constant-time positional access, so low/high/mid as plain integer indices no longer directly map to an O(1) lookup the way they do for an array.",
+                "It assumes O(1) access to the element at position mid via direct indexing - a tree-backed sorted collection has no such constant-time positional access, so integer low/high/mid indices no longer map to an O(1) lookup.",
                 true,
                 "Binary search's efficiency isn't just about the comparison logic - it specifically leans on arrays' O(1) random access by index, which a different underlying structure with the same sorted-order guarantee might not provide, changing what 'efficient' even means for that structure.",
             ),
@@ -1487,7 +1487,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-integer-vs-real-domain-limitation", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "The original low < high integer-narrowing loop assumes a discrete domain where 'no more candidates left' is well-defined by low meeting high; over the reals, there's no such natural stopping point, so the loop needs to instead run for a fixed number of iterations or until the range shrinks below a chosen precision threshold like 0.005.",
+                "The low < high integer loop assumes a discrete domain where 'no candidates left' means low meets high; over the reals there's no such stopping point, so the loop must run a fixed number of iterations or until the range is below a chosen precision like 0.005.",
                 true,
                 "Binary search over integers and binary search over reals share the halving idea, but the termination condition genuinely differs - integers have a natural 'nothing left to check' point that real numbers don't, which has to be replaced with a precision-based stopping rule instead.",
             ),
@@ -1755,7 +1755,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-cache-locality-vs-asymptotic", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "Yes, legitimately - binary search's jumps have poor cache locality compared to a linear scan's sequential access pattern, so for small enough arrays where O(log n) versus O(n) barely differs in raw comparison count, cache-friendly linear scanning can genuinely win in wall-clock time despite the worse asymptotic complexity.",
+                "Yes, legitimately - binary search's jumps have poor cache locality versus a linear scan's sequential access, so on small arrays where O(log n) and O(n) barely differ, cache-friendly scanning can win in wall-clock time.",
                 true,
                 "Big-O complexity intentionally ignores hardware-level effects like cache behavior, but those effects are very real in practice - for small arrays, the actual measured performance can favor the asymptotically 'worse' algorithm, which is exactly why real-world libraries often switch to linear or insertion-based approaches below some threshold size.",
             ),
@@ -1777,7 +1777,7 @@ internal val advancedWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "binary-search-precompute-vs-lazy-evaluation-tradeoff", difficulty = ADVANCED,
         choices = listOf(
             choice(
-                "This adds O(m) space (m = max pile size) and O(n * m) time just to build the precomputed table - which is worse overall than the O(n log m) time and O(1) space of computing hoursNeeded lazily only for the O(log m) speeds binary search actually visits.",
+                "This adds O(m) space and O(n * m) time just to build the table - worse than the O(n log m) time and O(1) space of computing hoursNeeded lazily for only the O(log m) speeds the search visits.",
                 true,
                 "Precomputing every possible answer trades away exactly the efficiency binary search was providing in the first place - since only a small, logarithmic number of candidate speeds ever get checked, computing the other, unused ones ahead of time is pure waste, not an optimization.",
             ),

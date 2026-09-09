@@ -36,17 +36,17 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-index-vs-value-keying", difficulty = INTERMEDIATE,
         choices = listOf(
             choice(
-                "A map from value to index, since only the most recent index for a repeated value is ever the one that matters for finding a still-valid complement.",
+                "A map from value to index, since only the most recent index for a repeated value matters for finding a valid complement.",
                 true,
                 "Even with duplicate values, only the most recently seen index for a given value can pair with a future complement - overwriting the map entry for a repeated value is exactly the right behavior, not a bug.",
             ),
             choice(
-                "A map from value to a list of every index that value appeared at.",
+                "A map from each value to a list of every index that value appeared at.",
                 false,
                 "Tracking every past index for a value adds complexity that isn't needed here - the earliest occurrence of a duplicate can never be the correct answer once a later occurrence exists at the same value.",
             ),
             choice(
-                "A set of values seen so far, checked for membership only.",
+                "A set of values seen so far, checked only for membership, not position.",
                 false,
                 "A plain set can confirm a complement exists but can't report which index it came from, and the problem specifically asks for the pair of indices.",
             ),
@@ -58,12 +58,12 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-index-vs-value-keying", difficulty = INTERMEDIATE,
         choices = listOf(
             choice(
-                "The question only ever needs a yes/no answer about existence, and a set answers 'has this value appeared before' with no need to know how many times.",
+                "The question only needs a yes/no answer about existence, and a set answers 'has this value appeared before'.",
                 true,
                 "Counting how many times each value appears is more information than the question requires - membership alone is enough to answer whether any value repeats.",
             ),
             choice(
-                "A set is required because counting could overflow for large arrays.",
+                "A set is required because counting occurrences could overflow for very large arrays.",
                 false,
                 "Overflow isn't a realistic concern for counting occurrences within a single array - the actual reason a set suffices is that the question only needs existence, not frequency.",
             ),
@@ -80,7 +80,7 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-partial-overlap-detection", difficulty = INTERMEDIATE,
         choices = listOf(
             choice(
-                "That every final count is exactly zero, not just that some counts are - a nonzero count for even one letter (like 'r' or 't' here) means the letters used don't fully match.",
+                "That every final count is exactly zero, not just some - a nonzero count for even one letter means the letters don't fully match.",
                 true,
                 "Partial letter overlap between two strings can still leave some counts nonzero after the increment/decrement pass - checking every single count, not just some of them, is what catches this.",
             ),
@@ -90,7 +90,7 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 "Matching total length is necessary but not sufficient - \"rat\" and \"car\" are the same length yet clearly aren't anagrams, so length alone can't be the deciding check.",
             ),
             choice(
-                "That the first character of each string matches.",
+                "That the first character of each string matches the other's first character.",
                 false,
                 "The first characters don't need to match for two strings to be anagrams - anagrams can rearrange characters in any order, including the very first one.",
             ),
@@ -102,7 +102,7 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-zero-and-negative-values", difficulty = INTERMEDIATE,
         choices = listOf(
             choice(
-                "At the second 0 (index 3), the complement (0 - 0 = 0) is looked up in the map, which by then already holds the first 0's index from index 0 - the check happens before the second 0 overwrites anything.",
+                "At the second 0 (index 3), the complement 0 is looked up and finds the first 0's index, since the check runs before index 3 inserts itself.",
                 true,
                 "The order matters precisely in cases like this: index 3's complement lookup finds index 0's earlier entry before index 3 ever inserts itself, correctly pairing the two distinct zero positions.",
             ),
@@ -112,7 +112,7 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 "Zero is stored and looked up in the map exactly like any other integer value - there's nothing special about it that breaks the map-based approach.",
             ),
             choice(
-                "It only works because target itself happens to be zero.",
+                "It only works because the target itself happens to be zero in this case.",
                 false,
                 "The target's value doesn't change how the algorithm behaves - the same check-then-insert logic handles any target correctly, zero included.",
             ),
@@ -124,7 +124,7 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "arrays-hashing-best-vs-worst-case-shape", difficulty = INTERMEDIATE,
         choices = listOf(
             choice(
-                "Nothing about the duplicate's late position matters much - the set has to grow to hold nearly the entire array regardless, since no early exit is possible until the duplicate is finally reached.",
+                "The duplicate's late position barely matters - the set still grows to nearly the whole array, since no early exit is possible until it's reached.",
                 true,
                 "A duplicate appearing near the end means the set still grows close to its maximum size before the answer is found - this is actually closer to the worst case than a best case for how much state gets built up.",
             ),
@@ -134,7 +134,7 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
                 "With the duplicate near the end, the set has already grown to hold nearly every distinct value in the array by the time it's found - it's not a small set at that point.",
             ),
             choice(
-                "It's the best case because sets resize more efficiently when nearly full.",
+                "It's the best case because sets resize more efficiently when they are nearly full.",
                 false,
                 "Set resizing behavior isn't what determines best or worst case here - what matters is how much of the array gets scanned (and how large the set grows) before a duplicate is found.",
             ),
@@ -147,12 +147,12 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         code = "val counts = IntArray(26)\nfor (c in s) counts[c - 'a']++\nfor (c in t) counts[c - 'a']--\nreturn counts.all { it == 0 }",
         choices = listOf(
             choice(
-                "s and t containing accented or non-English letters - c - 'a' produces an index outside 0..25, either crashing or silently corrupting unrelated slots depending on the language's array bounds behavior.",
+                "s and t with accented or non-English letters - c - 'a' gives an index outside 0..25, crashing or corrupting unrelated slots.",
                 true,
                 "The fixed 26-slot array assumes only lowercase English letters - characters outside that range compute an out-of-range index, which is a correctness bug baked into the assumption itself, not just an edge case.",
             ),
             choice(
-                "s and t both being empty strings.",
+                "s and t both being completely empty strings with no characters.",
                 false,
                 "Two empty strings never enter either loop at all, so the fixed-alphabet assumption is never exercised - this doesn't expose the bug.",
             ),
@@ -379,17 +379,17 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "two-pointers-mixed-alphanumeric-comparison", difficulty = INTERMEDIATE,
         choices = listOf(
             choice(
-                "That case-insensitivity only applies to letters - digits have no case, so lowercasing '0' leaves it unchanged, and the comparison still correctly treats '0' and 'p'/'P' as matching only when the letters themselves match after normalization.",
+                "That case-insensitivity applies only to letters - digits have no case, so lowercasing '0' leaves it unchanged and comparisons stay uniform.",
                 true,
                 "Digits pass through case normalization unaffected, which is exactly why lowercasing everything before comparing works uniformly for a mix of letters and digits without needing separate handling.",
             ),
             choice(
-                "That digits should be excluded from the palindrome check entirely.",
+                "That digits should be excluded from the palindrome comparison check entirely.",
                 false,
                 "Digits are explicitly alphanumeric and must be included in the comparison, not skipped - only truly non-alphanumeric characters like punctuation and spaces get filtered out.",
             ),
             choice(
-                "That '0' and 'O' (the letter) should be treated as equivalent.",
+                "That '0' the digit and 'O' the letter should be treated as equivalent characters.",
                 false,
                 "The digit zero and the letter O are different characters entirely - case-insensitivity only unifies a letter with its own different-case version, not visually similar but distinct characters.",
             ),
@@ -833,17 +833,17 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         code = "var left = 0\nvar maxLen = 0\nval window = HashSet<Char>()\nfor (right in s.indices) {\n    while (s[right] in window) {\n        window.remove(s[right])\n        left++\n    }\n    window.add(s[right])\n    maxLen = maxOf(maxLen, right - left + 1)\n}",
         choices = listOf(
             choice(
-                "\"abba\" - removing s[right] (the duplicate character itself) instead of s[left] never actually shrinks the window from its left edge, so left drifts out of sync with what's truly still in the window.",
+                "\"abba\" - removing s[right] instead of s[left] never shrinks the window from its left edge, so left drifts out of sync with the window.",
                 true,
                 "The window is supposed to shrink from its left edge until the specific duplicate is gone - removing s[right] instead removes the wrong entry from the set entirely and just increments left without actually removing what left points to.",
             ),
             choice(
-                "\"abcdef\" - all unique characters.",
+                "\"abcdef\" - a string of all unique characters with no repeats.",
                 false,
                 "With no duplicates at all, the inner while loop's body never executes, so this input can't reveal a bug in what gets removed during shrinking.",
             ),
             choice(
-                "\"aaaa\" - every character identical.",
+                "\"aaaa\" - a string where every character is identical.",
                 false,
                 "Here removing s[right] happens to remove the same character value that's also at s[left] (since they're all 'a'), coincidentally masking the bug rather than exposing it.",
             ),
@@ -1065,17 +1065,17 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         conceptKey = "stack-count-vs-order-sensitivity", difficulty = INTERMEDIATE,
         choices = listOf(
             choice(
-                "Counting only tracks how many of each bracket type exist, but \"(])\" has correctly balanced counts of each individual type in some pairings - it's the *order and nesting*, not the counts, that make it invalid, which only a stack captures.",
+                "Counting only tracks how many of each type exist, but it's the order and nesting, not the counts, that make \"(])\" invalid - a stack captures that.",
                 true,
                 "A stack doesn't just tally brackets, it tracks *which* bracket is waiting to be closed next - that ordering information is exactly what distinguishes \"(])\" (invalid nesting) from a genuinely valid string with the same bracket counts.",
             ),
             choice(
-                "Because \"(])\" has an odd total number of characters.",
+                "Because \"(])\" has an odd total number of characters in it.",
                 false,
                 "\"(])\" has three characters, which is indeed odd, but that's incidental - a string could have an even count and still be invalid due to nesting order, which is the actual issue here.",
             ),
             choice(
-                "Because square brackets are inherently invalid inside parentheses.",
+                "Because square brackets are inherently invalid when nested inside parentheses.",
                 false,
                 "Different bracket types can validly nest inside each other, like \"([])\" - the issue with \"(])\" is specifically that the closing order doesn't match the opening order, not that mixing bracket types is disallowed.",
             ),
@@ -1176,17 +1176,17 @@ internal val intermediateWorkoutSteps: List<WorkoutStep> = listOf(
         code = "val answer = IntArray(temperatures.size)\nval stack = ArrayDeque<Int>()\nfor (i in temperatures.indices) {\n    while (stack.isNotEmpty() && temperatures[i] >= temperatures[stack.last()]) {\n        val prevDay = stack.removeLast()\n        answer[prevDay] = i - prevDay\n    }\n    stack.addLast(i)\n}",
         choices = listOf(
             choice(
-                "[70, 70, 75] - the first 70 gets resolved against the second 70 (an *equal*, not warmer, temperature), incorrectly reporting a 1-day wait instead of correctly waiting for the actual warmer day at index 2.",
+                "[70, 70, 75] - the first 70 gets resolved against the equal (not warmer) second 70, wrongly reporting a 1-day wait instead of 2.",
                 true,
                 "The problem specifically asks for a *warmer* day, not an equal or warmer one - using >= incorrectly resolves a day against an equally-cool day instead of waiting for a genuinely higher temperature.",
             ),
             choice(
-                "[70, 72, 75], strictly increasing.",
+                "[70, 72, 75], a strictly increasing temperature sequence.",
                 false,
                 "With every day strictly warmer than the last, the >= comparison behaves identically to a strict > comparison here, since no two adjacent values are ever equal - this case doesn't expose the bug.",
             ),
             choice(
-                "[80], a single day.",
+                "[80], an array containing only a single day.",
                 false,
                 "With only one day and nothing to compare it against, the while loop's condition is never even evaluated - this doesn't exercise the strict-versus-inclusive distinction at all.",
             ),
