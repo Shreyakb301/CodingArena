@@ -17,8 +17,8 @@ postgres = "42.7.7"
 logback = "1.5.18"
 jwt = "4.5.0"
 androidMinSdk = "26"
-androidTargetSdk = "35"
-androidCompileSdk = "35"
+androidTargetSdk = "36"
+androidCompileSdk = "36"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

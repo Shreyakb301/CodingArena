@@ -5,7 +5,7 @@ apply plugin: "com.android.library"
 
 android {
     namespace = "com.codingarena.core"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
