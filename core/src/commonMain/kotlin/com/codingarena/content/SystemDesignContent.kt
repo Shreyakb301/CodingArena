@@ -762,6 +762,64 @@ object SystemDesignContent {
                 ),
             ),
         ),
+        SystemDesignConcept(
+            id = "leader-election",
+            title = "Leader Election",
+            category = INFRASTRUCTURE,
+            summary = "In a cluster of otherwise-identical nodes, leader election is how they agree " +
+                "on exactly one of them being in charge of a job that must not run twice at once " +
+                "- and on picking a new leader if the current one goes silent.",
+            keyPoints = listOf(
+                "Ensures exactly one node handles a job that must not run twice concurrently",
+                "Nodes must detect a failed leader and elect a replacement",
+                "Common tools: a lock in a shared coordination store, or a consensus protocol like Raft",
+                "Split-brain - two nodes both believing they're the leader - is the failure this prevents",
+            ),
+            questions = listOf(
+                SystemDesignQuestion(
+                    id = "leader-election-purpose",
+                    prompt = "A cron-style job must run on exactly one server, never zero and never two at once, but the app runs on five identical servers. What does leader election solve here?",
+                    choices = listOf(
+                        choice(
+                            "It lets the five servers agree on exactly one of themselves to run the job, and hand it off if that one fails.",
+                            true,
+                            "That's precisely the coordination problem leader election addresses - a set of equally capable nodes reaching agreement on a single owner for work that must not be duplicated or dropped.",
+                        ),
+                        choice(
+                            "It makes all five servers run the job simultaneously but merges their results afterward.",
+                            false,
+                            "Running the job everywhere and merging results is a different pattern entirely (and risky if the job isn't safe to run twice) - leader election exists to avoid duplicate execution, not reconcile it after the fact.",
+                        ),
+                        choice(
+                            "It permanently designates one server as the leader for every job the system will ever run.",
+                            false,
+                            "Leadership in this pattern is typically scoped and re-electable, not a one-time permanent designation - a failed leader needs to be replaceable, not locked in forever.",
+                        ),
+                    ),
+                ),
+                SystemDesignQuestion(
+                    id = "leader-election-split-brain",
+                    prompt = "A network glitch briefly cuts the current leader off from the rest of the cluster, and the others elect a new leader. Then the network heals and the old leader is still running, unaware it's been replaced. What's this situation called?",
+                    choices = listOf(
+                        choice(
+                            "Split-brain - two nodes both believe they're the leader at the same time.",
+                            true,
+                            "This is exactly the scenario leader-election systems are built to avoid: a temporary partition can leave the old leader still acting as leader while a new one has already been chosen, so briefly there are two.",
+                        ),
+                        choice(
+                            "A deadlock - both nodes are stuck waiting on each other and neither can proceed.",
+                            false,
+                            "Deadlock describes two parties blocking on each other's next move - here both nodes are actively running, just disagreeing about who's in charge, which is a different failure mode.",
+                        ),
+                        choice(
+                            "Normal operation - the system is designed to always run with two active leaders.",
+                            false,
+                            "Having two simultaneous leaders is the specific failure the system is trying to prevent, not an intended steady state - it's a bug to detect and resolve, not the design.",
+                        ),
+                    ),
+                ),
+            ),
+        ),
     )
 
     fun byId(id: String): SystemDesignConcept? = concepts.firstOrNull { it.id == id }
