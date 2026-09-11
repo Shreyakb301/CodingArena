@@ -820,6 +820,64 @@ object SystemDesignContent {
                 ),
             ),
         ),
+        SystemDesignConcept(
+            id = "horizontal-vs-vertical-scaling",
+            title = "Horizontal vs Vertical Scaling",
+            category = SCALABILITY,
+            summary = "Vertical scaling means making one server bigger - more CPU, more RAM. " +
+                "Horizontal scaling means adding more servers and spreading the load across them. " +
+                "One hits a hardware ceiling; the other trades that ceiling for coordination work.",
+            keyPoints = listOf(
+                "Vertical: upgrade one machine's hardware - simple, but has a hard ceiling",
+                "Horizontal: add more machines - needs load balancing and often data partitioning",
+                "Horizontal scaling has no fixed upper limit, but adds real coordination complexity",
+                "Most systems that grow large eventually have to scale horizontally",
+            ),
+            questions = listOf(
+                SystemDesignQuestion(
+                    id = "scaling-vertical-limit",
+                    prompt = "A team keeps buying a bigger single server every time load grows. What's the fundamental limit they'll eventually run into?",
+                    choices = listOf(
+                        choice(
+                            "There's a hardware ceiling - eventually no bigger single machine exists to buy.",
+                            true,
+                            "Vertical scaling is bounded by what a single machine can physically hold and process - at some point you reach the largest machine on the market, and that ceiling doesn't move.",
+                        ),
+                        choice(
+                            "The server would need to be manually restarted after every upgrade, causing constant downtime.",
+                            false,
+                            "A restart during an upgrade is a temporary, one-time inconvenience, not the fundamental limiting factor - the real ceiling is that machine capacity itself is finite.",
+                        ),
+                        choice(
+                            "Vertical scaling actually has no limit at all, unlike horizontal scaling.",
+                            false,
+                            "That reverses the actual tradeoff - horizontal scaling is the approach without a fixed ceiling, while a single machine's capacity is exactly what's bounded.",
+                        ),
+                    ),
+                ),
+                SystemDesignQuestion(
+                    id = "scaling-horizontal-tradeoff",
+                    prompt = "A team switches from one big server to ten smaller ones sharing the load. What do they take on in exchange for escaping the single-machine ceiling?",
+                    choices = listOf(
+                        choice(
+                            "The need to coordinate across machines - load balancing, and often splitting data so no single server holds all of it.",
+                            true,
+                            "Spreading work across many machines only helps if requests and data are properly distributed among them, which is real added complexity that a single server never had to deal with.",
+                        ),
+                        choice(
+                            "Nothing - ten smaller servers behave identically to one large server in every respect.",
+                            false,
+                            "Ten independent machines don't automatically act as one - without load balancing and data coordination, they'd just be ten separate, uncoordinated servers rather than one scaled system.",
+                        ),
+                        choice(
+                            "A hard cap of exactly ten servers that can never be exceeded going forward.",
+                            false,
+                            "Horizontal scaling doesn't impose a fixed server-count ceiling like that - more machines can generally be added later, which is the whole appeal relative to vertical scaling's hard limit.",
+                        ),
+                    ),
+                ),
+            ),
+        ),
     )
 
     fun byId(id: String): SystemDesignConcept? = concepts.firstOrNull { it.id == id }
