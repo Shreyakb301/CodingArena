@@ -1,6 +1,7 @@
 package com.codingarena.features.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -126,6 +127,7 @@ fun ProfileScreen(
     onOpenSettings: () -> Unit,
     onOpenRatings: () -> Unit,
     onOpenPatterns: () -> Unit,
+    onOpenSystemDesign: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -185,8 +187,23 @@ fun ProfileScreen(
         }
         item { ProfileCountRow("Questions solved", state.stats.totalCompleted) }
         item { ProfileCountRow("Interview questions solved", state.interviewQuestionsSolved) }
+        item { ProfileLinkRow("System Design", onOpenSystemDesign) }
         item { Box(Modifier.padding(bottom = 24.dp)) }
     }
+}
+
+/** A tappable row to a sub-section, styled like [ProfileCountRow] but navigable. */
+@Composable
+private fun ProfileLinkRow(label: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 18.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label)
+        Text("›", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium)
+    }
+    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
 }
 
 @Composable

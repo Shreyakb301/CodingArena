@@ -48,6 +48,9 @@ object Routes {
     const val INTERVIEW_TECH_COMM_PROBLEM_ROUTE = "interview/techcomm/{problemSlug}"
     const val INTERVIEW_MOCK = "interview/mock"
 
+    const val SYSTEM_DESIGN_HOME = "systemDesign"
+    const val SYSTEM_DESIGN_CONCEPT_ROUTE = "systemDesign/{conceptId}"
+
     const val ARG_PROBLEM_ID = "problemId"
     const val ARG_SOURCE = "source"
     const val ARG_ATTEMPT_ID = "attemptId"
@@ -59,6 +62,7 @@ object Routes {
     const val ARG_GROUP = "group"
     const val ARG_CATEGORY = "category"
     const val ARG_PROBLEM_SLUG = "problemSlug"
+    const val ARG_CONCEPT_ID = "conceptId"
 
     fun challenge(problemId: String, source: AttemptSource = AttemptSource.PRACTICE): String =
         "challenge/$problemId/${source.name}"
@@ -80,6 +84,8 @@ object Routes {
 
     fun interviewCategoryWorkout(category: String): String = "interview/categories/$category/workout"
     fun interviewTechCommProblem(problemSlug: String): String = "interview/techcomm/$problemSlug"
+
+    fun systemDesignConcept(conceptId: String): String = "systemDesign/$conceptId"
 }
 
 /** The five primary jobs: orient, progress, practise, interview-prep, and manage. */

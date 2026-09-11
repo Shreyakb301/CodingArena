@@ -118,6 +118,26 @@ object ArenaIcons {
     val Diamond: ImageVector = icon("diamond") {
         moveTo(12f, 2.5f); lineTo(20.5f, 12f); lineTo(12f, 21.5f); lineTo(3.5f, 12f); close()
     }
+
+    /** Infrastructure — a server rack. */
+    val Server: ImageVector = icon("server", fill = {
+        circle(6.5f, 5.5f, 0.9f); circle(6.5f, 12f, 0.9f); circle(6.5f, 18.5f, 0.9f)
+    }) {
+        roundRect(3f, 3f, 18f, 5f, 1.5f)
+        roundRect(3f, 9.5f, 18f, 5f, 1.5f)
+        roundRect(3f, 16f, 18f, 5f, 1.5f)
+    }
+
+    /** Databases — a cylinder. */
+    val Database: ImageVector = icon("database") {
+        moveTo(3f, 6f)
+        arcToRelative(9f, 3f, 0f, false, true, 18f, 0f)
+        arcToRelative(9f, 3f, 0f, false, true, -18f, 0f)
+        moveTo(3f, 6f); verticalLineTo(18f)
+        moveTo(21f, 6f); verticalLineTo(18f)
+        moveTo(3f, 12f); arcToRelative(9f, 3f, 0f, false, false, 18f, 0f)
+        moveTo(3f, 18f); arcToRelative(9f, 3f, 0f, false, false, 18f, 0f)
+    }
 }
 
 // --------------------------------------------------------------------- builders

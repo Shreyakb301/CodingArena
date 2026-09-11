@@ -27,6 +27,7 @@ import com.codingarena.features.ratings.RatingsViewModel
 import com.codingarena.features.roadmap.RoadmapViewModel
 import com.codingarena.features.settings.SettingsViewModel
 import com.codingarena.features.splash.SplashViewModel
+import com.codingarena.features.systemdesign.SystemDesignViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -62,4 +63,5 @@ val appModule: Module = module {
     viewModel { TechCommProblemsViewModel(get(), get()) }
     viewModel { TechCommRoundViewModel(get(), get(), get(), get()) }
     viewModel { MockInterviewViewModel(get(), get(), get(), get()) }
+    viewModel { SystemDesignViewModel(get()) }
 }

@@ -46,6 +46,8 @@ import com.codingarena.features.roadmap.RoadmapScreen
 import com.codingarena.features.roadmap.RoadmapLessonScreen
 import com.codingarena.features.roadmap.RoadmapExplanationScreen
 import com.codingarena.features.settings.SettingsScreen
+import com.codingarena.features.systemdesign.SystemDesignConceptScreen
+import com.codingarena.features.systemdesign.SystemDesignHomeScreen
 import com.codingarena.features.solutionreview.SolutionReviewScreen
 import com.codingarena.features.splash.SplashScreen
 
@@ -416,11 +418,29 @@ fun AppNavigation(navController: NavHostController) {
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenRatings = { navController.navigate(Routes.RATINGS) },
                 onOpenPatterns = { navController.navigate(Routes.PATTERNS) },
+                onOpenSystemDesign = { navController.navigate(Routes.SYSTEM_DESIGN_HOME) },
             )
         }
 
         composable(Routes.SETTINGS) {
             SettingsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.SYSTEM_DESIGN_HOME) {
+            SystemDesignHomeScreen(
+                onBack = { navController.popBackStack() },
+                onOpenConcept = { id -> navController.navigate(Routes.systemDesignConcept(id)) },
+            )
+        }
+
+        composable(
+            route = Routes.SYSTEM_DESIGN_CONCEPT_ROUTE,
+            arguments = listOf(navArgument(Routes.ARG_CONCEPT_ID) { type = NavType.StringType }),
+        ) { entry ->
+            SystemDesignConceptScreen(
+                conceptId = entry.stringArg(Routes.ARG_CONCEPT_ID).orEmpty(),
+                onBack = { navController.popBackStack() },
+            )
         }
     }
 }
