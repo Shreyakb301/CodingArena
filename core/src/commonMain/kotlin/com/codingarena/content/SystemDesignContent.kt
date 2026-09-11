@@ -587,6 +587,65 @@ object SystemDesignContent {
                 ),
             ),
         ),
+        SystemDesignConcept(
+            id = "idempotency",
+            title = "Idempotency",
+            category = APIS,
+            summary = "An idempotent operation has the same effect no matter how many times it's " +
+                "applied. That's what makes 'just retry on failure' a safe default instead of a " +
+                "risk - a client can resend a request after a timeout without worrying it will " +
+                "happen twice.",
+            keyPoints = listOf(
+                "Repeating the same request has the same effect as sending it once",
+                "GET, PUT, and DELETE are idempotent by convention; plain POST is not",
+                "A client-generated idempotency key lets the server recognize a retried POST",
+                "Idempotency is what makes automatic retries on timeout safe to build in",
+            ),
+            questions = listOf(
+                SystemDesignQuestion(
+                    id = "idempotency-payment-retry",
+                    prompt = "A payment request times out after the charge actually succeeded on the server, so the client retries the same request. What stops the customer from being charged twice?",
+                    choices = listOf(
+                        choice(
+                            "An idempotency key sent with the request lets the server recognize the retry and return the original result instead of charging again.",
+                            true,
+                            "The key ties both attempts to the same logical operation, so the server can look it up, see the charge already happened, and hand back that result rather than repeating the side effect.",
+                        ),
+                        choice(
+                            "The client waits ten seconds before retrying, which is enough time for the first charge to fully complete.",
+                            false,
+                            "A delay changes timing, not correctness - without a way to recognize the retry as the same operation, waiting longer doesn't prevent the second attempt from also charging the customer.",
+                        ),
+                        choice(
+                            "HTTP itself automatically discards any two identical requests sent within a minute.",
+                            false,
+                            "HTTP has no built-in request deduplication - preventing a duplicate charge is something the API has to implement deliberately, not something the protocol does for free.",
+                        ),
+                    ),
+                ),
+                SystemDesignQuestion(
+                    id = "idempotency-methods",
+                    prompt = "Which of these is idempotent by convention - repeating it has the same effect as doing it once?",
+                    choices = listOf(
+                        choice(
+                            "PUT /users/5 with the same body - the user ends up in the same state whether it's sent once or five times.",
+                            true,
+                            "PUT means 'set this resource to exactly this state,' so sending the identical update again just sets it to the same state again - nothing changes on the second, third, or later attempt.",
+                        ),
+                        choice(
+                            "POST /orders with the same body - a plain create endpoint that adds a new record on every call.",
+                            false,
+                            "A bare create endpoint typically makes a new order each time it's called, so calling it twice produces two orders - that's the opposite of idempotent unless an idempotency key is added.",
+                        ),
+                        choice(
+                            "Any request at all, as long as it uses HTTPS instead of plain HTTP.",
+                            false,
+                            "Encryption in transit is a security property and has no bearing on whether repeating a request changes its effect - idempotency depends on what the operation does, not on the transport.",
+                        ),
+                    ),
+                ),
+            ),
+        ),
     )
 
     fun byId(id: String): SystemDesignConcept? = concepts.firstOrNull { it.id == id }
