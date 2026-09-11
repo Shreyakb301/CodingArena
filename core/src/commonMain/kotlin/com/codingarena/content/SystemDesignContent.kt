@@ -704,6 +704,64 @@ object SystemDesignContent {
                 ),
             ),
         ),
+        SystemDesignConcept(
+            id = "consistent-hashing",
+            title = "Consistent Hashing",
+            category = SCALABILITY,
+            summary = "Consistent hashing maps both servers and data onto positions on the same " +
+                "numeric ring, so adding or removing a server only reassigns the small slice of " +
+                "data next to it on the ring, instead of reshuffling everything.",
+            keyPoints = listOf(
+                "Both servers and keys are hashed onto positions on a shared ring",
+                "A key belongs to the next server found walking clockwise from its position",
+                "Adding or removing one server only affects its immediate neighbors on the ring",
+                "Plain hash-modulo-N reassigns almost every key when N changes; this avoids that",
+            ),
+            questions = listOf(
+                SystemDesignQuestion(
+                    id = "consistent-hashing-vs-modulo",
+                    prompt = "A cache cluster picks a server for each key using `hash(key) % serverCount`. What happens to nearly every key's assigned server when one server is added?",
+                    choices = listOf(
+                        choice(
+                            "Almost every key's assigned server changes, since the modulo divisor itself changed.",
+                            true,
+                            "Because the formula divides by the total server count, changing that count shifts the result for nearly every key, not just the ones that should logically move to the new server.",
+                        ),
+                        choice(
+                            "Nothing changes - modulo hashing is specifically designed to keep assignments stable when servers are added.",
+                            false,
+                            "It's the opposite - plain modulo hashing is exactly the approach that reshuffles almost everything on a server count change, which is the problem consistent hashing exists to solve.",
+                        ),
+                        choice(
+                            "Only the keys that hash to a value lower than the new server count move.",
+                            false,
+                            "The disruption isn't limited to some narrow range of hash values - changing the divisor in a modulo operation can change the result for keys across the whole range.",
+                        ),
+                    ),
+                ),
+                SystemDesignQuestion(
+                    id = "consistent-hashing-adding-server",
+                    prompt = "On a consistent-hashing ring, a new server is inserted between two existing ones. Which keys does it end up serving?",
+                    choices = listOf(
+                        choice(
+                            "Only the keys that fall in the ring segment between the new server and its counterclockwise neighbor.",
+                            true,
+                            "A key belongs to the next server found going clockwise from its position, so inserting a new server only pulls in the keys whose nearest clockwise server used to be the neighbor just past it - everyone else's assignment is untouched.",
+                        ),
+                        choice(
+                            "All the keys previously served by every other server on the ring.",
+                            false,
+                            "That would defeat the entire purpose of consistent hashing, which is specifically designed so a single server change only disturbs a small local segment of the ring, not the whole thing.",
+                        ),
+                        choice(
+                            "No keys at all, until every other server is manually rebalanced first.",
+                            false,
+                            "Consistent hashing doesn't require a manual rebalance step - the new server immediately starts owning its neighboring segment of the ring as soon as it's placed on it.",
+                        ),
+                    ),
+                ),
+            ),
+        ),
     )
 
     fun byId(id: String): SystemDesignConcept? = concepts.firstOrNull { it.id == id }
