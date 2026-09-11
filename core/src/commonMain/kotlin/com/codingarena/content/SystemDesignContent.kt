@@ -646,6 +646,64 @@ object SystemDesignContent {
                 ),
             ),
         ),
+        SystemDesignConcept(
+            id = "webhooks-vs-polling",
+            title = "Webhooks vs Polling",
+            category = APIS,
+            summary = "Polling means the client repeatedly asks 'has anything changed yet?' on a " +
+                "schedule. A webhook flips that around: the server calls the client back the " +
+                "instant something actually happens, so there's no need to keep asking.",
+            keyPoints = listOf(
+                "Polling: the client checks on a schedule, whether or not anything changed",
+                "Webhook: the server pushes a notification the moment an event occurs",
+                "Webhooks cut wasted requests, but need the receiver to expose a reachable endpoint",
+                "Polling is simpler to set up and still works if the receiver is offline sometimes",
+            ),
+            questions = listOf(
+                SystemDesignQuestion(
+                    id = "webhook-vs-poll-tradeoff",
+                    prompt = "A shipping partner's status rarely changes, but an app checks its API every 10 seconds anyway just in case. What does switching to a webhook fix?",
+                    choices = listOf(
+                        choice(
+                            "Almost all of those checks were wasted - a webhook only fires when the status actually changes.",
+                            true,
+                            "Polling pays the cost of asking on a fixed schedule regardless of whether there's news, while a webhook only sends a request when there's genuinely something to report, cutting out nearly all the empty checks.",
+                        ),
+                        choice(
+                            "The shipping partner's own servers would process orders faster internally.",
+                            false,
+                            "How the app is notified of a status change doesn't affect the partner's internal order processing speed - that's a separate system entirely from the notification mechanism.",
+                        ),
+                        choice(
+                            "The app would no longer need any network connection at all.",
+                            false,
+                            "A webhook still requires the app to be reachable over the network to receive the callback - it changes who initiates the request, not whether a network is involved.",
+                        ),
+                    ),
+                ),
+                SystemDesignQuestion(
+                    id = "webhook-vs-poll-when-poll-wins",
+                    prompt = "A mobile app needs updates, but the phone is frequently offline or behind a firewall that blocks incoming connections. Which approach still works reliably?",
+                    choices = listOf(
+                        choice(
+                            "Polling - the client initiates every check, so it just tries again next time it's online, with nothing needing to reach it directly.",
+                            true,
+                            "Since polling only relies on the client being able to make outgoing requests when it happens to be online, it sidesteps the problem entirely - there's no inbound callback that could be blocked or missed.",
+                        ),
+                        choice(
+                            "Webhooks - the server will simply retry delivering the callback forever until the phone comes back online.",
+                            false,
+                            "A webhook needs to reach the receiver directly, and a firewall blocking incoming connections (or a phone that's offline) means those callbacks can be missed or undeliverable, not reliably queued forever.",
+                        ),
+                        choice(
+                            "Neither approach can work if a device is ever offline for any period of time.",
+                            false,
+                            "Polling specifically tolerates intermittent connectivity just fine - the client simply catches up by asking again the next time it's online, so this claim overstates the limitation.",
+                        ),
+                    ),
+                ),
+            ),
+        ),
     )
 
     fun byId(id: String): SystemDesignConcept? = concepts.firstOrNull { it.id == id }
