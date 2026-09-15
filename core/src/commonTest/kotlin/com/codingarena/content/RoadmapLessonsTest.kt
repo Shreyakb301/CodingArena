@@ -35,18 +35,18 @@ class RoadmapLessonsTest {
     @Test
     fun `every lesson follows one of the two authored question sequences`() {
         val legacySequence = listOf(
-            LessonQuestionKind.APPROACH,
             LessonQuestionKind.CODE_BLOCK,
+            LessonQuestionKind.APPROACH,
             LessonQuestionKind.DEBUG,
             LessonQuestionKind.TIME_COMPLEXITY,
             LessonQuestionKind.SPACE_COMPLEXITY,
         )
         val stepByStepSequence = listOf(
+            LessonQuestionKind.CODE_BLOCK,
             LessonQuestionKind.PATTERN_RECOGNITION,
             LessonQuestionKind.APPROACH,
             LessonQuestionKind.STATE_SELECTION,
             LessonQuestionKind.BOUNDARY_UPDATE,
-            LessonQuestionKind.CODE_BLOCK,
             LessonQuestionKind.TIME_COMPLEXITY,
         )
         lessons.forEach { lesson ->

@@ -102,6 +102,31 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
+                id = "contains-duplicate-code-block",
+                kind = LessonQuestionKind.CODE_BLOCK,
+                prompt = "All three read almost identically. Which one actually returns the right answer?",
+                choices = listOf(
+                    LessonChoice(
+                        text = "Checks whether the value was already there, using add()'s return value.",
+                        correct = true,
+                        feedback = "add() returns false when the value was already present, so !seen.add(n) fires exactly on the duplicate and nothing else.",
+                        code = "fun containsDuplicate(nums: IntArray): Boolean {\n    val seen = mutableSetOf<Int>()\n    for (n in nums) {\n        if (!seen.add(n)) return true\n    }\n    return false\n}",
+                    ),
+                    LessonChoice(
+                        text = "Checks the same add() result, but reads it as-is instead of flipping true and false like the correct version does.",
+                        correct = false,
+                        feedback = "add() returns true for a brand-new value, so this returns true on the very first element of almost any input - the true/false flip is missing.",
+                        code = "fun containsDuplicate(nums: IntArray): Boolean {\n    val seen = mutableSetOf<Int>()\n    for (n in nums) {\n        if (seen.add(n)) return true\n    }\n    return false\n}",
+                    ),
+                    LessonChoice(
+                        text = "Compares the set size to the array length afterward.",
+                        correct = false,
+                        feedback = "A duplicate makes the set smaller than the array, so the sizes are equal exactly when there is no duplicate - this returns the opposite answer.",
+                        code = "fun containsDuplicate(nums: IntArray): Boolean {\n    val seen = mutableSetOf<Int>()\n    for (n in nums) {\n        seen.add(n)\n    }\n    return seen.size == nums.size\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
                 id = "contains-duplicate-pattern-recognition",
                 kind = LessonQuestionKind.PATTERN_RECOGNITION,
                 prompt = "Given an array, decide whether any value appears more than once. Which pattern fits?",
@@ -190,31 +215,6 @@ object RoadmapLessons {
                 ),
             ),
             LessonQuestion(
-                id = "contains-duplicate-code-block",
-                kind = LessonQuestionKind.CODE_BLOCK,
-                prompt = "All three read almost identically. Which one actually returns the right answer?",
-                choices = listOf(
-                    LessonChoice(
-                        text = "Checks whether the value was already there, using add()'s return value.",
-                        correct = true,
-                        feedback = "add() returns false when the value was already present, so !seen.add(n) fires exactly on the duplicate and nothing else.",
-                        code = "fun containsDuplicate(nums: IntArray): Boolean {\n    val seen = mutableSetOf<Int>()\n    for (n in nums) {\n        if (!seen.add(n)) return true\n    }\n    return false\n}",
-                    ),
-                    LessonChoice(
-                        text = "Checks the same add() result, but reads it as-is instead of flipping true and false like the correct version does.",
-                        correct = false,
-                        feedback = "add() returns true for a brand-new value, so this returns true on the very first element of almost any input - the true/false flip is missing.",
-                        code = "fun containsDuplicate(nums: IntArray): Boolean {\n    val seen = mutableSetOf<Int>()\n    for (n in nums) {\n        if (seen.add(n)) return true\n    }\n    return false\n}",
-                    ),
-                    LessonChoice(
-                        text = "Compares the set size to the array length afterward.",
-                        correct = false,
-                        feedback = "A duplicate makes the set smaller than the array, so the sizes are equal exactly when there is no duplicate - this returns the opposite answer.",
-                        code = "fun containsDuplicate(nums: IntArray): Boolean {\n    val seen = mutableSetOf<Int>()\n    for (n in nums) {\n        seen.add(n)\n    }\n    return seen.size == nums.size\n}",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "contains-duplicate-time",
                 kind = LessonQuestionKind.TIME_COMPLEXITY,
                 prompt = "Assuming average O(1) set membership and insertion, what is the time complexity?",
@@ -242,8 +242,7 @@ object RoadmapLessons {
                     GlossaryTerm("O(n log n)", "Grows a bit faster than linear - what sorting typically costs."),
                     GlossaryTerm("O(n squared)", "Grows much faster than linear - what comparing every value against every other value costs."),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Think of checking people in at the door of a party.\n\nYou keep a guest list, empty at first.\n\nEach time someone new arrives, you check the list before writing their name down. If the name is already there, they've checked in before.\n\nA 'set' in code is exactly that guest list. Its only job is to remember what it has already seen, and answer 'have I seen this?' instantly.",
             walkthrough = listOf(
@@ -293,6 +292,31 @@ object RoadmapLessons {
             LessonExample("s = \"a\", t = \"ab\"", "false", "Different lengths can never be anagrams of each other."),
         ),
         questions = listOf(
+            LessonQuestion(
+                id = "valid-anagram-code-block",
+                kind = LessonQuestionKind.CODE_BLOCK,
+                prompt = "All three build a 26-letter count array. Which one actually returns the right answer?",
+                choices = listOf(
+                    LessonChoice(
+                        text = "Increments the count for each letter of s, decrements for each letter of t, then checks every count is zero.",
+                        correct = true,
+                        feedback = "If s and t use exactly the same letters the same number of times, every increment from s is cancelled by a matching decrement from t, leaving all zeros.",
+                        code = "fun isAnagram(s: String, t: String): Boolean {\n    if (s.length != t.length) return false\n    val counts = IntArray(26)\n    for (c in s) counts[c - 'a']++\n    for (c in t) counts[c - 'a']--\n    return counts.all { it == 0 }\n}",
+                    ),
+                    LessonChoice(
+                        text = "Increments the count for each letter of s and, separately, for each letter of t, then checks every count is zero.",
+                        correct = false,
+                        feedback = "Incrementing for both strings instead of decrementing for one means the counts only reach zero when both strings are empty - this rejects almost every real anagram.",
+                        code = "fun isAnagram(s: String, t: String): Boolean {\n    if (s.length != t.length) return false\n    val counts = IntArray(26)\n    for (c in s) counts[c - 'a']++\n    for (c in t) counts[c - 'a']++\n    return counts.all { it == 0 }\n}",
+                    ),
+                    LessonChoice(
+                        text = "Increments the count for each letter of s, decrements for each letter of t, then checks that at least one count is zero.",
+                        correct = false,
+                        feedback = "Requiring only one zero count instead of all of them accepts strings that share just a single letter's frequency - far too weak a check.",
+                        code = "fun isAnagram(s: String, t: String): Boolean {\n    if (s.length != t.length) return false\n    val counts = IntArray(26)\n    for (c in s) counts[c - 'a']++\n    for (c in t) counts[c - 'a']--\n    return counts.any { it == 0 }\n}",
+                    ),
+                ),
+            ),
             LessonQuestion(
                 id = "valid-anagram-pattern-recognition",
                 kind = LessonQuestionKind.PATTERN_RECOGNITION,
@@ -382,31 +406,6 @@ object RoadmapLessons {
                 ),
             ),
             LessonQuestion(
-                id = "valid-anagram-code-block",
-                kind = LessonQuestionKind.CODE_BLOCK,
-                prompt = "All three build a 26-letter count array. Which one actually returns the right answer?",
-                choices = listOf(
-                    LessonChoice(
-                        text = "Increments the count for each letter of s, decrements for each letter of t, then checks every count is zero.",
-                        correct = true,
-                        feedback = "If s and t use exactly the same letters the same number of times, every increment from s is cancelled by a matching decrement from t, leaving all zeros.",
-                        code = "fun isAnagram(s: String, t: String): Boolean {\n    if (s.length != t.length) return false\n    val counts = IntArray(26)\n    for (c in s) counts[c - 'a']++\n    for (c in t) counts[c - 'a']--\n    return counts.all { it == 0 }\n}",
-                    ),
-                    LessonChoice(
-                        text = "Increments the count for each letter of s and, separately, for each letter of t, then checks every count is zero.",
-                        correct = false,
-                        feedback = "Incrementing for both strings instead of decrementing for one means the counts only reach zero when both strings are empty - this rejects almost every real anagram.",
-                        code = "fun isAnagram(s: String, t: String): Boolean {\n    if (s.length != t.length) return false\n    val counts = IntArray(26)\n    for (c in s) counts[c - 'a']++\n    for (c in t) counts[c - 'a']++\n    return counts.all { it == 0 }\n}",
-                    ),
-                    LessonChoice(
-                        text = "Increments the count for each letter of s, decrements for each letter of t, then checks that at least one count is zero.",
-                        correct = false,
-                        feedback = "Requiring only one zero count instead of all of them accepts strings that share just a single letter's frequency - far too weak a check.",
-                        code = "fun isAnagram(s: String, t: String): Boolean {\n    if (s.length != t.length) return false\n    val counts = IntArray(26)\n    for (c in s) counts[c - 'a']++\n    for (c in t) counts[c - 'a']--\n    return counts.any { it == 0 }\n}",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "valid-anagram-time",
                 kind = LessonQuestionKind.TIME_COMPLEXITY,
                 prompt = "With n as the length of s (equal to t after the length check), what is the time complexity?",
@@ -432,8 +431,7 @@ object RoadmapLessons {
                     GlossaryTerm("O(n log n)", "A growth rate a bit worse than linear, typical of sorting."),
                     GlossaryTerm("O(1)", "Constant time - the same small amount of work regardless of size."),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Imagine two jars of Scrabble tiles.\n\nTo know if they contain exactly the same tiles, you don't need to line the tiles up in order - you just need to count how many of each letter is in each jar and compare the counts.\n\nThat's exactly what an anagram check does: it ignores the order of the letters entirely and only cares about how many of each letter shows up.",
             walkthrough = listOf(
@@ -483,6 +481,31 @@ object RoadmapLessons {
             LessonExample("nums = [3, 3], target = 6", "[0, 1]", "The same value at two different positions can still be the answer."),
         ),
         questions = listOf(
+            LessonQuestion(
+                id = "two-sum-code-block",
+                kind = LessonQuestionKind.CODE_BLOCK,
+                prompt = "All three use a map from value to index. Which one returns the right pair?",
+                choices = listOf(
+                    LessonChoice(
+                        text = "Checks whether target minus the current value is already in the map before adding the current value.",
+                        correct = true,
+                        feedback = "Checking for the complement before inserting the current value guarantees the two indices found are always distinct positions.",
+                        code = "fun twoSum(nums: IntArray, target: Int): IntArray {\n    val seen = mutableMapOf<Int, Int>()\n    for (i in nums.indices) {\n        val need = target - nums[i]\n        seen[need]?.let { return intArrayOf(it, i) }\n        seen[nums[i]] = i\n    }\n    return intArrayOf()\n}",
+                    ),
+                    LessonChoice(
+                        text = "Adds the current value to the map before checking for its complement.",
+                        correct = false,
+                        feedback = "Inserting first means a value exactly half of target can match itself, returning the same index twice instead of two distinct positions.",
+                        code = "fun twoSum(nums: IntArray, target: Int): IntArray {\n    val seen = mutableMapOf<Int, Int>()\n    for (i in nums.indices) {\n        seen[nums[i]] = i\n        val need = target - nums[i]\n        seen[need]?.let { return intArrayOf(it, i) }\n    }\n    return intArrayOf()\n}",
+                    ),
+                    LessonChoice(
+                        text = "Checks whether the current value itself is already in the map, instead of its complement.",
+                        correct = false,
+                        feedback = "Looking up nums[i] instead of target - nums[i] only finds a repeated value, not a pair that actually sums to the target.",
+                        code = "fun twoSum(nums: IntArray, target: Int): IntArray {\n    val seen = mutableMapOf<Int, Int>()\n    for (i in nums.indices) {\n        seen[nums[i]]?.let { return intArrayOf(it, i) }\n        seen[nums[i]] = i\n    }\n    return intArrayOf()\n}",
+                    ),
+                ),
+            ),
             LessonQuestion(
                 id = "two-sum-pattern-recognition",
                 kind = LessonQuestionKind.PATTERN_RECOGNITION,
@@ -572,31 +595,6 @@ object RoadmapLessons {
                 ),
             ),
             LessonQuestion(
-                id = "two-sum-code-block",
-                kind = LessonQuestionKind.CODE_BLOCK,
-                prompt = "All three use a map from value to index. Which one returns the right pair?",
-                choices = listOf(
-                    LessonChoice(
-                        text = "Checks whether target minus the current value is already in the map before adding the current value.",
-                        correct = true,
-                        feedback = "Checking for the complement before inserting the current value guarantees the two indices found are always distinct positions.",
-                        code = "fun twoSum(nums: IntArray, target: Int): IntArray {\n    val seen = mutableMapOf<Int, Int>()\n    for (i in nums.indices) {\n        val need = target - nums[i]\n        seen[need]?.let { return intArrayOf(it, i) }\n        seen[nums[i]] = i\n    }\n    return intArrayOf()\n}",
-                    ),
-                    LessonChoice(
-                        text = "Adds the current value to the map before checking for its complement.",
-                        correct = false,
-                        feedback = "Inserting first means a value exactly half of target can match itself, returning the same index twice instead of two distinct positions.",
-                        code = "fun twoSum(nums: IntArray, target: Int): IntArray {\n    val seen = mutableMapOf<Int, Int>()\n    for (i in nums.indices) {\n        seen[nums[i]] = i\n        val need = target - nums[i]\n        seen[need]?.let { return intArrayOf(it, i) }\n    }\n    return intArrayOf()\n}",
-                    ),
-                    LessonChoice(
-                        text = "Checks whether the current value itself is already in the map, instead of its complement.",
-                        correct = false,
-                        feedback = "Looking up nums[i] instead of target - nums[i] only finds a repeated value, not a pair that actually sums to the target.",
-                        code = "fun twoSum(nums: IntArray, target: Int): IntArray {\n    val seen = mutableMapOf<Int, Int>()\n    for (i in nums.indices) {\n        seen[nums[i]]?.let { return intArrayOf(it, i) }\n        seen[nums[i]] = i\n    }\n    return intArrayOf()\n}",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "two-sum-time",
                 kind = LessonQuestionKind.TIME_COMPLEXITY,
                 prompt = "With n as the number of values in the array, what is the time complexity of the single-pass, complement-lookup approach?",
@@ -622,8 +620,7 @@ object RoadmapLessons {
                     GlossaryTerm("O(n log n)", "A growth rate a bit worse than linear, typical of sorting."),
                     GlossaryTerm("O(n squared)", "A growth rate proportional to the square of the input size."),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Imagine going through a guest list looking for two people whose ages add up to exactly 30.\n\nInstead of comparing every guest to every other guest, you could keep a notebook: for each guest, write down 'I need someone who is X years old' where X completes the pair.\n\nThe next time you see a guest whose age matches something already written down, you've found your pair - without ever comparing everyone to everyone.",
             walkthrough = listOf(
@@ -673,28 +670,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "group-anagrams-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach groups the strings without comparing every string to every other string?",
-                choices = listOf(
-                    LessonChoice(
-                        "For each string, compare it against every other ungrouped string to check if they're anagrams.",
-                        false,
-                        "Checking each string against every other string is correct but costs O(n squared) comparisons for n strings - slow once there are many strings.",
-                    ),
-                    LessonChoice(
-                        "For each string, compute a signature that anagrams share (like its sorted letters) and group by it.",
-                        true,
-                        "Anagrams always produce the same sorted signature, so grouping by that signature sorts strings into the right buckets in roughly one pass.",
-                    ),
-                    LessonChoice(
-                        "Sort the entire array of strings alphabetically, then group adjacent identical strings.",
-                        false,
-                        "Sorting the strings themselves only groups strings that are already identical - anagrams like 'eat' and 'tea' are different strings and won't end up adjacent just from an alphabetical sort.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "group-anagrams-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three group strings by a signature. Which one uses a signature that actually identifies anagrams?",
@@ -716,6 +691,28 @@ object RoadmapLessons {
                         correct = true,
                         feedback = "Sorting a string's own letters produces the same result for every anagram of it - 'eat', 'tea', and 'ate' all sort to 'aet'.",
                         code = "fun groupAnagrams(strs: Array<String>): List<List<String>> {\n    val groups = mutableMapOf<String, MutableList<String>>()\n    for (s in strs) {\n        val key = s.toCharArray().sorted().joinToString(\"\")\n        groups.getOrPut(key) { mutableListOf() }.add(s)\n    }\n    return groups.values.toList()\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "group-anagrams-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach groups the strings without comparing every string to every other string?",
+                choices = listOf(
+                    LessonChoice(
+                        "For each string, compare it against every other ungrouped string to check if they're anagrams.",
+                        false,
+                        "Checking each string against every other string is correct but costs O(n squared) comparisons for n strings - slow once there are many strings.",
+                    ),
+                    LessonChoice(
+                        "For each string, compute a signature that anagrams share (like its sorted letters) and group by it.",
+                        true,
+                        "Anagrams always produce the same sorted signature, so grouping by that signature sorts strings into the right buckets in roughly one pass.",
+                    ),
+                    LessonChoice(
+                        "Sort the entire array of strings alphabetically, then group adjacent identical strings.",
+                        false,
+                        "Sorting the strings themselves only groups strings that are already identical - anagrams like 'eat' and 'tea' are different strings and won't end up adjacent just from an alphabetical sort.",
                     ),
                 ),
             ),
@@ -788,8 +785,7 @@ object RoadmapLessons {
                         "If no two strings are anagrams, every one of the n strings gets its own group, and all of them together take roughly n times k space to store.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Think of sorting a pile of mismatched socks into matching pairs, except instead of matching by color you match by which letters are inside each word.\n\nTwo words are anagrams exactly when rearranging their letters into alphabetical order produces the same result.\n\nSo instead of comparing every word to every other word, give each word a 'label' - its letters sorted alphabetically - and words with the same label belong in the same pile.",
             walkthrough = listOf(
@@ -841,28 +837,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "top-k-frequent-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the k most frequent values without fully sorting every distinct value by frequency?",
-                choices = listOf(
-                    LessonChoice(
-                        "Count how often each value appears, then bucket values by their count, and read off values starting from the highest-count bucket.",
-                        true,
-                        "Because a value can appear at most n times, there are at most n buckets - reading the top buckets first finds the k most frequent values without comparing every value's count to every other's.",
-                    ),
-                    LessonChoice(
-                        "Count how often each value appears, then sort all distinct values by count from highest to lowest and take the first k.",
-                        false,
-                        "This works, but sorting every distinct value by count costs O(m log m) for m distinct values - more work than a fixed-size bucket approach needs.",
-                    ),
-                    LessonChoice(
-                        "For each distinct value, scan the entire array again to count how many times it appears.",
-                        false,
-                        "Rescanning the whole array once per distinct value can cost O(n squared) in the worst case, when there are many distinct values.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "top-k-frequent-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three build count buckets indexed by frequency. Which one collects the top k values correctly?",
@@ -884,6 +858,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Indexing buckets by the value itself instead of by how often it occurs loses the frequency information entirely - the buckets would no longer represent 'how many times seen'.",
                         code = "fun topKFrequent(nums: IntArray, k: Int): IntArray {\n    val counts = nums.groupingBy { it }.eachCount()\n    val buckets = Array(nums.size + 1) { mutableListOf<Int>() }\n    for ((value, count) in counts) buckets[value % buckets.size].add(value)\n    val result = mutableListOf<Int>()\n    for (bucket in buckets.reversed()) {\n        for (value in bucket) {\n            if (result.size == k) return result.toIntArray()\n            result.add(value)\n        }\n    }\n    return result.toIntArray()\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "top-k-frequent-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the k most frequent values without fully sorting every distinct value by frequency?",
+                choices = listOf(
+                    LessonChoice(
+                        "Count how often each value appears, then bucket values by their count, and read off values starting from the highest-count bucket.",
+                        true,
+                        "Because a value can appear at most n times, there are at most n buckets - reading the top buckets first finds the k most frequent values without comparing every value's count to every other's.",
+                    ),
+                    LessonChoice(
+                        "Count how often each value appears, then sort all distinct values by count from highest to lowest and take the first k.",
+                        false,
+                        "This works, but sorting every distinct value by count costs O(m log m) for m distinct values - more work than a fixed-size bucket approach needs.",
+                    ),
+                    LessonChoice(
+                        "For each distinct value, scan the entire array again to count how many times it appears.",
+                        false,
+                        "Rescanning the whole array once per distinct value can cost O(n squared) in the worst case, when there are many distinct values.",
                     ),
                 ),
             ),
@@ -953,8 +949,7 @@ object RoadmapLessons {
                         "Having a fixed number of data structures doesn't mean they stay a fixed size - both the map and the array can grow as large as n.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a row of empty bins on a shelf, one bin for 'appeared once', one for 'appeared twice', all the way up to 'appeared n times'.\n\nFirst, count how many times each value shows up in the array.\n\nThen drop each value into the bin matching its count.\n\nThe most frequent values end up in the bins furthest along the shelf - just walk backward from the end, collecting values, until k of them have been gathered.",
             walkthrough = listOf(
@@ -1006,28 +1001,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "encode-decode-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach reliably decodes back to the original list, even when strings contain unusual characters?",
-                choices = listOf(
-                    LessonChoice(
-                        "Join the strings with a comma between each one, then split the result on commas to decode.",
-                        false,
-                        "If any string itself contains a comma, splitting on commas would incorrectly break that string into two pieces during decoding.",
-                    ),
-                    LessonChoice(
-                        "Join the strings with a rare character like '#' between them, then split on '#' to decode.",
-                        false,
-                        "This fails the same way a comma would if any string happens to contain that same rare character - no single delimiter character is guaranteed safe.",
-                    ),
-                    LessonChoice(
-                        "Prefix each string with its length and a delimiter, so the decoder reads a fixed count each time.",
-                        true,
-                        "Because the decoder reads a known number of characters rather than searching for a delimiter, the content of the string itself - even if it contains that same delimiter character - can never break the decoding.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "encode-decode-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three prefix each string with a length. Which one decodes back to the correct list?",
@@ -1049,6 +1022,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "A length like 5 is a single digit, and a length like 12 is two digits - always reading a fixed 4 characters would misread lengths that don't happen to be exactly 4 digits long.",
                         code = "fun decode(s: String): List<String> {\n    val result = mutableListOf<String>()\n    var i = 0\n    while (i < s.length) {\n        val len = s.substring(i, i + 4).toInt()\n        val start = i + 4 + 1\n        result.add(s.substring(start, start + len))\n        i = start + len\n    }\n    return result\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "encode-decode-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach reliably decodes back to the original list, even when strings contain unusual characters?",
+                choices = listOf(
+                    LessonChoice(
+                        "Join the strings with a comma between each one, then split the result on commas to decode.",
+                        false,
+                        "If any string itself contains a comma, splitting on commas would incorrectly break that string into two pieces during decoding.",
+                    ),
+                    LessonChoice(
+                        "Join the strings with a rare character like '#' between them, then split on '#' to decode.",
+                        false,
+                        "This fails the same way a comma would if any string happens to contain that same rare character - no single delimiter character is guaranteed safe.",
+                    ),
+                    LessonChoice(
+                        "Prefix each string with its length and a delimiter, so the decoder reads a fixed count each time.",
+                        true,
+                        "Because the decoder reads a known number of characters rather than searching for a delimiter, the content of the string itself - even if it contains that same delimiter character - can never break the decoding.",
                     ),
                 ),
             ),
@@ -1118,8 +1113,7 @@ object RoadmapLessons {
                         "Both the encoded string and the decoded list scale directly with the total number of characters across all the original strings, plus a small constant amount per string for the length prefix.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture packing several letters into one big envelope to mail them together.\n\nIf you just tape the letters end to end, the recipient can't tell where one letter ends and the next begins - especially if a letter's own text happens to contain your tape marks.\n\nInstead, write a sticky note on each letter saying exactly how many pages it has. Now the recipient can always find the next letter's start, no matter what's written inside.",
             walkthrough = listOf(
@@ -1171,28 +1165,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "product-except-self-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach avoids division while still finishing in a single pass in each direction?",
-                choices = listOf(
-                    LessonChoice(
-                        "Multiply all the values together, then divide by the value at each position to exclude it.",
-                        false,
-                        "This would work arithmetically, but division is explicitly disallowed - and it also breaks down whenever the array contains a zero.",
-                    ),
-                    LessonChoice(
-                        "For each position, multiply together the running product of everything to its left with the running product of everything to its right.",
-                        true,
-                        "The product of everything except position i is exactly the product of everything before i times the product of everything after i - no division needed.",
-                    ),
-                    LessonChoice(
-                        "For each position, loop through the entire array again and multiply every value except the one at that position.",
-                        false,
-                        "This avoids division, but recomputing the product from scratch for every position costs O(n squared) instead of the linear time a running left and right product achieves.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "product-except-self-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three build left and right running products. Which one combines them correctly?",
@@ -1214,6 +1186,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "The left product alone only accounts for values before i - it completely ignores every value after i, so the result would be missing half of what should be multiplied in.",
                         code = "fun productExceptSelf(nums: IntArray): IntArray {\n    val n = nums.size\n    val result = IntArray(n) { 1 }\n    var left = 1\n    for (i in 0 until n) {\n        result[i] = left\n        left *= nums[i]\n    }\n    return result\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "product-except-self-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach avoids division while still finishing in a single pass in each direction?",
+                choices = listOf(
+                    LessonChoice(
+                        "Multiply all the values together, then divide by the value at each position to exclude it.",
+                        false,
+                        "This would work arithmetically, but division is explicitly disallowed - and it also breaks down whenever the array contains a zero.",
+                    ),
+                    LessonChoice(
+                        "For each position, multiply together the running product of everything to its left with the running product of everything to its right.",
+                        true,
+                        "The product of everything except position i is exactly the product of everything before i times the product of everything after i - no division needed.",
+                    ),
+                    LessonChoice(
+                        "For each position, loop through the entire array again and multiply every value except the one at that position.",
+                        false,
+                        "This avoids division, but recomputing the product from scratch for every position costs O(n squared) instead of the linear time a running left and right product achieves.",
                     ),
                 ),
             ),
@@ -1283,8 +1277,7 @@ object RoadmapLessons {
                         "How many digits a number needs to store isn't what space complexity measures here - it counts the number of extra variables or structures used, which stays fixed at two running products regardless of array size.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Imagine standing at each position in a line of numbers and wanting the product of everyone except yourself.\n\nOne way to get that: multiply together everyone standing to your left, and separately multiply together everyone standing to your right, then combine those two totals.\n\nThat's the whole trick - compute a running product from the left, then a running product from the right, and multiply the two together at each position.",
             walkthrough = listOf(
@@ -1336,28 +1329,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "valid-sudoku-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach checks all three Sudoku rules while only scanning the board once?",
-                choices = listOf(
-                    LessonChoice(
-                        "For each filled cell, add its digit to a set for its row, its column, and its box; a repeat in any set means invalid.",
-                        true,
-                        "One pass over all 81 cells is enough, because each cell only ever needs to check and update the three sets - row, column, box - that it belongs to.",
-                    ),
-                    LessonChoice(
-                        "Scan every row for duplicates, then scan the whole board again for columns, then once more for boxes.",
-                        false,
-                        "This is correct, but it scans the board three separate times instead of combining all three checks into one pass over the cells.",
-                    ),
-                    LessonChoice(
-                        "Sort the digits within each row, column, and box, then scan each group for adjacent duplicate digits.",
-                        false,
-                        "Sorting adds unnecessary extra work for each of the 27 groups (9 rows, 9 columns, 9 boxes) when a simple 'have I seen this digit before' check accomplishes the same thing in a single pass.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "valid-sudoku-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use per-row, per-column, and per-box sets. Which one computes the box index correctly?",
@@ -1379,6 +1350,28 @@ object RoadmapLessons {
                         correct = true,
                         feedback = "Dividing the row and column by 3 separately identifies which of the 3 box-rows and 3 box-columns a cell belongs to, and combining them with * 3 + gives each of the 9 boxes its own unique index from 0 to 8.",
                         code = "fun isValidSudoku(board: Array<CharArray>): Boolean {\n    val rows = Array(9) { mutableSetOf<Char>() }\n    val cols = Array(9) { mutableSetOf<Char>() }\n    val boxes = Array(9) { mutableSetOf<Char>() }\n    for (r in 0 until 9) for (c in 0 until 9) {\n        val digit = board[r][c]\n        if (digit == '.') continue\n        val boxIndex = (r / 3) * 3 + (c / 3)\n        if (!rows[r].add(digit) || !cols[c].add(digit) || !boxes[boxIndex].add(digit)) return false\n    }\n    return true\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "valid-sudoku-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach checks all three Sudoku rules while only scanning the board once?",
+                choices = listOf(
+                    LessonChoice(
+                        "For each filled cell, add its digit to a set for its row, its column, and its box; a repeat in any set means invalid.",
+                        true,
+                        "One pass over all 81 cells is enough, because each cell only ever needs to check and update the three sets - row, column, box - that it belongs to.",
+                    ),
+                    LessonChoice(
+                        "Scan every row for duplicates, then scan the whole board again for columns, then once more for boxes.",
+                        false,
+                        "This is correct, but it scans the board three separate times instead of combining all three checks into one pass over the cells.",
+                    ),
+                    LessonChoice(
+                        "Sort the digits within each row, column, and box, then scan each group for adjacent duplicate digits.",
+                        false,
+                        "Sorting adds unnecessary extra work for each of the 27 groups (9 rows, 9 columns, 9 boxes) when a simple 'have I seen this digit before' check accomplishes the same thing in a single pass.",
                     ),
                 ),
             ),
@@ -1451,8 +1444,7 @@ object RoadmapLessons {
                         "Both the number of sets and the maximum number of digits (1 through 9) each set could ever hold are fixed constants for any Sudoku board, so the total space never grows.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Imagine three referees watching a Sudoku board at once: one referee per row watching for repeated digits, one referee per column doing the same, and one referee per 3x3 box doing the same.\n\nAs each filled cell is revealed, all three referees relevant to that cell check whether they've already seen that digit.\n\nIf any referee has seen it before, the board breaks a rule - it's invalid.",
             walkthrough = listOf(
@@ -1502,28 +1494,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "longest-consecutive-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the longest run without sorting the array first?",
-                choices = listOf(
-                    LessonChoice(
-                        "Sort the array, then walk through counting how long each consecutive run lasts.",
-                        false,
-                        "This correctly finds the answer, but sorting costs O(n log n) - more work than a hash-set approach needs to achieve the same result.",
-                    ),
-                    LessonChoice(
-                        "Put every value into a set, then for each value that has no value one less than it in the set, count upward from there to see how long the run extends.",
-                        true,
-                        "Only starting a count from values with no predecessor in the set means each number is only ever counted as part of exactly one run, keeping the total work linear.",
-                    ),
-                    LessonChoice(
-                        "For each value in the array, repeatedly check whether the next integer up is present, without first filtering out values that already have a predecessor present.",
-                        false,
-                        "Without skipping values that have a predecessor, this recounts the same run starting from every one of its members, which can add up to O(n squared) work in the worst case.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "longest-consecutive-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use a set and only start counting from run-starts. Which one identifies run-starts correctly?",
@@ -1545,6 +1515,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Without skipping values that already have a predecessor in the set, every number in a run of length k gets counted as its own starting point, redoing the same counting work up to k times over.",
                         code = "fun longestConsecutive(nums: IntArray): Int {\n    val set = nums.toHashSet()\n    var longest = 0\n    for (n in set) {\n        var length = 1\n        var current = n\n        while (current + 1 in set) {\n            current++\n            length++\n        }\n        longest = maxOf(longest, length)\n    }\n    return longest\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "longest-consecutive-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the longest run without sorting the array first?",
+                choices = listOf(
+                    LessonChoice(
+                        "Sort the array, then walk through counting how long each consecutive run lasts.",
+                        false,
+                        "This correctly finds the answer, but sorting costs O(n log n) - more work than a hash-set approach needs to achieve the same result.",
+                    ),
+                    LessonChoice(
+                        "Put every value into a set, then for each value that has no value one less than it in the set, count upward from there to see how long the run extends.",
+                        true,
+                        "Only starting a count from values with no predecessor in the set means each number is only ever counted as part of exactly one run, keeping the total work linear.",
+                    ),
+                    LessonChoice(
+                        "For each value in the array, repeatedly check whether the next integer up is present, without first filtering out values that already have a predecessor present.",
+                        false,
+                        "Without skipping values that have a predecessor, this recounts the same run starting from every one of its members, which can add up to O(n squared) work in the worst case.",
                     ),
                 ),
             ),
@@ -1614,8 +1606,7 @@ object RoadmapLessons {
                         "A hash set's size is determined by how many distinct elements are stored in it, not by how the set organizes them internally - it can hold up to n elements.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a pile of numbered cards scattered on a table, and you want to find the longest unbroken staircase you could build by lining up consecutive numbers.\n\nFirst, spread all the cards out where you can instantly check 'do I have this number?' - that's what the set is for.\n\nThen, for each card, only start building a staircase from it if there's no card one step below it - that guarantees you're starting from the true bottom of a staircase, not partway up one you'd end up re-walking.",
             walkthrough = listOf(
@@ -1667,28 +1658,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "valid-palindrome-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach checks the palindrome property using constant extra space, without building a new cleaned string first?",
-                choices = listOf(
-                    LessonChoice(
-                        "Build a new string containing only the lowercase letters and digits, then check whether that new string equals its own reverse.",
-                        false,
-                        "This is correct, but building an entirely new string and its reverse uses O(n) extra space - avoidable with two pointers scanning the original string directly.",
-                    ),
-                    LessonChoice(
-                        "Convert the string to a character array, sort it, and check if it reads the same both ways.",
-                        false,
-                        "Sorting doesn't preserve the order needed to check for a palindrome at all - it scrambles the very sequence that needs to be compared.",
-                    ),
-                    LessonChoice(
-                        "Use two pointers starting at both ends of the string, skipping non-alphanumeric characters and moving inward, comparing lowercase letters as they go.",
-                        true,
-                        "This never builds a second string - it compares characters directly from the two ends of the original string, using only two index variables as extra space.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "valid-palindrome-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use two pointers skipping non-alphanumeric characters. Which one compares correctly?",
@@ -1710,6 +1679,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "If the right side has punctuation or spaces, the right pointer would compare a letter against a space or punctuation mark, incorrectly reporting a mismatch.",
                         code = "fun isPalindrome(s: String): Boolean {\n    var left = 0\n    var right = s.length - 1\n    while (left < right) {\n        while (left < right && !s[left].isLetterOrDigit()) left++\n        if (s[left].lowercaseChar() != s[right].lowercaseChar()) return false\n        left++\n        right--\n    }\n    return true\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "valid-palindrome-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach checks the palindrome property using constant extra space, without building a new cleaned string first?",
+                choices = listOf(
+                    LessonChoice(
+                        "Build a new string containing only the lowercase letters and digits, then check whether that new string equals its own reverse.",
+                        false,
+                        "This is correct, but building an entirely new string and its reverse uses O(n) extra space - avoidable with two pointers scanning the original string directly.",
+                    ),
+                    LessonChoice(
+                        "Convert the string to a character array, sort it, and check if it reads the same both ways.",
+                        false,
+                        "Sorting doesn't preserve the order needed to check for a palindrome at all - it scrambles the very sequence that needs to be compared.",
+                    ),
+                    LessonChoice(
+                        "Use two pointers starting at both ends of the string, skipping non-alphanumeric characters and moving inward, comparing lowercase letters as they go.",
+                        true,
+                        "This never builds a second string - it compares characters directly from the two ends of the original string, using only two index variables as extra space.",
                     ),
                 ),
             ),
@@ -1779,8 +1770,7 @@ object RoadmapLessons {
                         "Two integers is a fixed, constant amount of extra memory, no matter whether the string is 10 characters or 10 million.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture reading a phrase from both ends at once with two fingers, one starting at the very first character and one at the very last.\n\nSkip past anything that isn't a letter or number - punctuation and spaces don't count.\n\nCompare what's under each finger, ignoring uppercase versus lowercase, then move both fingers one step closer to the middle. If the fingers ever meet without a mismatch, it's a palindrome.",
             walkthrough = listOf(
@@ -1832,28 +1822,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "two-sum-ii-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach takes advantage of the array already being sorted to use constant extra space?",
-                choices = listOf(
-                    LessonChoice(
-                        "Use a hash map from value to index to look up complements, just like the unsorted version.",
-                        false,
-                        "This works, but a hash map uses O(n) extra space - the array being sorted means a two-pointer approach can find the pair with no extra space at all.",
-                    ),
-                    LessonChoice(
-                        "Two pointers from both ends: raise left when the sum is too small, lower right when too large, return both on a match.",
-                        true,
-                        "Because the array is sorted, moving the left pointer right only ever increases the sum, and moving the right pointer left only ever decreases it - that lets the pointers narrow in on the target using no extra memory.",
-                    ),
-                    LessonChoice(
-                        "Check every pair of positions directly with nested loops, ignoring that the array is sorted.",
-                        false,
-                        "The array being sorted is exactly what makes the two-pointer approach possible - ignoring that and checking all pairs wastes the sorted order's advantage.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "two-sum-ii-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use two pointers from both ends. Which one moves them in the right direction?",
@@ -1875,6 +1843,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Moving both pointers on every step, even when only one side needs adjusting, can skip right past the correct pair entirely.",
                         code = "fun twoSum(numbers: IntArray, target: Int): IntArray {\n    var left = 0\n    var right = numbers.size - 1\n    while (left < right) {\n        val sum = numbers[left] + numbers[right]\n        if (sum == target) return intArrayOf(left + 1, right + 1)\n        left++\n        right--\n    }\n    return intArrayOf()\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "two-sum-ii-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach takes advantage of the array already being sorted to use constant extra space?",
+                choices = listOf(
+                    LessonChoice(
+                        "Use a hash map from value to index to look up complements, just like the unsorted version.",
+                        false,
+                        "This works, but a hash map uses O(n) extra space - the array being sorted means a two-pointer approach can find the pair with no extra space at all.",
+                    ),
+                    LessonChoice(
+                        "Two pointers from both ends: raise left when the sum is too small, lower right when too large, return both on a match.",
+                        true,
+                        "Because the array is sorted, moving the left pointer right only ever increases the sum, and moving the right pointer left only ever decreases it - that lets the pointers narrow in on the target using no extra memory.",
+                    ),
+                    LessonChoice(
+                        "Check every pair of positions directly with nested loops, ignoring that the array is sorted.",
+                        false,
+                        "The array being sorted is exactly what makes the two-pointer approach possible - ignoring that and checking all pairs wastes the sorted order's advantage.",
                     ),
                 ),
             ),
@@ -1944,8 +1934,7 @@ object RoadmapLessons {
                         "The array is already given sorted - nothing in this solution sorts it again, so there's no divide-and-conquer step to account for.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture two people standing at opposite ends of a sorted line of numbers, each holding up their number and shouting the sum.\n\nIf the sum is too small, the person on the low end steps toward the middle to a bigger number.\n\nIf the sum is too big, the person on the high end steps toward the middle to a smaller number.\n\nBecause the line is sorted, this always moves the sum in the right direction, and they'll meet at the answer without ever needing to remember anyone else's number.",
             walkthrough = listOf(
@@ -1996,28 +1985,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "3sum-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds all triplets without checking every possible triplet directly?",
-                choices = listOf(
-                    LessonChoice(
-                        "Check every combination of three values directly, with three nested loops.",
-                        false,
-                        "This finds every triplet correctly, but three nested loops over n values costs O(n cubed) - very slow once the array has even a few thousand values.",
-                    ),
-                    LessonChoice(
-                        "Sort the array, then for each value, use two pointers on the remaining sorted portion to find pairs that sum to the negative of that value.",
-                        true,
-                        "Sorting first turns 'find two values summing to a target' into the same two-pointer trick used in Two Sum II, reducing the total work from three nested loops to one loop around a two-pointer scan.",
-                    ),
-                    LessonChoice(
-                        "For each value, build a hash set of the rest of the array and check every other value against it independently.",
-                        false,
-                        "This still effectively checks every pair for every fixed first value without using the sorted order to skip past invalid ranges, and it makes avoiding duplicate triplets much harder to manage correctly.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "3sum-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three sort first and use two pointers for the remaining sum. Which one correctly avoids duplicate triplets?",
@@ -2039,6 +2006,28 @@ object RoadmapLessons {
                         correct = true,
                         feedback = "Skipping repeats at the outer loop avoids re-processing the same starting value, and skipping repeats after a match avoids re-adding the same triplet found from adjacent equal values.",
                         code = "fun threeSum(nums: IntArray): List<List<Int>> {\n    val sorted = nums.sorted()\n    val result = mutableListOf<List<Int>>()\n    for (i in sorted.indices) {\n        if (i > 0 && sorted[i] == sorted[i - 1]) continue\n        var left = i + 1\n        var right = sorted.size - 1\n        while (left < right) {\n            val sum = sorted[i] + sorted[left] + sorted[right]\n            when {\n                sum < 0 -> left++\n                sum > 0 -> right--\n                else -> {\n                    result.add(listOf(sorted[i], sorted[left], sorted[right]))\n                    while (left < right && sorted[left] == sorted[left + 1]) left++\n                    while (left < right && sorted[right] == sorted[right - 1]) right--\n                    left++\n                    right--\n                }\n            }\n        }\n    }\n    return result\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "3sum-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds all triplets without checking every possible triplet directly?",
+                choices = listOf(
+                    LessonChoice(
+                        "Check every combination of three values directly, with three nested loops.",
+                        false,
+                        "This finds every triplet correctly, but three nested loops over n values costs O(n cubed) - very slow once the array has even a few thousand values.",
+                    ),
+                    LessonChoice(
+                        "Sort the array, then for each value, use two pointers on the remaining sorted portion to find pairs that sum to the negative of that value.",
+                        true,
+                        "Sorting first turns 'find two values summing to a target' into the same two-pointer trick used in Two Sum II, reducing the total work from three nested loops to one loop around a two-pointer scan.",
+                    ),
+                    LessonChoice(
+                        "For each value, build a hash set of the rest of the array and check every other value against it independently.",
+                        false,
+                        "This still effectively checks every pair for every fixed first value without using the sorted order to skip past invalid ranges, and it makes avoiding duplicate triplets much harder to manage correctly.",
                     ),
                 ),
             ),
@@ -2108,8 +2097,7 @@ object RoadmapLessons {
                         "Not every sorting algorithm sorts with zero extra memory - many need some additional space internally, even if it's much less than a full second copy of the array.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Imagine fixing one number as an 'anchor' and then asking: what pair of the remaining numbers cancels it out to zero?\n\nThat's just the Two Sum II problem in disguise - find two numbers in a sorted list that sum to a specific target, the negative of the anchor.\n\nSort the whole array once, then walk through it, treating each value in turn as the anchor and using two pointers to search the rest for a matching pair, skipping repeated values along the way to avoid reporting the same triplet twice.",
             walkthrough = listOf(
@@ -2161,28 +2149,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "container-water-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the maximum water without checking every pair of lines directly?",
-                choices = listOf(
-                    LessonChoice(
-                        "Two pointers at the outermost lines: compute the water between them, then move the shorter line inward.",
-                        true,
-                        "The width between the pointers only ever shrinks, so keeping the taller line and moving the shorter one inward is the only way a later pair could possibly hold more water than the current one.",
-                    ),
-                    LessonChoice(
-                        "Check every pair of lines directly with nested loops, computing the water each pair could hold.",
-                        false,
-                        "This finds the correct answer, but comparing every pair of lines costs O(n squared), which is far more work than necessary.",
-                    ),
-                    LessonChoice(
-                        "Sort the heights from tallest to shortest, then pair up the two tallest to hold the water.",
-                        false,
-                        "Sorting the heights destroys their original positions, and the width between two lines - which the answer directly depends on - is determined by their original indices, not by how tall they are.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "container-water-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use two pointers moving inward. Which one decides correctly which pointer to move?",
@@ -2204,6 +2170,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Keeping the shorter, limiting line in place while shrinking the width can only ever hold the same or less water than before - it can never discover a better answer than what's already been checked.",
                         code = "fun maxArea(height: IntArray): Int {\n    var left = 0\n    var right = height.size - 1\n    var best = 0\n    while (left < right) {\n        val area = minOf(height[left], height[right]) * (right - left)\n        best = maxOf(best, area)\n        if (height[left] < height[right]) right-- else left++\n    }\n    return best\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "container-water-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the maximum water without checking every pair of lines directly?",
+                choices = listOf(
+                    LessonChoice(
+                        "Two pointers at the outermost lines: compute the water between them, then move the shorter line inward.",
+                        true,
+                        "The width between the pointers only ever shrinks, so keeping the taller line and moving the shorter one inward is the only way a later pair could possibly hold more water than the current one.",
+                    ),
+                    LessonChoice(
+                        "Check every pair of lines directly with nested loops, computing the water each pair could hold.",
+                        false,
+                        "This finds the correct answer, but comparing every pair of lines costs O(n squared), which is far more work than necessary.",
+                    ),
+                    LessonChoice(
+                        "Sort the heights from tallest to shortest, then pair up the two tallest to hold the water.",
+                        false,
+                        "Sorting the heights destroys their original positions, and the width between two lines - which the answer directly depends on - is determined by their original indices, not by how tall they are.",
                     ),
                 ),
             ),
@@ -2273,8 +2261,7 @@ object RoadmapLessons {
                         "The pointers move one step at a time toward each other, not by halving the remaining range the way a binary search would.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture standing between two fences of different heights and asking how much water could pool between them - the water level can never rise above the shorter fence, or it just spills over.\n\nStart by considering the widest possible container, using the two outermost fences.\n\nSince the shorter of those two fences is what's limiting how much water fits, moving the taller fence inward could only ever make things worse - so always move the shorter one instead, hoping to find a taller replacement even though the width shrinks.",
             walkthrough = listOf(
@@ -2326,28 +2313,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "trapping-water-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach computes the trapped water without recomputing the tallest bar on each side from scratch for every position?",
-                choices = listOf(
-                    LessonChoice(
-                        "For each position, scan left to find the tallest bar so far and scan right to find the tallest bar so far, then use the smaller of the two.",
-                        false,
-                        "This is correct, but rescanning the entire array to the left and right for every single position costs O(n squared) in total.",
-                    ),
-                    LessonChoice(
-                        "Precompute, in one pass, the tallest bar to the left of each position, and in another pass, the tallest bar to the right of each position; then combine them.",
-                        true,
-                        "Building both arrays takes two linear passes, and combining them for every position is a third linear pass - three passes total, each proportional to n, is still O(n) overall.",
-                    ),
-                    LessonChoice(
-                        "Sort the bars by height and fill water starting from the tallest bar down to the shortest.",
-                        false,
-                        "Sorting the bars discards their original positions, which is exactly what determines which bars are 'to the left' or 'to the right' of a given dip - that positional relationship is essential to this problem.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "trapping-water-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three precompute left-max and right-max arrays. Which one combines them into the correct answer per position?",
@@ -2369,6 +2334,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Without carrying the maximum forward, leftMax[i] and rightMax[i] only reflect the bar at position i itself, not the tallest bar seen so far in that direction - which loses exactly the information needed to know how high a wall exists on each side.",
                         code = "fun trap(height: IntArray): Int {\n    val n = height.size\n    if (n == 0) return 0\n    val leftMax = IntArray(n)\n    val rightMax = IntArray(n)\n    for (i in 0 until n) leftMax[i] = height[i]\n    for (i in 0 until n) rightMax[i] = height[i]\n    var total = 0\n    for (i in 0 until n) {\n        total += minOf(leftMax[i], rightMax[i]) - height[i]\n    }\n    return total\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "trapping-water-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach computes the trapped water without recomputing the tallest bar on each side from scratch for every position?",
+                choices = listOf(
+                    LessonChoice(
+                        "For each position, scan left to find the tallest bar so far and scan right to find the tallest bar so far, then use the smaller of the two.",
+                        false,
+                        "This is correct, but rescanning the entire array to the left and right for every single position costs O(n squared) in total.",
+                    ),
+                    LessonChoice(
+                        "Precompute, in one pass, the tallest bar to the left of each position, and in another pass, the tallest bar to the right of each position; then combine them.",
+                        true,
+                        "Building both arrays takes two linear passes, and combining them for every position is a third linear pass - three passes total, each proportional to n, is still O(n) overall.",
+                    ),
+                    LessonChoice(
+                        "Sort the bars by height and fill water starting from the tallest bar down to the shortest.",
+                        false,
+                        "Sorting the bars discards their original positions, which is exactly what determines which bars are 'to the left' or 'to the right' of a given dip - that positional relationship is essential to this problem.",
                     ),
                 ),
             ),
@@ -2438,8 +2425,7 @@ object RoadmapLessons {
                         "Both arrays are the same length as the input array, so the extra memory used grows directly with how many bars there are.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture an elevation map after rain, and ask how deep the water sits above any one particular bar.\n\nThat depends on two walls: the tallest bar somewhere to its left, and the tallest bar somewhere to its right. Water can only rise as high as the shorter of those two walls, since it would spill over the lower side otherwise.\n\nSo the plan is: for every position, find the tallest wall to its left, find the tallest wall to its right, take the shorter of the two, and subtract the bar's own height to see how much water sits on top of it.",
             walkthrough = listOf(
@@ -2491,28 +2477,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "best-time-stock-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the maximum profit in a single pass through the prices?",
-                choices = listOf(
-                    LessonChoice(
-                        "Check every pair of a buy day and a later sell day, computing the profit for each pair.",
-                        false,
-                        "This finds the correct answer, but checking every pair of days costs O(n squared) - far more work than a single pass needs.",
-                    ),
-                    LessonChoice(
-                        "Scan forward tracking the lowest price so far, and at each day keep the best profit of selling against it.",
-                        true,
-                        "Because the buy day must come before the sell day, remembering only the lowest price seen so far - not every past price - is enough to compute the best possible profit ending on each day.",
-                    ),
-                    LessonChoice(
-                        "Sort the prices in order, then subtract the smallest value from the largest value.",
-                        false,
-                        "Sorting scrambles the order the prices actually occurred in, but the sell day must come after the buy day - the largest price might have occurred before the smallest one, which wouldn't be a valid trade.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "best-time-stock-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three track a running minimum price. Which one computes the maximum profit correctly?",
@@ -2534,6 +2498,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "That computes the profit from selling today after buying at some later, higher price, which is backwards - the buy day must come before the sell day, not after it.",
                         code = "fun maxProfit(prices: IntArray): Int {\n    var maxPrice = Int.MIN_VALUE\n    var best = 0\n    for (price in prices) {\n        best = maxOf(best, maxPrice - price)\n        maxPrice = maxOf(maxPrice, price)\n    }\n    return best\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "best-time-stock-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the maximum profit in a single pass through the prices?",
+                choices = listOf(
+                    LessonChoice(
+                        "Check every pair of a buy day and a later sell day, computing the profit for each pair.",
+                        false,
+                        "This finds the correct answer, but checking every pair of days costs O(n squared) - far more work than a single pass needs.",
+                    ),
+                    LessonChoice(
+                        "Scan forward tracking the lowest price so far, and at each day keep the best profit of selling against it.",
+                        true,
+                        "Because the buy day must come before the sell day, remembering only the lowest price seen so far - not every past price - is enough to compute the best possible profit ending on each day.",
+                    ),
+                    LessonChoice(
+                        "Sort the prices in order, then subtract the smallest value from the largest value.",
+                        false,
+                        "Sorting scrambles the order the prices actually occurred in, but the sell day must come after the buy day - the largest price might have occurred before the smallest one, which wouldn't be a valid trade.",
                     ),
                 ),
             ),
@@ -2603,8 +2589,7 @@ object RoadmapLessons {
                         "The running minimum is just a single variable updated with a simple comparison each day - no sorted structure of any kind is involved.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Imagine watching stock prices day by day, and every day asking two questions: 'If I had bought at the cheapest price I've seen so far and sold today, how much would I make?' and 'Is today's price the new cheapest I've seen?'\n\nKeep track of the answer to both questions as you go, always remembering the best profit found and the lowest price seen so far.\n\nBy the time you reach the end, you've effectively considered selling on every day against the best possible earlier buy day, without ever needing to look backward.",
             walkthrough = listOf(
@@ -2656,28 +2641,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "longest-substring-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the answer without checking every possible substring directly?",
-                choices = listOf(
-                    LessonChoice(
-                        "Check every possible substring, scanning each one to see whether it has any repeated characters.",
-                        false,
-                        "This finds the correct answer, but there are O(n squared) substrings, and checking each one for repeats can add even more work on top - far slower than necessary.",
-                    ),
-                    LessonChoice(
-                        "Slide a window across the string, growing it at the right and shrinking from the left whenever a repeat appears.",
-                        true,
-                        "This 'sliding window' technique keeps the window always free of repeats by growing and shrinking it as needed, visiting each character only a small, bounded number of times overall.",
-                    ),
-                    LessonChoice(
-                        "Sort the string's characters, then find the longest run of distinct adjacent characters.",
-                        false,
-                        "Sorting the string destroys the original order, but the problem specifically requires a substring - a run of consecutive characters in the original order, not a rearrangement.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "longest-substring-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use a sliding window with a set of characters currently inside it. Which one shrinks the window correctly on a repeat?",
@@ -2699,6 +2662,28 @@ object RoadmapLessons {
                         correct = true,
                         feedback = "Shrinking strictly from the left, one character at a time, until the specific repeated character is removed, correctly restores the 'no repeats' property while keeping as much of the window as possible.",
                         code = "fun lengthOfLongestSubstring(s: String): Int {\n    var best = 0\n    var left = 0\n    val seen = mutableSetOf<Char>()\n    for (right in s.indices) {\n        while (s[right] in seen) {\n            seen.remove(s[left])\n            left++\n        }\n        seen.add(s[right])\n        best = maxOf(best, right - left + 1)\n    }\n    return best\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "longest-substring-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the answer without checking every possible substring directly?",
+                choices = listOf(
+                    LessonChoice(
+                        "Check every possible substring, scanning each one to see whether it has any repeated characters.",
+                        false,
+                        "This finds the correct answer, but there are O(n squared) substrings, and checking each one for repeats can add even more work on top - far slower than necessary.",
+                    ),
+                    LessonChoice(
+                        "Slide a window across the string, growing it at the right and shrinking from the left whenever a repeat appears.",
+                        true,
+                        "This 'sliding window' technique keeps the window always free of repeats by growing and shrinking it as needed, visiting each character only a small, bounded number of times overall.",
+                    ),
+                    LessonChoice(
+                        "Sort the string's characters, then find the longest run of distinct adjacent characters.",
+                        false,
+                        "Sorting the string destroys the original order, but the problem specifically requires a substring - a run of consecutive characters in the original order, not a rearrangement.",
                     ),
                 ),
             ),
@@ -2771,8 +2756,7 @@ object RoadmapLessons {
                 glossary = listOf(
                     GlossaryTerm("O(min(n, alphabet size))", "Bounded by whichever is smaller: how long the input is, or how many distinct characters could ever appear."),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a window sliding across the string, always trying to grow as wide as possible while never containing a repeated character.\n\nExpand the window by moving its right edge forward, adding the new character.\n\nIf that new character is already inside the window, shrink the window from the left edge - one character at a time - until the repeat is gone, then keep expanding.\n\nThe longest the window ever gets, at any point during this process, is the answer.",
             walkthrough = listOf(
@@ -2824,28 +2808,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "longest-repeating-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the answer without trying every possible substring and replacement combination?",
-                choices = listOf(
-                    LessonChoice(
-                        "For each possible substring, count the characters differing from its most common letter and check that count is at most k.",
-                        false,
-                        "This finds the correct answer, but checking every one of the O(n squared) substrings this way is much more work than a sliding window needs.",
-                    ),
-                    LessonChoice(
-                        "Slide a window tracking letter counts; keep it valid while window length minus the top letter's count stays at most k, shrinking left otherwise.",
-                        true,
-                        "The number of characters that would need replacing in a window is exactly its length minus how many of its most common letter it already has - keeping that value at most k, using a sliding window, avoids ever re-scanning from scratch.",
-                    ),
-                    LessonChoice(
-                        "Try every possible combination of up to k character replacements directly, checking the resulting string each time.",
-                        false,
-                        "The number of ways to choose which characters to replace grows extremely quickly, making this approach impractical even for modestly sized strings.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "longest-repeating-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three track letter counts in the window and the count of the most frequent letter. Which one correctly decides when to shrink?",
@@ -2867,6 +2829,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "This produces a correct answer, but rescanning all 26 letter counts to find the current maximum on every single step adds significant extra work compared to tracking maxCount as a running value.",
                         code = "fun characterReplacement(s: String, k: Int): Int {\n    val counts = IntArray(26)\n    var left = 0\n    var best = 0\n    for (right in s.indices) {\n        counts[s[right] - 'A']++\n        val maxCount = counts.max()\n        while (right - left + 1 - maxCount > k) {\n            counts[s[left] - 'A']--\n            left++\n        }\n        best = maxOf(best, right - left + 1)\n    }\n    return best\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "longest-repeating-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the answer without trying every possible substring and replacement combination?",
+                choices = listOf(
+                    LessonChoice(
+                        "For each possible substring, count the characters differing from its most common letter and check that count is at most k.",
+                        false,
+                        "This finds the correct answer, but checking every one of the O(n squared) substrings this way is much more work than a sliding window needs.",
+                    ),
+                    LessonChoice(
+                        "Slide a window tracking letter counts; keep it valid while window length minus the top letter's count stays at most k, shrinking left otherwise.",
+                        true,
+                        "The number of characters that would need replacing in a window is exactly its length minus how many of its most common letter it already has - keeping that value at most k, using a sliding window, avoids ever re-scanning from scratch.",
+                    ),
+                    LessonChoice(
+                        "Try every possible combination of up to k character replacements directly, checking the resulting string each time.",
+                        false,
+                        "The number of ways to choose which characters to replace grows extremely quickly, making this approach impractical even for modestly sized strings.",
                     ),
                 ),
             ),
@@ -2936,8 +2920,7 @@ object RoadmapLessons {
                         "26 is a fixed constant that never grows with the size of the input, which is exactly what constant extra space means.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a window sliding across the string, and inside that window, imagine you'd replace every letter except whichever one appears most often - that's the fewest replacements needed to make the window a single repeated letter.\n\nAs the window grows, keep track of the highest count any single letter has reached inside it so far.\n\nIf the window's length minus that highest count ever exceeds k - meaning more than k characters would need replacing - shrink the window from the left until it's affordable again.",
             walkthrough = listOf(
@@ -2989,28 +2972,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "permutation-string-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach checks for a permutation without sorting every possible substring of s2?",
-                choices = listOf(
-                    LessonChoice(
-                        "For every substring of s2 matching s1's length, sort both it and s1, then compare the sorted strings.",
-                        false,
-                        "This works, but there are many such substrings, and sorting each one costs extra work per substring - much more than a fixed-size window with letter counts needs.",
-                    ),
-                    LessonChoice(
-                        "Slide a window of s1's length across s2, keeping letter counts inside it and comparing them to s1's counts each step.",
-                        true,
-                        "Because the window size never changes, sliding it one step at a time only requires removing the count of the character that just left and adding the count of the character that just entered - no resorting needed.",
-                    ),
-                    LessonChoice(
-                        "Search s2 for the exact substring s1 character for character, ignoring that a permutation reorders letters.",
-                        false,
-                        "Searching for an exact match would miss valid permutations where the letters appear in a different order, like finding 'ba' when searching literally for 'ab'.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "permutation-string-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three slide a fixed-size window comparing letter counts. Which one correctly maintains the window's size?",
@@ -3032,6 +2993,28 @@ object RoadmapLessons {
                         correct = true,
                         feedback = "Keeping the window at exactly s1's length by adding one character and removing the one that's now too far behind is what lets it 'slide' - checking the counts at each valid position for a match.",
                         code = "fun checkInclusion(s1: String, s2: String): Boolean {\n    val need = IntArray(26)\n    for (c in s1) need[c - 'a']++\n    val window = IntArray(26)\n    for (i in s2.indices) {\n        window[s2[i] - 'a']++\n        if (i >= s1.length) window[s2[i - s1.length] - 'a']--\n        if (i >= s1.length - 1 && window.contentEquals(need)) return true\n    }\n    return false\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "permutation-string-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach checks for a permutation without sorting every possible substring of s2?",
+                choices = listOf(
+                    LessonChoice(
+                        "For every substring of s2 matching s1's length, sort both it and s1, then compare the sorted strings.",
+                        false,
+                        "This works, but there are many such substrings, and sorting each one costs extra work per substring - much more than a fixed-size window with letter counts needs.",
+                    ),
+                    LessonChoice(
+                        "Slide a window of s1's length across s2, keeping letter counts inside it and comparing them to s1's counts each step.",
+                        true,
+                        "Because the window size never changes, sliding it one step at a time only requires removing the count of the character that just left and adding the count of the character that just entered - no resorting needed.",
+                    ),
+                    LessonChoice(
+                        "Search s2 for the exact substring s1 character for character, ignoring that a permutation reorders letters.",
+                        false,
+                        "Searching for an exact match would miss valid permutations where the letters appear in a different order, like finding 'ba' when searching literally for 'ab'.",
                     ),
                 ),
             ),
@@ -3101,8 +3084,7 @@ object RoadmapLessons {
                         "26 is a fixed constant that doesn't grow with the length of either string, which is exactly what constant extra space means.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture cutting out a window exactly as wide as s1 and sliding it across s2, one character at a time.\n\nAt every position, ask: does this window contain exactly the same letters, in the same quantities, as s1 - just possibly in a different order?\n\nInstead of re-counting the whole window from scratch each time it slides, just remove the count of the character that fell out the back and add the count of the character that entered the front - the window's letter counts update in constant time at every step.",
             walkthrough = listOf(
@@ -3154,28 +3136,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "min-window-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the minimum window without checking every possible substring of s directly?",
-                choices = listOf(
-                    LessonChoice(
-                        "Check every possible substring of s, verifying for each one whether it contains all of t's required characters.",
-                        false,
-                        "This finds the correct answer, but there are O(n squared) substrings to check, and verifying each one can add even more work - far slower than a sliding window needs.",
-                    ),
-                    LessonChoice(
-                        "Grow a window across s until it covers everything t needs, then shrink it from the left while still valid, keeping the shortest.",
-                        true,
-                        "Growing until the window is valid, then shrinking until it's just barely still valid, finds every 'locally shortest' window without ever re-scanning characters that have already been accounted for.",
-                    ),
-                    LessonChoice(
-                        "Sort both s and t, then scan the sorted version of s for the shortest run matching t's characters.",
-                        false,
-                        "Sorting destroys the original positions in s, but the answer must be an actual contiguous substring of s in its original order - a sorted rearrangement isn't a valid substring.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "min-window-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three grow and shrink a window while tracking how many required characters are currently satisfied. Which one shrinks at the right time?",
@@ -3197,6 +3157,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "The window is actually smallest right before it becomes invalid again - checking the best length only once, right when the window first becomes valid, misses every smaller valid window found while continuing to shrink from there.",
                         code = "fun minWindow(s: String, t: String): String {\n    if (t.isEmpty()) return \"\"\n    val need = HashMap<Char, Int>()\n    for (c in t) need[c] = (need[c] ?: 0) + 1\n    val required = need.size\n    var formed = 0\n    val windowCounts = HashMap<Char, Int>()\n    var left = 0\n    var bestLen = Int.MAX_VALUE\n    var bestLeft = 0\n    for (right in s.indices) {\n        val c = s[right]\n        windowCounts[c] = (windowCounts[c] ?: 0) + 1\n        if (need.containsKey(c) && windowCounts[c] == need[c]) formed++\n        if (formed == required && right - left + 1 < bestLen) {\n            bestLen = right - left + 1\n            bestLeft = left\n        }\n        while (formed == required) {\n            val leftChar = s[left]\n            windowCounts[leftChar] = windowCounts[leftChar]!! - 1\n            if (need.containsKey(leftChar) && windowCounts[leftChar]!! < need[leftChar]!!) formed--\n            left++\n        }\n    }\n    return if (bestLen == Int.MAX_VALUE) \"\" else s.substring(bestLeft, bestLeft + bestLen)\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "min-window-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the minimum window without checking every possible substring of s directly?",
+                choices = listOf(
+                    LessonChoice(
+                        "Check every possible substring of s, verifying for each one whether it contains all of t's required characters.",
+                        false,
+                        "This finds the correct answer, but there are O(n squared) substrings to check, and verifying each one can add even more work - far slower than a sliding window needs.",
+                    ),
+                    LessonChoice(
+                        "Grow a window across s until it covers everything t needs, then shrink it from the left while still valid, keeping the shortest.",
+                        true,
+                        "Growing until the window is valid, then shrinking until it's just barely still valid, finds every 'locally shortest' window without ever re-scanning characters that have already been accounted for.",
+                    ),
+                    LessonChoice(
+                        "Sort both s and t, then scan the sorted version of s for the shortest run matching t's characters.",
+                        false,
+                        "Sorting destroys the original positions in s, but the answer must be an actual contiguous substring of s in its original order - a sorted rearrangement isn't a valid substring.",
                     ),
                 ),
             ),
@@ -3266,8 +3248,7 @@ object RoadmapLessons {
                         "Having a fixed number of maps doesn't limit how many entries each one can hold - both maps can grow to hold one entry per distinct character seen.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture growing a window across s until it happens to contain everything t asks for - every required character, with at least the right count of each.\n\nOnce that's true, try shrinking the window from the left as much as possible while it still satisfies every requirement, checking its length at each step.\n\nThe moment shrinking further would break one of the requirements, stop, remember the shortest valid length found along the way, and go back to growing the window further to the right.",
             walkthrough = listOf(
@@ -3319,28 +3300,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "sliding-max-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds every window's maximum without rescanning all k elements for every window position?",
-                choices = listOf(
-                    LessonChoice(
-                        "For each window position, scan all k of its elements directly to find that window's maximum.",
-                        false,
-                        "This finds the correct answer, but scanning k elements for each of roughly n window positions costs O(n * k) - slow when k is large.",
-                    ),
-                    LessonChoice(
-                        "Keep a deque of indices in decreasing value order, dropping ones that leave the window and smaller back values before an add.",
-                        true,
-                        "The deque always keeps its front index pointing at the current window's maximum, and because each index is added and removed from the deque at most once overall, the total work stays linear.",
-                    ),
-                    LessonChoice(
-                        "Sort each window's k elements, then read off the maximum as the last element of the sorted list.",
-                        false,
-                        "Sorting a window of k elements costs extra work for every window position, adding unnecessary overhead when a well-maintained deque can track the maximum directly.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "sliding-max-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three maintain a deque of indices. Which one keeps it correctly ordered so the front is always the window's maximum?",
@@ -3362,6 +3321,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Keeping the deque in decreasing order isn't enough on its own - without removing a front index that has aged out of the window, the reported maximum can come from a value that's no longer actually inside the current window at all.",
                         code = "fun maxSlidingWindow(nums: IntArray, k: Int): IntArray {\n    val deque = ArrayDeque<Int>()\n    val result = mutableListOf<Int>()\n    for (i in nums.indices) {\n        while (deque.isNotEmpty() && nums[deque.last()] < nums[i]) deque.removeLast()\n        deque.addLast(i)\n        if (i >= k - 1) result.add(nums[deque.first()])\n    }\n    return result.toIntArray()\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "sliding-max-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds every window's maximum without rescanning all k elements for every window position?",
+                choices = listOf(
+                    LessonChoice(
+                        "For each window position, scan all k of its elements directly to find that window's maximum.",
+                        false,
+                        "This finds the correct answer, but scanning k elements for each of roughly n window positions costs O(n * k) - slow when k is large.",
+                    ),
+                    LessonChoice(
+                        "Keep a deque of indices in decreasing value order, dropping ones that leave the window and smaller back values before an add.",
+                        true,
+                        "The deque always keeps its front index pointing at the current window's maximum, and because each index is added and removed from the deque at most once overall, the total work stays linear.",
+                    ),
+                    LessonChoice(
+                        "Sort each window's k elements, then read off the maximum as the last element of the sorted list.",
+                        false,
+                        "Sorting a window of k elements costs extra work for every window position, adding unnecessary overhead when a well-maintained deque can track the maximum directly.",
                     ),
                 ),
             ),
@@ -3434,8 +3415,7 @@ object RoadmapLessons {
                         "Since every index in the deque must be within the current window (any index that falls outside gets removed from the front), and a window only ever spans k positions, the deque can never hold more than k indices at once.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a line of people waiting to be considered for 'tallest person currently in view,' where people leave the line once they're out of sight or once someone taller cuts in front of them.\n\nKeep a special line, the deque, of candidate indices, always in decreasing order of value, from front to back.\n\nWhenever a new value arrives, kick out anyone shorter standing at the back of the line first - they'll never be the tallest again while this new, taller person is around. Then check whether the person at the very front of the line has wandered out of the current window; if so, remove them too. Whoever's left at the front is always the current window's maximum.",
             walkthrough = listOf(
@@ -3487,28 +3467,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "valid-parens-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach checks bracket validity in a single pass through the string?",
-                choices = listOf(
-                    LessonChoice(
-                        "Repeatedly search the string for any adjacent matching pair like '()' and remove it, checking if the string becomes empty.",
-                        false,
-                        "This can work, but repeatedly searching and removing pairs can cost O(n squared) in the worst case, since each removal may require rescanning the string.",
-                    ),
-                    LessonChoice(
-                        "Push every opening bracket onto a stack; when a closing bracket appears, check whether it matches the bracket on top of the stack, popping it if so.",
-                        true,
-                        "A stack naturally remembers brackets in the order they need to be closed - the most recently opened bracket must be the next one closed, which is exactly what a stack's last-in-first-out order provides.",
-                    ),
-                    LessonChoice(
-                        "Count the number of opening and closing brackets of each type, and check whether the counts match.",
-                        false,
-                        "Matching counts alone doesn't guarantee correct nesting - '([)]' has equal counts of each bracket type but is not validly nested.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "valid-parens-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use a stack for opening brackets. Which one correctly validates a closing bracket?",
@@ -3530,6 +3488,28 @@ object RoadmapLessons {
                         correct = true,
                         feedback = "Checking both that the stack isn't empty and that the top actually matches the current closing bracket, before popping, correctly rejects both unmatched and mismatched brackets.",
                         code = "fun isValid(s: String): Boolean {\n    val stack = ArrayDeque<Char>()\n    val pairs = mapOf(')' to '(', ']' to '[', '}' to '{')\n    for (c in s) {\n        if (c in pairs) {\n            if (stack.isEmpty() || stack.removeLast() != pairs[c]) return false\n        } else {\n            stack.addLast(c)\n        }\n    }\n    return stack.isEmpty()\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "valid-parens-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach checks bracket validity in a single pass through the string?",
+                choices = listOf(
+                    LessonChoice(
+                        "Repeatedly search the string for any adjacent matching pair like '()' and remove it, checking if the string becomes empty.",
+                        false,
+                        "This can work, but repeatedly searching and removing pairs can cost O(n squared) in the worst case, since each removal may require rescanning the string.",
+                    ),
+                    LessonChoice(
+                        "Push every opening bracket onto a stack; when a closing bracket appears, check whether it matches the bracket on top of the stack, popping it if so.",
+                        true,
+                        "A stack naturally remembers brackets in the order they need to be closed - the most recently opened bracket must be the next one closed, which is exactly what a stack's last-in-first-out order provides.",
+                    ),
+                    LessonChoice(
+                        "Count the number of opening and closing brackets of each type, and check whether the counts match.",
+                        false,
+                        "Matching counts alone doesn't guarantee correct nesting - '([)]' has equal counts of each bracket type but is not validly nested.",
                     ),
                 ),
             ),
@@ -3599,8 +3579,7 @@ object RoadmapLessons {
                         "How deeply nested the brackets are isn't bounded logarithmically - a string can be nested as deeply as its length allows, letting the stack grow linearly with the input.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a stack of plates: the only plate you can take off is the one on top, and it must be the same plate you're 'expecting' based on the order they were stacked.\n\nEvery opening bracket is like placing a plate on the stack.\n\nEvery closing bracket asks: does the type of bracket on top of the stack match what I'm supposed to close? If it does, remove that plate. If it doesn't, or there's no plate left to check against, the brackets aren't properly nested.",
             walkthrough = listOf(
@@ -3652,28 +3631,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "min-stack-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach retrieves the minimum in constant time without rescanning the stack?",
-                choices = listOf(
-                    LessonChoice(
-                        "Scan the entire stack every time getMin() is called to find the smallest value.",
-                        false,
-                        "This correctly finds the minimum, but scanning the whole stack costs O(n) per call, not the constant time the problem requires.",
-                    ),
-                    LessonChoice(
-                        "Maintain a second stack that tracks the minimum value at each point, pushing a new minimum alongside every push and popping it alongside every pop.",
-                        true,
-                        "Because the second stack's top always reflects 'the minimum among everything currently on the main stack', both stacks can be pushed and popped together in constant time, keeping getMin() instant.",
-                    ),
-                    LessonChoice(
-                        "Keep a single variable holding the overall minimum ever pushed, updating it only when a smaller value is pushed.",
-                        false,
-                        "A single variable can't be un-learned when the minimum value is popped off - once that minimum is removed, there's no way to recover what the minimum was before it, without rescanning.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "min-stack-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use a second stack to track minimums. Which one keeps it correctly synchronized with the main stack?",
@@ -3695,6 +3652,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Without popping the min-stack alongside the main stack, the min-stack keeps growing forever and its top no longer reflects the minimum of only what's currently on the main stack.",
                         code = "class MinStack {\n    private val stack = ArrayDeque<Int>()\n    private val minStack = ArrayDeque<Int>()\n\n    fun push(value: Int) {\n        stack.addLast(value)\n        val currentMin = if (minStack.isEmpty()) value else minOf(value, minStack.last())\n        minStack.addLast(currentMin)\n    }\n\n    fun pop() {\n        stack.removeLast()\n    }\n\n    fun top(): Int = stack.last()\n    fun getMin(): Int = minStack.last()\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "min-stack-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach retrieves the minimum in constant time without rescanning the stack?",
+                choices = listOf(
+                    LessonChoice(
+                        "Scan the entire stack every time getMin() is called to find the smallest value.",
+                        false,
+                        "This correctly finds the minimum, but scanning the whole stack costs O(n) per call, not the constant time the problem requires.",
+                    ),
+                    LessonChoice(
+                        "Maintain a second stack that tracks the minimum value at each point, pushing a new minimum alongside every push and popping it alongside every pop.",
+                        true,
+                        "Because the second stack's top always reflects 'the minimum among everything currently on the main stack', both stacks can be pushed and popped together in constant time, keeping getMin() instant.",
+                    ),
+                    LessonChoice(
+                        "Keep a single variable holding the overall minimum ever pushed, updating it only when a smaller value is pushed.",
+                        false,
+                        "A single variable can't be un-learned when the minimum value is popped off - once that minimum is removed, there's no way to recover what the minimum was before it, without rescanning.",
                     ),
                 ),
             ),
@@ -3764,8 +3743,7 @@ object RoadmapLessons {
                         "Every push adds one entry to both stacks together, so the min-stack always has exactly as many entries as the main stack, giving it the same O(n) size.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture keeping two stacks of cards side by side, always the same height.\n\nThe first stack holds the actual values, in the order they were pushed, just like a normal stack.\n\nThe second stack holds, at every position, 'the smallest value seen so far, from the bottom up to this point' - so its very top always tells you the minimum of everything currently on the main stack, without having to look anywhere else.",
             walkthrough = listOf(
@@ -3817,28 +3795,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "rpn-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach evaluates an RPN expression in a single pass through the tokens?",
-                choices = listOf(
-                    LessonChoice(
-                        "Convert the expression back to standard infix notation with parentheses, then evaluate that using normal order-of-operations rules.",
-                        false,
-                        "Converting to infix and re-parsing it adds significant extra work when RPN can actually be evaluated directly, without ever needing parentheses or operator precedence rules.",
-                    ),
-                    LessonChoice(
-                        "Push numbers onto a stack; when an operator is seen, pop the two most recent numbers, apply the operator, and push the result back onto the stack.",
-                        true,
-                        "Because RPN places an operator immediately after the two operands it applies to, the two most recently pushed numbers are always exactly the ones that operator needs - a stack naturally provides that 'most recent first' access.",
-                    ),
-                    LessonChoice(
-                        "Scan the tokens from right to left instead of left to right, applying each operator to the next two numbers found in that direction.",
-                        false,
-                        "RPN is specifically designed to be evaluated left to right using a stack - reading it backward doesn't correctly reconstruct the intended order of operations.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "rpn-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use a stack for numbers. Which one applies operators in the correct order?",
@@ -3860,6 +3816,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Leaving the original two operands on the stack alongside the new result means the stack keeps growing with stale values instead of replacing the two operands with their combined result.",
                         code = "fun evalRPN(tokens: Array<String>): Int {\n    val stack = ArrayDeque<Int>()\n    val ops = setOf(\"+\", \"-\", \"*\", \"/\")\n    for (token in tokens) {\n        if (token in ops) {\n            val right = stack.last()\n            val left = stack[stack.size - 2]\n            val result = when (token) {\n                \"+\" -> left + right\n                \"-\" -> left - right\n                \"*\" -> left * right\n                else -> left / right\n            }\n            stack.addLast(result)\n        } else {\n            stack.addLast(token.toInt())\n        }\n    }\n    return stack.last()\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "rpn-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach evaluates an RPN expression in a single pass through the tokens?",
+                choices = listOf(
+                    LessonChoice(
+                        "Convert the expression back to standard infix notation with parentheses, then evaluate that using normal order-of-operations rules.",
+                        false,
+                        "Converting to infix and re-parsing it adds significant extra work when RPN can actually be evaluated directly, without ever needing parentheses or operator precedence rules.",
+                    ),
+                    LessonChoice(
+                        "Push numbers onto a stack; when an operator is seen, pop the two most recent numbers, apply the operator, and push the result back onto the stack.",
+                        true,
+                        "Because RPN places an operator immediately after the two operands it applies to, the two most recently pushed numbers are always exactly the ones that operator needs - a stack naturally provides that 'most recent first' access.",
+                    ),
+                    LessonChoice(
+                        "Scan the tokens from right to left instead of left to right, applying each operator to the next two numbers found in that direction.",
+                        false,
+                        "RPN is specifically designed to be evaluated left to right using a stack - reading it backward doesn't correctly reconstruct the intended order of operations.",
                     ),
                 ),
             ),
@@ -3929,8 +3907,7 @@ object RoadmapLessons {
                         "There's no notion of nesting depth limiting the stack here - the stack's size is determined directly by how many numbers get pushed before being consumed by operators, which can be close to n.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture reading the expression left to right and keeping a stack of numbers you haven't used yet.\n\nWhenever you see a number, set it down on the stack.\n\nWhenever you see an operator, it always applies to the two numbers you set down most recently - pick them up, combine them with the operator, and set the result back down as if it were a single number, ready to be used by a later operator.",
             walkthrough = listOf(
@@ -3982,28 +3959,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "generate-parens-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach avoids generating every possible arrangement of 2n parentheses and filtering out the invalid ones afterward?",
-                choices = listOf(
-                    LessonChoice(
-                        "Generate every string of n opening and n closing parentheses in any order, then check each for validity.",
-                        false,
-                        "This works, but the number of possible arrangements grows extremely quickly, and most of them are invalid - checking every one wastes a lot of work on strings that could never have been valid.",
-                    ),
-                    LessonChoice(
-                        "Build the string character by character: add an open while opens are below n, add a close only while closes trail opens.",
-                        true,
-                        "Tracking how many opening and closing parentheses have been placed so far lets the algorithm only ever build strings that could still become valid, never wasting effort on a doomed-from-the-start combination.",
-                    ),
-                    LessonChoice(
-                        "Build all combinations for n - 1 pairs first, then insert one more pair into every position of each one.",
-                        false,
-                        "This can work in principle, but carefully avoiding duplicate combinations produced by inserting a pair in different but equivalent positions is significantly trickier to get right than building directly with a count-based rule.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "generate-parens-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three build strings recursively while tracking counts of opening and closing parentheses used. Which one applies the correct rules for when each can be added?",
@@ -4025,6 +3980,28 @@ object RoadmapLessons {
                         correct = true,
                         feedback = "Requiring the count of closes to stay behind the count of opens guarantees a closing parenthesis is never added without an unmatched opening one already placed earlier in the string.",
                         code = "fun generateParenthesis(n: Int): List<String> {\n    val result = mutableListOf<String>()\n    fun backtrack(current: StringBuilder, opens: Int, closes: Int) {\n        if (current.length == 2 * n) {\n            result.add(current.toString())\n            return\n        }\n        if (opens < n) {\n            current.append('(')\n            backtrack(current, opens + 1, closes)\n            current.deleteCharAt(current.length - 1)\n        }\n        if (closes < opens) {\n            current.append(')')\n            backtrack(current, opens, closes + 1)\n            current.deleteCharAt(current.length - 1)\n        }\n    }\n    backtrack(StringBuilder(), 0, 0)\n    return result\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "generate-parens-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach avoids generating every possible arrangement of 2n parentheses and filtering out the invalid ones afterward?",
+                choices = listOf(
+                    LessonChoice(
+                        "Generate every string of n opening and n closing parentheses in any order, then check each for validity.",
+                        false,
+                        "This works, but the number of possible arrangements grows extremely quickly, and most of them are invalid - checking every one wastes a lot of work on strings that could never have been valid.",
+                    ),
+                    LessonChoice(
+                        "Build the string character by character: add an open while opens are below n, add a close only while closes trail opens.",
+                        true,
+                        "Tracking how many opening and closing parentheses have been placed so far lets the algorithm only ever build strings that could still become valid, never wasting effort on a doomed-from-the-start combination.",
+                    ),
+                    LessonChoice(
+                        "Build all combinations for n - 1 pairs first, then insert one more pair into every position of each one.",
+                        false,
+                        "This can work in principle, but carefully avoiding duplicate combinations produced by inserting a pair in different but equivalent positions is significantly trickier to get right than building directly with a count-based rule.",
                     ),
                 ),
             ),
@@ -4097,8 +4074,7 @@ object RoadmapLessons {
                         "The number of strings that could exist isn't what determines the recursion's extra space - only how deep the recursive call chain goes at any one time matters, and that depth is bounded by 2n, not by how many total combinations exist.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture building a string of parentheses one character at a time, and before adding each character, asking two simple questions: 'Have I already used all n opening parentheses?' and 'Do I have more closing parentheses placed than opening ones so far?'\n\nAn opening parenthesis can always be added as long as there's still room for one, fewer than n used.\n\nA closing parenthesis can only be added if there's an unmatched opening one already waiting for it, fewer closes than opens so far.\n\nFollowing just those two rules, and backtracking, undoing a choice and trying the other, whenever a path is explored, naturally produces only valid combinations.",
             walkthrough = listOf(
@@ -4150,28 +4126,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "daily-temps-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds every day's answer without scanning forward from each day individually?",
-                choices = listOf(
-                    LessonChoice(
-                        "For each day, scan forward through the rest of the array until a warmer temperature turns up, counting the days.",
-                        false,
-                        "This finds the correct answer, but scanning forward from every single day can cost O(n squared) in the worst case, such as when temperatures are strictly decreasing.",
-                    ),
-                    LessonChoice(
-                        "Walk the temperatures once with a stack of days still waiting; when today is warmer than the stack's top, pop it and record the gap.",
-                        true,
-                        "The stack holds exactly the days that haven't yet found their answer - each day is pushed once and popped once, when its answer is finally found, keeping the total work linear.",
-                    ),
-                    LessonChoice(
-                        "Sort the temperatures, then match each day to the nearest larger value found in the sorted order.",
-                        false,
-                        "Sorting destroys the original day-to-day order, but the answer specifically depends on how many days must pass in the original sequence - a sorted rearrangement loses that information entirely.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "daily-temps-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use a stack of day indices waiting for a warmer temperature. Which one correctly resolves them?",
@@ -4193,6 +4147,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Without the day index, there's no way to compute how many days passed between the two days - the answer specifically needs the difference in positions, not just a comparison of temperature values.",
                         code = "fun dailyTemperatures(temperatures: IntArray): IntArray {\n    val answer = IntArray(temperatures.size)\n    val stack = ArrayDeque<Int>()\n    for (i in temperatures.indices) {\n        while (stack.isNotEmpty() && temperatures[i] > stack.last()) {\n            stack.removeLast()\n        }\n        stack.addLast(temperatures[i])\n    }\n    return answer\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "daily-temps-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds every day's answer without scanning forward from each day individually?",
+                choices = listOf(
+                    LessonChoice(
+                        "For each day, scan forward through the rest of the array until a warmer temperature turns up, counting the days.",
+                        false,
+                        "This finds the correct answer, but scanning forward from every single day can cost O(n squared) in the worst case, such as when temperatures are strictly decreasing.",
+                    ),
+                    LessonChoice(
+                        "Walk the temperatures once with a stack of days still waiting; when today is warmer than the stack's top, pop it and record the gap.",
+                        true,
+                        "The stack holds exactly the days that haven't yet found their answer - each day is pushed once and popped once, when its answer is finally found, keeping the total work linear.",
+                    ),
+                    LessonChoice(
+                        "Sort the temperatures, then match each day to the nearest larger value found in the sorted order.",
+                        false,
+                        "Sorting destroys the original day-to-day order, but the answer specifically depends on how many days must pass in the original sequence - a sorted rearrangement loses that information entirely.",
                     ),
                 ),
             ),
@@ -4262,8 +4238,7 @@ object RoadmapLessons {
                         "How often temperatures happen to increase doesn't bound the stack logarithmically - in the worst case, strictly decreasing temperatures, the stack grows linearly, holding every single day at once.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a line of people waiting for someone taller to walk by.\n\nAs each new day's temperature comes in, check whether it's warmer than the temperature of whoever's been waiting longest at the back of the line, the most recently added, still-unresolved day.\n\nIf it is, that waiting day finally gets its answer: today minus that day's own index. Keep checking and resolving waiting days from the back of the line until the current temperature isn't warmer than whoever's left waiting, then add today to the back of the line to wait for its own turn.",
             walkthrough = listOf(
@@ -4315,28 +4290,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "car-fleet-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach determines the number of fleets without simulating the drive moment by moment?",
-                choices = listOf(
-                    LessonChoice(
-                        "Simulate the positions of every car at each time step until all cars reach the destination, checking which are adjacent when they arrive.",
-                        false,
-                        "This can work in principle, but simulating every moment in time is far more work than necessary, and choosing a fine enough time step to be accurate is tricky.",
-                    ),
-                    LessonChoice(
-                        "Sort cars by position (nearest the destination first), compute each solo arrival time, then scan front-to-back merging a car into the fleet ahead if it arrives no later.",
-                        true,
-                        "A car can never arrive later than the fleet directly ahead of it if its own solo arrival time is already less than or equal to that fleet's time - it will simply catch up and join, so no moment-by-moment simulation is needed.",
-                    ),
-                    LessonChoice(
-                        "Sort the cars by speed instead of by position, then group cars that travel at similar speeds into fleets.",
-                        false,
-                        "Similar speeds alone don't determine whether cars merge into a fleet - a fast car starting far behind a slow car directly ahead of it will still be blocked and forced to merge, regardless of how their speeds compare to other, unrelated cars.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "car-fleet-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three sort by position and compute solo arrival times. Which one correctly counts the fleets while scanning?",
@@ -4358,6 +4311,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "A car that would arrive sooner than the fleet ahead is exactly the case where it catches up and merges - flipping the comparison would count merging cars as new fleets and vice versa.",
                         code = "fun carFleet(target: Int, position: IntArray, speed: IntArray): Int {\n    val cars = position.indices.sortedByDescending { position[it] }\n    var fleets = 0\n    var currentArrival = 0.0\n    for (i in cars) {\n        val arrival = (target - position[i]).toDouble() / speed[i]\n        if (arrival < currentArrival) {\n            fleets++\n            currentArrival = arrival\n        }\n    }\n    return fleets\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "car-fleet-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach determines the number of fleets without simulating the drive moment by moment?",
+                choices = listOf(
+                    LessonChoice(
+                        "Simulate the positions of every car at each time step until all cars reach the destination, checking which are adjacent when they arrive.",
+                        false,
+                        "This can work in principle, but simulating every moment in time is far more work than necessary, and choosing a fine enough time step to be accurate is tricky.",
+                    ),
+                    LessonChoice(
+                        "Sort cars by position (nearest the destination first), compute each solo arrival time, then scan front-to-back merging a car into the fleet ahead if it arrives no later.",
+                        true,
+                        "A car can never arrive later than the fleet directly ahead of it if its own solo arrival time is already less than or equal to that fleet's time - it will simply catch up and join, so no moment-by-moment simulation is needed.",
+                    ),
+                    LessonChoice(
+                        "Sort the cars by speed instead of by position, then group cars that travel at similar speeds into fleets.",
+                        false,
+                        "Similar speeds alone don't determine whether cars merge into a fleet - a fast car starting far behind a slow car directly ahead of it will still be blocked and forced to merge, regardless of how their speeds compare to other, unrelated cars.",
                     ),
                 ),
             ),
@@ -4427,8 +4402,7 @@ object RoadmapLessons {
                         "Whether extra space is needed at all depends on which sorting algorithm is used, but the scan-and-merge logic that happens after sorting only ever needs a small, fixed number of variables.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture cars lined up on a single-lane road, all heading to the same finish line, where nobody's allowed to pass.\n\nWork out how long each car would take to reach the finish line if it were driving completely alone, at its own speed.\n\nThen, starting from whichever car is closest to the finish line and working backward, check each car in turn: if it would arrive at the finish line later than the car (or fleet) directly ahead of it, it forms its own new fleet. But if it would arrive at the same time or sooner, it must be catching up - it merges into the fleet ahead and effectively finishes at that fleet's slower pace instead.",
             walkthrough = listOf(
@@ -4480,28 +4454,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "histogram-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the largest rectangle without checking every possible contiguous range of bars?",
-                choices = listOf(
-                    LessonChoice(
-                        "For every pair of a start bar and an end bar, compute the area of the rectangle spanning them and keep the largest.",
-                        false,
-                        "This finds the correct answer, but there are O(n squared) such pairs, and computing the minimum height for each one can add even more work on top.",
-                    ),
-                    LessonChoice(
-                        "Keep a stack of indices with rising heights; when a shorter bar appears, pop the taller ones and size each rectangle from the current index to the new stack top.",
-                        true,
-                        "Each bar, once popped, has its largest possible rectangle computed using exactly the boundaries where it stopped being the shortest - the stack lets every bar be resolved this way with each index pushed and popped only once.",
-                    ),
-                    LessonChoice(
-                        "Sort the bars by height, then greedily combine the tallest bars together first into rectangles.",
-                        false,
-                        "Sorting destroys the original left-to-right order of the bars, but a rectangle must span contiguous bars in their original positions - a sorted rearrangement can't represent that.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "histogram-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three use a stack of indices with increasing heights. Which one computes each popped bar's rectangle correctly?",
@@ -4523,6 +4475,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "The rectangle's height must be the bar's actual height value, not its position in the array - using the index as if it were the height computes a completely unrelated number.",
                         code = "fun largestRectangleArea(heights: IntArray): Int {\n    val stack = ArrayDeque<Int>()\n    var best = 0\n    for (i in heights.indices) {\n        while (stack.isNotEmpty() && heights[i] < heights[stack.last()]) {\n            val poppedIndex = stack.removeLast()\n            val width = if (stack.isEmpty()) i else i - stack.last() - 1\n            best = maxOf(best, poppedIndex * width)\n        }\n        stack.addLast(i)\n    }\n    while (stack.isNotEmpty()) {\n        val poppedIndex = stack.removeLast()\n        val width = if (stack.isEmpty()) heights.size else heights.size - stack.last() - 1\n        best = maxOf(best, poppedIndex * width)\n    }\n    return best\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "histogram-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the largest rectangle without checking every possible contiguous range of bars?",
+                choices = listOf(
+                    LessonChoice(
+                        "For every pair of a start bar and an end bar, compute the area of the rectangle spanning them and keep the largest.",
+                        false,
+                        "This finds the correct answer, but there are O(n squared) such pairs, and computing the minimum height for each one can add even more work on top.",
+                    ),
+                    LessonChoice(
+                        "Keep a stack of indices with rising heights; when a shorter bar appears, pop the taller ones and size each rectangle from the current index to the new stack top.",
+                        true,
+                        "Each bar, once popped, has its largest possible rectangle computed using exactly the boundaries where it stopped being the shortest - the stack lets every bar be resolved this way with each index pushed and popped only once.",
+                    ),
+                    LessonChoice(
+                        "Sort the bars by height, then greedily combine the tallest bars together first into rectangles.",
+                        false,
+                        "Sorting destroys the original left-to-right order of the bars, but a rectangle must span contiguous bars in their original positions - a sorted rearrangement can't represent that.",
                     ),
                 ),
             ),
@@ -4592,8 +4566,7 @@ object RoadmapLessons {
                         "There's no logarithmic bound here - in the worst case, strictly increasing heights, the stack's size grows linearly with the number of bars, all the way up to n.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture each bar in the histogram asking: 'How wide could a rectangle at my height stretch, using me as its limiting, shortest, bar?'\n\nA bar's rectangle can extend left until it hits a bar shorter than itself, and right until it hits a bar shorter than itself - anywhere in between, this bar is tall enough to support a rectangle of its own height.\n\nA stack of increasing heights tracks exactly this: when a shorter bar finally appears, every taller bar sitting on the stack has just found its right boundary, and whatever's left below it on the stack is its left boundary, so its rectangle's width and area can be computed right then.",
             walkthrough = listOf(
@@ -4644,28 +4617,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "binary-search-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the target in logarithmic time by taking advantage of the array being sorted?",
-                choices = listOf(
-                    LessonChoice(
-                        "Scan the array from left to right, comparing each value to the target until a match is found or the array ends.",
-                        false,
-                        "This works on any array, sorted or not, but it doesn't take advantage of the sorted order at all, so it still costs linear time in the worst case.",
-                    ),
-                    LessonChoice(
-                        "Repeatedly check the middle element of the remaining range; if it's too small, discard the left half, and if it's too large, discard the right half.",
-                        true,
-                        "Because the array is sorted, comparing the middle value to the target tells you which entire half can be safely thrown away, cutting the remaining range roughly in half every step.",
-                    ),
-                    LessonChoice(
-                        "Split the array into fixed-size blocks and scan each block's first element to decide which block might contain the target.",
-                        false,
-                        "Scanning block boundaries still leaves a linear number of blocks to check in the worst case, rather than repeatedly halving the search space the way a true binary search does.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "binary-search-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three maintain low and high pointers and compute a middle index. Which one correctly narrows the range on every comparison?",
@@ -4687,6 +4638,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "This swaps which direction each comparison moves the pointers, so the search space shrinks toward the wrong end of the array and never actually converges on the target.",
                         code = "fun search(nums: IntArray, target: Int): Int {\n    var low = 0\n    var high = nums.size - 1\n    while (low <= high) {\n        val mid = low + (high - low) / 2\n        when {\n            nums[mid] < target -> high = mid - 1\n            nums[mid] > target -> low = mid + 1\n            else -> return mid\n        }\n    }\n    return -1\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "binary-search-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the target in logarithmic time by taking advantage of the array being sorted?",
+                choices = listOf(
+                    LessonChoice(
+                        "Scan the array from left to right, comparing each value to the target until a match is found or the array ends.",
+                        false,
+                        "This works on any array, sorted or not, but it doesn't take advantage of the sorted order at all, so it still costs linear time in the worst case.",
+                    ),
+                    LessonChoice(
+                        "Repeatedly check the middle element of the remaining range; if it's too small, discard the left half, and if it's too large, discard the right half.",
+                        true,
+                        "Because the array is sorted, comparing the middle value to the target tells you which entire half can be safely thrown away, cutting the remaining range roughly in half every step.",
+                    ),
+                    LessonChoice(
+                        "Split the array into fixed-size blocks and scan each block's first element to decide which block might contain the target.",
+                        false,
+                        "Scanning block boundaries still leaves a linear number of blocks to check in the worst case, rather than repeatedly halving the search space the way a true binary search does.",
                     ),
                 ),
             ),
@@ -4756,8 +4729,7 @@ object RoadmapLessons {
                         "The input array is typically not counted as extra space since it already exists before the function runs - what matters is space the algorithm itself allocates beyond the input.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture looking up a word in a paper dictionary.\n\nYou don't start at the first page and read every entry - you open to the middle, see whether your word comes before or after that page, and throw away the half you now know it can't be in.\n\nRepeating that on the remaining half, and the half after that, narrows things down astonishingly fast, because the amount left to search keeps cutting in half.",
             walkthrough = listOf(
@@ -4806,28 +4778,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "matrix-search-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach searches the matrix in logarithmic time by treating it as one long sorted sequence?",
-                choices = listOf(
-                    LessonChoice(
-                        "First binary search the first column to find which row could contain the target, then binary search across that row separately.",
-                        false,
-                        "This can work, but it performs two separate binary searches rather than treating the whole matrix as one sorted sequence, which is a bit more bookkeeping than necessary.",
-                    ),
-                    LessonChoice(
-                        "Treat the matrix as a single sorted array of length rows times columns, and binary search it directly by converting each middle index into a row and column.",
-                        true,
-                        "Because each row continues exactly where the previous one left off, the entire matrix behaves like one flat sorted array - a single binary search over that virtual array finds the target directly.",
-                    ),
-                    LessonChoice(
-                        "Scan every row from top to bottom, and within each row, scan left to right until the target is found or ruled out.",
-                        false,
-                        "This checks every cell in the worst case, which is linear in the total number of cells and ignores the sorted structure that lets far fewer cells be examined.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "matrix-search-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three binary search over a flattened index space of size rows * cols. Which one correctly converts the flat index back into a row and column?",
@@ -4849,6 +4799,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Using the same computed value for both the row and column ignores the position within the row entirely, so most cells are never actually reachable by any mid value.",
                         code = "fun searchMatrix(matrix: Array<IntArray>, target: Int): Boolean {\n    val rows = matrix.size\n    val cols = matrix[0].size\n    var low = 0\n    var high = rows * cols - 1\n    while (low <= high) {\n        val mid = low + (high - low) / 2\n        val r = mid / cols\n        val value = matrix[r][r]\n        when {\n            value < target -> low = mid + 1\n            value > target -> high = mid - 1\n            else -> return true\n        }\n    }\n    return false\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "matrix-search-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach searches the matrix in logarithmic time by treating it as one long sorted sequence?",
+                choices = listOf(
+                    LessonChoice(
+                        "First binary search the first column to find which row could contain the target, then binary search across that row separately.",
+                        false,
+                        "This can work, but it performs two separate binary searches rather than treating the whole matrix as one sorted sequence, which is a bit more bookkeeping than necessary.",
+                    ),
+                    LessonChoice(
+                        "Treat the matrix as a single sorted array of length rows times columns, and binary search it directly by converting each middle index into a row and column.",
+                        true,
+                        "Because each row continues exactly where the previous one left off, the entire matrix behaves like one flat sorted array - a single binary search over that virtual array finds the target directly.",
+                    ),
+                    LessonChoice(
+                        "Scan every row from top to bottom, and within each row, scan left to right until the target is found or ruled out.",
+                        false,
+                        "This checks every cell in the worst case, which is linear in the total number of cells and ignores the sorted structure that lets far fewer cells be examined.",
                     ),
                 ),
             ),
@@ -4918,8 +4890,7 @@ object RoadmapLessons {
                         "The number of comparisons the loop performs affects how long it runs, not how much memory it uses at any one time - each comparison reuses the same few variables.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture unrolling the matrix row by row into one long line of numbers, left to right, top to bottom.\n\nBecause each row picks up exactly where the previous one left off, that unrolled line is fully sorted from start to finish.\n\nRather than physically building that line, a middle index into the imagined line can be converted back into a row and column with simple division and remainder - so an ordinary binary search still works, just with one extra translation step per comparison.",
             walkthrough = listOf(
@@ -4970,28 +4941,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "koko-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the minimum working speed without individually testing every speed starting from 1?",
-                choices = listOf(
-                    LessonChoice(
-                        "Start at speed 1 and increase it by 1 each time, checking after every increase whether that speed finishes within h hours, stopping at the first speed that works.",
-                        false,
-                        "This eventually finds the right answer, but checking every single speed one at a time from 1 upward can take as many steps as the largest pile size, which is far more work than necessary.",
-                    ),
-                    LessonChoice(
-                        "Binary search over possible speeds from 1 to the largest pile size, checking at each candidate speed whether all piles finish within h hours, and narrowing toward the smallest speed that works.",
-                        true,
-                        "As speed increases, the hours needed to finish never increases - that consistent, one-directional relationship between speed and total hours is exactly what makes binary searching over candidate speeds valid.",
-                    ),
-                    LessonChoice(
-                        "Sort the piles from largest to smallest and eat the largest pile first every hour, adjusting speed only when a pile is fully finished.",
-                        false,
-                        "The order in which piles are eaten doesn't change how many hours a given fixed speed takes overall, since each pile's hours depend only on its own size and the chosen speed, not on eating order.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "koko-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three binary search over candidate speeds and check feasibility with a helper. Which one correctly computes the hours needed for a given speed?",
@@ -5013,6 +4962,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "This divides speed by pile size instead of pile size by speed, inverting the relationship entirely - the hours a pile takes should shrink as speed grows, not the other way around.",
                         code = "fun minEatingSpeed(piles: IntArray, h: Int): Int {\n    fun hoursNeeded(speed: Int): Long {\n        var hours = 0L\n        for (pile in piles) hours += (speed + pile - 1) / pile\n        return hours\n    }\n    var low = 1\n    var high = piles.max()\n    while (low < high) {\n        val mid = low + (high - low) / 2\n        if (hoursNeeded(mid) <= h) high = mid else low = mid + 1\n    }\n    return low\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "koko-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the minimum working speed without individually testing every speed starting from 1?",
+                choices = listOf(
+                    LessonChoice(
+                        "Start at speed 1 and increase it by 1 each time, checking after every increase whether that speed finishes within h hours, stopping at the first speed that works.",
+                        false,
+                        "This eventually finds the right answer, but checking every single speed one at a time from 1 upward can take as many steps as the largest pile size, which is far more work than necessary.",
+                    ),
+                    LessonChoice(
+                        "Binary search over possible speeds from 1 to the largest pile size, checking at each candidate speed whether all piles finish within h hours, and narrowing toward the smallest speed that works.",
+                        true,
+                        "As speed increases, the hours needed to finish never increases - that consistent, one-directional relationship between speed and total hours is exactly what makes binary searching over candidate speeds valid.",
+                    ),
+                    LessonChoice(
+                        "Sort the piles from largest to smallest and eat the largest pile first every hour, adjusting speed only when a pile is fully finished.",
+                        false,
+                        "The order in which piles are eaten doesn't change how many hours a given fixed speed takes overall, since each pile's hours depend only on its own size and the chosen speed, not on eating order.",
                     ),
                 ),
             ),
@@ -5082,8 +5053,7 @@ object RoadmapLessons {
                         "Checking feasibility for a candidate speed only needs a running total updated pile by pile, and the binary search over speeds only needs its own low and high bounds - nothing scales with input size.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture guessing a speed and asking a simple yes-or-no question: 'At this speed, does Koko finish every pile within h hours?'\n\nA faster speed can only ever finish in the same amount of time or less, never more - so as speed increases, the answer to that question can only ever flip from no to yes, never back again.\n\nThat one-directional flip is exactly what makes it safe to binary search over candidate speeds instead of trying each one individually, homing in on the smallest speed where the answer first becomes yes.",
             walkthrough = listOf(
@@ -5134,28 +5104,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "rotated-min-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the minimum in logarithmic time by using the structure left over from the rotation?",
-                choices = listOf(
-                    LessonChoice(
-                        "Scan the whole array once, tracking the smallest value seen, and return it after checking every element.",
-                        false,
-                        "This correctly finds the minimum, but scanning every element takes linear time and completely ignores the fact that most of the array is still sorted in two pieces.",
-                    ),
-                    LessonChoice(
-                        "Binary search comparing the middle to the rightmost element: if middle is larger the minimum is to its right, else at or left of it.",
-                        true,
-                        "Comparing the middle to the right edge reveals which half is the untouched, still-sorted portion and which half contains the rotation point where the minimum hides, letting half the array be discarded each step.",
-                    ),
-                    LessonChoice(
-                        "Binary search for the one value that is smaller than the element immediately before it in index order.",
-                        false,
-                        "This describes what makes the minimum special once found, but it isn't itself a comparison that can be evaluated at a single middle index during the search - it doesn't give a rule for which half to discard.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "rotated-min-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three binary search with low and high pointers, comparing the middle to an edge. Which one correctly narrows toward the minimum?",
@@ -5177,6 +5125,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "This applies the correct comparison but moves the pointers in the opposite direction from what it should, discarding the half that actually contains the minimum instead of the half that can't.",
                         code = "fun findMin(nums: IntArray): Int {\n    var low = 0\n    var high = nums.size - 1\n    while (low < high) {\n        val mid = low + (high - low) / 2\n        if (nums[mid] > nums[high]) high = mid else low = mid + 1\n    }\n    return nums[low]\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "rotated-min-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the minimum in logarithmic time by using the structure left over from the rotation?",
+                choices = listOf(
+                    LessonChoice(
+                        "Scan the whole array once, tracking the smallest value seen, and return it after checking every element.",
+                        false,
+                        "This correctly finds the minimum, but scanning every element takes linear time and completely ignores the fact that most of the array is still sorted in two pieces.",
+                    ),
+                    LessonChoice(
+                        "Binary search comparing the middle to the rightmost element: if middle is larger the minimum is to its right, else at or left of it.",
+                        true,
+                        "Comparing the middle to the right edge reveals which half is the untouched, still-sorted portion and which half contains the rotation point where the minimum hides, letting half the array be discarded each step.",
+                    ),
+                    LessonChoice(
+                        "Binary search for the one value that is smaller than the element immediately before it in index order.",
+                        false,
+                        "This describes what makes the minimum special once found, but it isn't itself a comparison that can be evaluated at a single middle index during the search - it doesn't give a rule for which half to discard.",
                     ),
                 ),
             ),
@@ -5246,8 +5216,7 @@ object RoadmapLessons {
                         "Nothing about this approach reconstructs the original unrotated array - the minimum is located directly within the rotated array using comparisons alone.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture the array as two sorted runs stitched together at the rotation point, where a big value is immediately followed by a much smaller one.\n\nComparing the middle element to the rightmost element reveals which side of the rotation point mid sits on: if mid is bigger than the rightmost value, mid is still in the first, larger run, and the rotation point, along with the minimum, must be further right.\n\nOtherwise, mid is already at or past the rotation point, so the minimum is at mid or somewhere to its left - either way, half the array can always be safely dropped.",
             walkthrough = listOf(
@@ -5297,28 +5266,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "rotated-search-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach searches the rotated array in logarithmic time despite it not being fully sorted?",
-                choices = listOf(
-                    LessonChoice(
-                        "First binary search to find the rotation point, then run a second, ordinary binary search on whichever of the two resulting sorted halves could contain the target.",
-                        false,
-                        "This can work and still runs in logarithmic time, but it requires two separate binary searches, one to locate the pivot and one to search - more steps than are actually necessary.",
-                    ),
-                    LessonChoice(
-                        "At each step, determine which half of the current range, left of mid or right of mid, is currently sorted, then check whether the target falls within that sorted half's value range to decide which half to keep.",
-                        true,
-                        "Even though the whole array isn't sorted, at least one half of any given range always is - checking whether the target's value falls inside that sorted half's range gives a reliable rule for which half to keep on every single step.",
-                    ),
-                    LessonChoice(
-                        "Un-rotate the array back into fully sorted order first, then binary search it normally.",
-                        false,
-                        "Physically rebuilding the original sorted order takes linear time and linear extra space, which defeats the purpose of trying to search in logarithmic time in the first place.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "rotated-search-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three check which half is sorted, then decide whether to search there. Which one applies the correct rule?",
@@ -5340,6 +5287,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Without first checking which half is actually sorted, applying the left-half rule to a range where the right half is the sorted one uses comparisons that no longer mean what they're assumed to mean.",
                         code = "fun search(nums: IntArray, target: Int): Int {\n    var low = 0\n    var high = nums.size - 1\n    while (low <= high) {\n        val mid = low + (high - low) / 2\n        if (nums[mid] == target) return mid\n        if (nums[low] <= target && target < nums[mid]) high = mid - 1 else low = mid + 1\n    }\n    return -1\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "rotated-search-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach searches the rotated array in logarithmic time despite it not being fully sorted?",
+                choices = listOf(
+                    LessonChoice(
+                        "First binary search to find the rotation point, then run a second, ordinary binary search on whichever of the two resulting sorted halves could contain the target.",
+                        false,
+                        "This can work and still runs in logarithmic time, but it requires two separate binary searches, one to locate the pivot and one to search - more steps than are actually necessary.",
+                    ),
+                    LessonChoice(
+                        "At each step, determine which half of the current range, left of mid or right of mid, is currently sorted, then check whether the target falls within that sorted half's value range to decide which half to keep.",
+                        true,
+                        "Even though the whole array isn't sorted, at least one half of any given range always is - checking whether the target's value falls inside that sorted half's range gives a reliable rule for which half to keep on every single step.",
+                    ),
+                    LessonChoice(
+                        "Un-rotate the array back into fully sorted order first, then binary search it normally.",
+                        false,
+                        "Physically rebuilding the original sorted order takes linear time and linear extra space, which defeats the purpose of trying to search in logarithmic time in the first place.",
                     ),
                 ),
             ),
@@ -5409,8 +5378,7 @@ object RoadmapLessons {
                         "Determining which half is sorted and whether the target falls in it only requires comparing existing array values at a few indices - nothing is copied or allocated proportional to the array's size.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture a normal binary search, but with one extra question added at each step: 'which half of my current range is actually sorted right now?'\n\nBecause the rotation only creates a single break point, at least one of the two halves around any mid is always fully sorted, even if the other one isn't.\n\nOnce it's clear which half is sorted, a simple range check, is the target between that sorted half's own smallest and largest values, decides whether to search there or move to the other half instead.",
             walkthrough = listOf(
@@ -5461,28 +5429,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "timemap-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach answers a get query in logarithmic time rather than scanning every stored value for a key?",
-                choices = listOf(
-                    LessonChoice(
-                        "For each key, store its (timestamp, value) pairs in a list in the order they were set, and for get, scan the list from the end backward until a timestamp at or before the query is found.",
-                        false,
-                        "Because timestamps are set in strictly increasing order, this scan does find the right answer, but in the worst case it still checks every stored pair for that key, costing linear time per query.",
-                    ),
-                    LessonChoice(
-                        "For each key, store its (timestamp, value) pairs in a list in increasing timestamp order, and for get, binary search that list for the largest timestamp not exceeding the query.",
-                        true,
-                        "Since set calls for a key always use strictly increasing timestamps, the list for that key is automatically sorted by timestamp, so binary search can directly find the right boundary without scanning.",
-                    ),
-                    LessonChoice(
-                        "Store every (key, timestamp, value) triple in one single sorted list across all keys, and for get, binary search the whole combined list.",
-                        false,
-                        "Mixing every key's entries into one shared list means a query for one key would need extra work to skip past entries belonging to other keys, undermining a clean binary search over just that key's own history.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "timemap-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three binary search a key's timestamp list for the largest timestamp not exceeding the query. Which one correctly narrows toward it?",
@@ -5504,6 +5450,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Moving high down after a qualifying timestamp is found searches further left for a smaller qualifying timestamp instead of a larger one, converging on the earliest match instead of the most recent one at or before the query.",
                         code = "class TimeMap {\n    private val store = HashMap<String, MutableList<Pair<Int, String>>>()\n    fun set(key: String, value: String, timestamp: Int) {\n        store.getOrPut(key) { mutableListOf() }.add(timestamp to value)\n    }\n    fun get(key: String, timestamp: Int): String {\n        val entries = store[key] ?: return \"\"\n        var low = 0\n        var high = entries.size - 1\n        var result = \"\"\n        while (low <= high) {\n            val mid = low + (high - low) / 2\n            if (entries[mid].first <= timestamp) {\n                result = entries[mid].second\n                high = mid - 1\n            } else {\n                low = mid + 1\n            }\n        }\n        return result\n    }\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "timemap-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach answers a get query in logarithmic time rather than scanning every stored value for a key?",
+                choices = listOf(
+                    LessonChoice(
+                        "For each key, store its (timestamp, value) pairs in a list in the order they were set, and for get, scan the list from the end backward until a timestamp at or before the query is found.",
+                        false,
+                        "Because timestamps are set in strictly increasing order, this scan does find the right answer, but in the worst case it still checks every stored pair for that key, costing linear time per query.",
+                    ),
+                    LessonChoice(
+                        "For each key, store its (timestamp, value) pairs in a list in increasing timestamp order, and for get, binary search that list for the largest timestamp not exceeding the query.",
+                        true,
+                        "Since set calls for a key always use strictly increasing timestamps, the list for that key is automatically sorted by timestamp, so binary search can directly find the right boundary without scanning.",
+                    ),
+                    LessonChoice(
+                        "Store every (key, timestamp, value) triple in one single sorted list across all keys, and for get, binary search the whole combined list.",
+                        false,
+                        "Mixing every key's entries into one shared list means a query for one key would need extra work to skip past entries belonging to other keys, undermining a clean binary search over just that key's own history.",
                     ),
                 ),
             ),
@@ -5573,8 +5541,7 @@ object RoadmapLessons {
                         "Nothing set is ever discarded, since any past timestamp could still be the right answer for some future query, so the total space used grows directly with the number of set calls made.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture keeping a separate notebook page for each key, and on that page, writing down every value along with the timestamp it was set at, always at the bottom, since timestamps only increase.\n\nBecause the page is filled in strictly increasing timestamp order, it's automatically sorted by the time it's needed - answering 'what was the value at or before time t' becomes the same kind of question binary search already knows how to answer on any sorted list.\n\nThe search hunts for the rightmost entry whose timestamp doesn't exceed the query, remembering the best candidate found so far while still checking further right for an even better one.",
             walkthrough = listOf(
@@ -5624,28 +5591,6 @@ object RoadmapLessons {
         ),
         questions = listOf(
             LessonQuestion(
-                id = "median-approach",
-                kind = LessonQuestionKind.APPROACH,
-                prompt = "Which approach finds the median without merging the two arrays into one combined sorted array?",
-                choices = listOf(
-                    LessonChoice(
-                        "Merge both arrays into one sorted array with a standard merge step, then read off the middle value or values.",
-                        false,
-                        "This correctly finds the median, but merging both arrays takes time proportional to their combined size, which is more work than the problem's logarithmic-time goal requires.",
-                    ),
-                    LessonChoice(
-                        "Binary search the count to take from the smaller array's left side; the larger array's count follows, giving an even split with every left value at most every right value.",
-                        true,
-                        "Once a partition point in the smaller array is fixed, the required partition point in the larger array follows directly from the total counts needed on each side - binary searching that one partition point is enough to find where left and right meet correctly.",
-                    ),
-                    LessonChoice(
-                        "Binary search each array on its own for its individual median, then average those two medians together.",
-                        false,
-                        "The overall median of the combined set isn't simply the average of each array's own median - that ignores how the two arrays' values interleave with each other once combined.",
-                    ),
-                ),
-            ),
-            LessonQuestion(
                 id = "median-implementation",
                 kind = LessonQuestionKind.CODE_BLOCK,
                 prompt = "All three binary search a partition point in the smaller array. Which one correctly checks whether a partition is valid?",
@@ -5667,6 +5612,28 @@ object RoadmapLessons {
                         correct = false,
                         feedback = "Matching partition sizes alone doesn't guarantee every left value is no greater than every right value - the actual boundary values must be compared, or the partition could split the arrays at the wrong point entirely.",
                         code = "fun findMedianSortedArrays(nums1: IntArray, nums2: IntArray): Double {\n    val (a, b) = if (nums1.size <= nums2.size) nums1 to nums2 else nums2 to nums1\n    var low = 0\n    var high = a.size\n    val half = (a.size + b.size + 1) / 2\n    while (low <= high) {\n        val cutA = (low + high) / 2\n        val cutB = half - cutA\n        val leftA = if (cutA == 0) Int.MIN_VALUE else a[cutA - 1]\n        val rightA = if (cutA == a.size) Int.MAX_VALUE else a[cutA]\n        val leftB = if (cutB == 0) Int.MIN_VALUE else b[cutB - 1]\n        val rightB = if (cutB == b.size) Int.MAX_VALUE else b[cutB]\n        if (cutA + cutB == half) {\n            return if ((a.size + b.size) % 2 == 0) (maxOf(leftA, leftB) + minOf(rightA, rightB)) / 2.0\n            else maxOf(leftA, leftB).toDouble()\n        } else if (cutA < half - cutB) low = cutA + 1 else high = cutA - 1\n    }\n    return 0.0\n}",
+                    ),
+                ),
+            ),
+            LessonQuestion(
+                id = "median-approach",
+                kind = LessonQuestionKind.APPROACH,
+                prompt = "Which approach finds the median without merging the two arrays into one combined sorted array?",
+                choices = listOf(
+                    LessonChoice(
+                        "Merge both arrays into one sorted array with a standard merge step, then read off the middle value or values.",
+                        false,
+                        "This correctly finds the median, but merging both arrays takes time proportional to their combined size, which is more work than the problem's logarithmic-time goal requires.",
+                    ),
+                    LessonChoice(
+                        "Binary search the count to take from the smaller array's left side; the larger array's count follows, giving an even split with every left value at most every right value.",
+                        true,
+                        "Once a partition point in the smaller array is fixed, the required partition point in the larger array follows directly from the total counts needed on each side - binary searching that one partition point is enough to find where left and right meet correctly.",
+                    ),
+                    LessonChoice(
+                        "Binary search each array on its own for its individual median, then average those two medians together.",
+                        false,
+                        "The overall median of the combined set isn't simply the average of each array's own median - that ignores how the two arrays' values interleave with each other once combined.",
                     ),
                 ),
             ),
@@ -5736,8 +5703,7 @@ object RoadmapLessons {
                         "How many iterations the binary search performs determines its running time, not how much memory it uses at any single point - each iteration reuses the same few tracked variables.",
                     ),
                 ),
-            ),
-        ),
+            )),
         explanation = CompleteExplanation(
             intuition = "Picture drawing a single vertical line through both arrays at once, splitting the combined set of all values into a left group and a right group of equal, or nearly equal, size.\n\nIf that line is drawn in exactly the right place, every value in the left group is no greater than every value in the right group - and once that's true, the median is either the largest value on the left, or the average of the largest on the left and smallest on the right, depending on whether the total count is odd or even.\n\nRather than trying every possible line position, binary searching for where to cut the smaller array is enough, since the cut point in the larger array is then completely determined by how many elements are needed on the left overall.",
             walkthrough = listOf(
